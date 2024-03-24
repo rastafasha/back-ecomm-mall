@@ -12,6 +12,7 @@ var ProductoSchema = Schema({
     info_short: { type: String, required: true },
     detalle: { type: String, required: true },
     stock: { type: Number, required: true },
+    local: { type: Schema.ObjectId, ref: 'local' },
     categoria: { type: Schema.ObjectId, ref: 'categoria' },
     subcategoria: { type: String, required: false },
     marca: { type: Schema.ObjectId, ref: 'marca' },

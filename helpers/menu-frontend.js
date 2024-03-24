@@ -30,7 +30,7 @@ const getMenuFrontEnd = (role = 'USER') => {
     // }];
 
     if (role === 'ADMIN') {
-        menu[1].submenu.unshift({ titulo: 'Usuarios', url: 'usuarios' });
+        menu[1].submenu.unshift({ titulo: 'Usuarios', url: 'dashboard/usuarios' });
     }
 
     return menu;

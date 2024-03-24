@@ -29,11 +29,82 @@ const getUsuarios = async(req, res) => {
 
 const getAllUsers = async(req, res) => {
 
-    const usuarios = await Usuario.find().populate('first_name email role google img');
+    const allusuarios = await Usuario.find().populate('first_name email role google img');
 
     res.json({
         ok: true,
-        usuarios
+        allusuarios
+    });
+};
+
+const getTEmployees = async(req, res) => {
+
+    const desde = Number(req.query.desde) || 0;
+
+    const employees = await Usuario.find()
+    .where('role')
+    .equals('ADMIN' )
+    .skip(desde)
+    .limit(5)
+    .sort('-createdAt');
+    Usuario.countDocuments()
+
+    res.json({
+        ok: true,
+        employees
+    });
+};
+const getTClients = async(req, res) => {
+
+    const desde = Number(req.query.desde) || 0;
+
+    const clients = await Usuario.find()
+    .where('role')
+    .equals('USER' )
+    .skip(desde)
+    .limit(5)
+    .sort('-createdAt');
+    Usuario.countDocuments()
+
+    res.json({
+        ok: true,
+        clients
+    });
+};
+
+const getTiendaUsers = async(req, res) => {
+
+    const desde = Number(req.query.desde) || 0;
+
+    const tiendausers = await Usuario.find()
+    .where('role')
+    .equals('TIENDA' )
+    .skip(desde)
+    .limit(5)
+    .sort('-createdAt');
+    Usuario.countDocuments()
+
+    res.json({
+        ok: true,
+        tiendausers
+    });
+};
+
+const getAlmacenUsers = async(req, res) => {
+
+    const desde = Number(req.query.desde) || 0;
+
+    const almacenusers = await Usuario.find()
+    .where('role')
+    .equals('ALMACEN' )
+    .skip(desde)
+    .limit(5)
+    .sort('-createdAt');
+    Usuario.countDocuments()
+
+    res.json({
+        ok: true,
+        almacenusers
     });
 };
 
@@ -87,7 +158,8 @@ const crearUsuarios = async(req, res = response) => {
             first_name: body.first_name,
             last_name: body.last_name,
             telefono: body.telefono,
-            pais: body.pais,
+            local: body.local,
+            // pais: body.pais,
             numdoc: body.numdoc,
             email: body.email,
             role: body.role,
@@ -361,5 +433,9 @@ module.exports = {
     getAllUsers,
     set_token_recovery,
     verify_token_recovery,
-    change_password
+    change_password,
+    getTiendaUsers,
+    getAlmacenUsers,
+    getTEmployees,
+    getTClients
 };

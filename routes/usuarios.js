@@ -15,7 +15,11 @@ const {
     getAllUsers,
     set_token_recovery,
     verify_token_recovery,
-    change_password
+    change_password,
+    getTiendaUsers,
+    getAlmacenUsers,
+    getTEmployees,
+    getTClients
 } = require('../controllers/usuarios');
 const {
     validarJWT,
@@ -27,6 +31,10 @@ const {
 
 router.get('/', validarJWT, getUsuarios);
 router.get('/all/', validarJWT, getAllUsers);
+router.get('/users_store/', validarJWT, getTiendaUsers);
+router.get('/users_almacen/', validarJWT, getAlmacenUsers);
+router.get('/employees/', validarJWT, getTEmployees);
+router.get('/clients/', validarJWT, getTClients);
 
 router.get('/user_token/set/:email', set_token_recovery);
 router.get('/user_verify/token/:email/:codigo', verify_token_recovery);
@@ -48,7 +56,15 @@ router.put('/:id', [
     validarCampos
 ], actualizarUsuario);
 
-router.put('/:id', [
+router.put('/update/:id', [
+    validarJWT,
+    check('first_name', 'el nombre es obligatorio').not().isEmpty(),
+    check('email', 'el email es obligatorio').isEmail(),
+    check('role', 'el role es obligatorio').not().isEmpty(),
+    validarCampos
+], actualizarUsuario);
+
+router.put('/admin_update/:id', [
     validarJWT,
     validarAdminRole,
     validarAdminRoleOMismoUsuario,
