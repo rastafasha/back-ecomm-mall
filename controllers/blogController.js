@@ -6,7 +6,9 @@ const fs = require('fs');
 
 const getBlogs = async(req, res) => {
 
-    const blogs = await Blog.find().populate('titulo img categoria');
+    const blogs = await Blog.find()
+    .sort({ createdAt: -1 })
+    .populate('titulo img categoria');
 
     res.json({
         ok: true,

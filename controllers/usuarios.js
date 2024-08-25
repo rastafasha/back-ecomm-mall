@@ -13,6 +13,7 @@ const getUsuarios = async(req, res) => {
         Usuario
         .find({}, 'first_name email role google img') //esto ultimo filtra el resultado
         .skip(desde)
+        .sort({ createdAt: -1 })
         .limit(5),
 
         Usuario.countDocuments()
@@ -46,12 +47,13 @@ const getTEmployees = async(req, res) => {
     .equals('ADMIN' )
     .skip(desde)
     .limit(5)
-    .sort('-createdAt');
+    .sort({ createdAt: -1 });
     Usuario.countDocuments()
 
     res.json({
         ok: true,
-        employees
+        employees,
+        // total
     });
 };
 const getTClients = async(req, res) => {
@@ -63,12 +65,13 @@ const getTClients = async(req, res) => {
     .equals('USER' )
     .skip(desde)
     .limit(5)
-    .sort('-createdAt');
+    .sort({ createdAt: -1 });
     Usuario.countDocuments()
 
     res.json({
         ok: true,
-        clients
+        clients,
+        // total
     });
 };
 
@@ -81,12 +84,13 @@ const getTiendaUsers = async(req, res) => {
     .equals('TIENDA' )
     .skip(desde)
     .limit(5)
-    .sort('-createdAt');
+    .sort({ createdAt: -1 });
     Usuario.countDocuments()
 
     res.json({
         ok: true,
-        tiendausers
+        tiendausers,
+        
     });
 };
 
@@ -99,7 +103,7 @@ const getAlmacenUsers = async(req, res) => {
     .equals('ALMACEN' )
     .skip(desde)
     .limit(5)
-    .sort('-createdAt');
+    .sort({ createdAt: -1 });
     Usuario.countDocuments()
 
     res.json({
@@ -302,6 +306,39 @@ const actualizarUsuario = async(req, res = response) => {
         });
     }
 };
+const actualizarStatusUsuario = async(req, res = response) => {
+    //todo: validar token y comprobar si el usuario es correcto
+
+    const uid = req.params.id;
+
+    try {
+        // buscamos el usuarios
+        const usuarioDB = await Usuario.findById(uid);
+        if (!usuarioDB) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'No existe el usuario por ese id'
+            });
+        }
+
+        //actualizamos solo el role
+        const { role } = req.body;
+        
+        const usuarioActualizado = await Usuario.findByIdAndUpdate(uid, role, { new: true });
+
+        res.json({
+            ok: true,
+            usuario: usuarioActualizado.role
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error inesperado'
+        });
+    }
+};
 
 const borrarUsuario = async(req, res) => {
 
@@ -437,5 +474,6 @@ module.exports = {
     getTiendaUsers,
     getAlmacenUsers,
     getTEmployees,
-    getTClients
+    getTClients,
+    actualizarStatusUsuario
 };

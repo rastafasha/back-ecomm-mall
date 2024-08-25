@@ -30,6 +30,7 @@ function listarAdmin(req, res) {
 const getProductos = async(req, res) => {
 
     const productos = await Producto.find()
+    .sort({ createdAt: -1 })
     .populate('titulo img categoria color selector');
 
     res.json({

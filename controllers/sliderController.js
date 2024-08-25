@@ -168,6 +168,22 @@ function activar(req, res) {
     })
 }
 
+const listar_active = async(req, res) => {
+
+    Slider.find({  status: ['true'] }).exec((err, sliders_data) => {
+        if (err) {
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+        } else {
+            if (sliders_data) {
+                res.status(200).send({ sliders: sliders_data });
+            } else {
+                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
+            }
+        }
+    });
+
+};
+
 module.exports = {
     getSliders,
     crearSlider,
@@ -175,5 +191,6 @@ module.exports = {
     borrarSlider,
     getSlider,
     desactivar,
-    activar
+    activar,
+    listar_active
 };

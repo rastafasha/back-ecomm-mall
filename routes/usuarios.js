@@ -19,7 +19,8 @@ const {
     getTiendaUsers,
     getAlmacenUsers,
     getTEmployees,
-    getTClients
+    getTClients,
+    actualizarStatusUsuario
 } = require('../controllers/usuarios');
 const {
     validarJWT,
@@ -73,6 +74,11 @@ router.put('/admin_update/:id', [
     check('role', 'el role es obligatorio').not().isEmpty(),
     validarCampos
 ], actualizarUAdmin);
+
+router.put('/update/statusrole/:id', [
+    validarJWT,
+    validarCampos
+], actualizarStatusUsuario);
 
 router.delete('/:id', [validarJWT, validarAdminRole], borrarUsuario);
 

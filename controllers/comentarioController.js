@@ -5,7 +5,7 @@ const Dislikescoment = require('../models/dislikescoment');
 
 const getComentarios = async(req, res) => {
 
-    const comentarios = await Comentario.find();
+    const comentarios = await Comentario.find().sort({ createdAt: -1 });
 
     res.json({
         ok: true,

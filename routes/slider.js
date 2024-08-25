@@ -11,13 +11,15 @@ const {
     borrarSlider,
     getSlider,
     activar,
-    desactivar
+    desactivar,
+    listar_active
 } = require('../controllers/sliderController');
 const { validarJWT } = require('../middlewares/validar-jwt');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
 
 router.get('/', getSliders);
+router.get('/actives', listar_active);
 
 router.post('/', [
     validarJWT,

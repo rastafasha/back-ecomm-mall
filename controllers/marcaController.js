@@ -3,7 +3,9 @@ const Marca = require('../models/marca');
 
 const getMarcas = async(req, res) => {
 
-    const marcas = await Marca.find().populate('nombre img descripcion');
+    const marcas = await Marca.find()
+    .sort({ createdAt: -1 })
+    .populate('nombre img descripcion');
 
     res.json({
         ok: true,

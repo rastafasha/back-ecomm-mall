@@ -3,7 +3,7 @@ const Direccion = require('../models/direccion');
 
 const getDireccions = async(req, res) => {
 
-    const direccions = await Direccion.find();
+    const direccions = await Direccion.find().sort({ createdAt: -1 });
 
     res.json({
         ok: true,
@@ -135,7 +135,7 @@ const listarPorUsuario = (req, res) => {
         } else {
             res.status(500).send({ error: err });
         }
-    });
+    }).sort({ createdAt: -1 });
 }
 
 

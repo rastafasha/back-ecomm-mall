@@ -4,7 +4,9 @@ const Producto = require('../models/producto');
 
 const getCategorias = async(req, res) => {
 
-    const categorias = await Categoria.find().populate('nombre img subcategorias');
+    const categorias = await Categoria.find()
+    .sort({ createdAt: -1 })
+    .populate('nombre img subcategorias');
 
     res.json({
         ok: true,

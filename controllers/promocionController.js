@@ -135,10 +135,29 @@ const borrarPromocion = async(req, res) => {
     }
 };
 
+
+
+const listar_active = async(req, res) => {
+
+    Promocion.find({  estado: [true] }).exec((err, promocion_data) => {
+        if (err) {
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+        } else {
+            if (promocion_data) {
+                res.status(200).send({ promocion: promocion_data });
+            } else {
+                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
+            }
+        }
+    });
+
+};
+
 module.exports = {
     getPromocions,
     crearPromocion,
     actualizarPromocion,
     borrarPromocion,
-    getPromocion
+    getPromocion,
+    listar_active
 };
