@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var PaymentSchema = Schema({
+var PaymentMethodSchema = Schema({
     nombreCompleto: { type: String, required: true },
     username: { type: String, required: true },
     type: { type: String, required: true },
@@ -14,4 +14,4 @@ var PaymentSchema = Schema({
     updatedAt: { type: Date }
 });
 
-module.exports = mongoose.model('payment', PaymentSchema);
+module.exports = mongoose.model('paymentmethod', PaymentMethodSchema);

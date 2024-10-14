@@ -138,6 +138,7 @@ app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/videocursos', require('./routes/videocurso'));
 app.use('/api/favoritos', require('./routes/favorito'));
 app.use('/api/tiendas', require('./routes/tienda'));
+app.use('/api/transferencia', require('./routes/transferencia'));
 
 
 //test
