@@ -6,6 +6,7 @@ const Page = require('../models/page');
 const Slider = require('../models/slider');
 const Producto = require('../models/producto');
 const Curso = require('../models/curso');
+const Transferencia = require('../models/transferencia');
 
 const getTodo = async(req, res = response) => {
 
@@ -77,6 +78,9 @@ const getDocumentosColeccion = async(req, res = response) => {
         case 'cursos':
             data = await Curso.find({ nombre: regex });
             break;
+        case 'transferencias':
+            data = await Transferencia.find({ nombre: regex });
+            break;
 
 
 
@@ -92,7 +96,7 @@ const getDocumentosColeccion = async(req, res = response) => {
         resultados: data
     });
 
-    const [usuarios, marcas, blogs, pages, productos, sliders, cursos] = await Promise.all([
+    const [usuarios, marcas, blogs, pages, productos, sliders, cursos, transferencias] = await Promise.all([
         Usuario.find({ nombre: regex }),
         Marca.find({ nombre: regex }),
         Blog.find({ nombre: regex }),
@@ -100,6 +104,7 @@ const getDocumentosColeccion = async(req, res = response) => {
         Producto.find({ nombre: regex }),
         Slider.find({ nombre: regex }),
         Curso.find({ nombre: regex }),
+        Transferencia.find({ nombre: regex }),
     ]);
 
     res.json({
@@ -110,7 +115,8 @@ const getDocumentosColeccion = async(req, res = response) => {
         pages,
         productos,
         sliders,
-        cursos
+        cursos,
+        transferencias
 
     });
 }

@@ -7,7 +7,7 @@ var TransferenciaSchema = Schema({
     bankName: { type: String, required: true },
     amount: { type: String, required: true },
     referencia: { type: String, required: true },
-    status: { type: String, required: true, default: 'Pending' },
+    status: { type: String, required: true, default: 'pending' },
     paymentday: { type: Date, default: Date.now, required: false },
     createdAt: { type: Date, default: Date.now, required: true },
     updatedAt: { type: Date }

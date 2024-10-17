@@ -55,7 +55,7 @@ const crearTransferencia = async(req, res) => {
 
         res.json({
             ok: true,
-            payment: transferenciaDB
+            transferencia: transferenciaDB
         });
 
     } catch (error) {
@@ -151,6 +151,41 @@ const listarPorUsuario = (req, res) => {
 }
 
 
+const updateStatus = async(req, res) =>{
+    const id = req.params.id;
+    const uid = req.uid;
+
+    try {
+
+        const transferencia = await Transferencia.findById(id);
+        if (!transferencia) {
+            return res.status(500).json({
+                ok: false,
+                msg: 'transferencia no encontrado por el id'
+            });
+        }
+
+        const cambiosTransferencia = {
+            ...req.body,
+            usuario: uid
+        }
+
+        const transferenciaActualizado = await Transferencia.findByIdAndUpdate(id, cambiosTransferencia, { new: true });
+
+        res.json({
+            ok: true,
+            transferenciaActualizado
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Error hable con el admin'
+        });
+    }
+}
+
+
 
 module.exports = {
     getTransferencias,
@@ -158,5 +193,6 @@ module.exports = {
     actualizarTransferencia,
     borrarTransferencia,
     getTransferencia,
-    listarPorUsuario
+    listarPorUsuario,
+    updateStatus,
 };

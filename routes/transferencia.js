@@ -10,7 +10,8 @@
     actualizarTransferencia,
     borrarTransferencia,
     getTransferencia,
-    listarPorUsuario
+    listarPorUsuario,
+    updateStatus
  } = require('../controllers/transferenciaController');
  const { validarJWT } = require('../middlewares/validar-jwt');
  const { check } = require('express-validator');
@@ -19,21 +20,18 @@
  router.get('/', getTransferencias);
  router.get('/transferencia/:id', listarPorUsuario);
  
- router.post('/transferencia/registro', [
-     validarJWT,
-     check('type', 'El type es necesario').not().isEmpty(),
-     validarCampos
- ], crearTransferencia);
+ router.post('/store', crearTransferencia);
  
- router.put('/transferencia/update/:id', [
+ router.put('/update/:id', [
      validarJWT,
      check('type', 'El type es necesario').not().isEmpty(),
      validarCampos
  ], actualizarTransferencia);
+
+ router.put('/statusupdate/:id', updateStatus);
  
- router.delete('/transferencia/remove/:id', validarJWT, borrarTransferencia);
+ router.delete('/remove/:id', validarJWT, borrarTransferencia);
  
- router.get('/transferencia/data/:id', getTransferencia);
  
  
  
