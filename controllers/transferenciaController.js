@@ -1,5 +1,5 @@
 const { response } = require('express');
-const Transferencia = require('../models/trasnferencia');
+const Transferencia = require('../models/transferencia');
 
 const getTransferencias = async(req, res) => {
 
