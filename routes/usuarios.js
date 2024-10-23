@@ -20,7 +20,10 @@ const {
     getAlmacenUsers,
     getTEmployees,
     getTClients,
-    actualizarStatusUsuario
+    actualizarStatusUsuario,
+    getUsuariobyCedula,
+    crearCliente
+    
 } = require('../controllers/usuarios');
 const {
     validarJWT,
@@ -47,6 +50,12 @@ router.post('/registro', [
     check('email', 'el email es obligatorio').isEmail(),
     validarCampos
 ], crearUsuarios);
+
+router.post('/registrocliente', [
+    check('first_name', 'el nombre es obligatorio').not().isEmpty(),
+    check('email', 'el email es obligatorio').isEmail(),
+    validarCampos
+], crearCliente);
 
 router.put('/:id', [
     validarJWT,
@@ -83,6 +92,7 @@ router.put('/update/statusrole/:id', [
 router.delete('/:id', [validarJWT, validarAdminRole], borrarUsuario);
 
 router.get('/:id', [validarJWT], getUsuario);
+router.get('/numdoc/:numdoc', [validarJWT], getUsuariobyCedula);
 
 
 

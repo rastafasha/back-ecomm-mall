@@ -141,7 +141,81 @@ const getUsuario = async(req, res) => {
         });
 };
 
+
+const getUsuariobyCedula = async(req, res) => {
+
+
+        var numdoc = req.params['numdoc'];
+
+        Usuario.findOne({ numdoc: numdoc }).exec((err, numdoc_data) => {
+        if (err) {
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+        } else {
+            if (numdoc_data) {
+                res.status(200).send({ numdoc: numdoc_data });
+            } else {
+                res.status(404).send({ message: 'No se encontró ningun dato en esta sección.' });
+            }
+        }
+    });
+
+};
 const crearUsuarios = async(req, res = response) => {
+
+    const { email, password } = req.body;
+
+    const body = req.body;
+
+    try {
+
+        const existeEmail = await Usuario.findOne({ email });
+
+        if (existeEmail) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'El correo ya está registrado'
+            })
+        }
+
+        const usuario = new Usuario({
+            first_name: body.first_name,
+            last_name: body.last_name,
+            telefono: body.telefono,
+            local: body.local,
+            // pais: body.pais,
+            numdoc: body.numdoc,
+            email: body.email,
+            role: body.role,
+            img: 'default.png',
+        });
+
+        //encriptar password
+        const salt = bcrypt.genSaltSync();
+        usuario.password = bcrypt.hashSync(password, salt);
+
+        //guardar usuario
+        await usuario.save();
+
+        //generar el token - JWT
+        const token = await generarJWT(usuario.id);
+
+        res.json({
+            ok: true,
+            usuario,
+            token
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error inesperado... revisar logs'
+        });
+    }
+
+
+};
+const crearCliente = async(req, res = response) => {
 
     const { email, password } = req.body;
 
@@ -475,5 +549,7 @@ module.exports = {
     getAlmacenUsers,
     getTEmployees,
     getTClients,
-    actualizarStatusUsuario
+    actualizarStatusUsuario,
+    getUsuariobyCedula,
+    crearCliente
 };
