@@ -133,10 +133,10 @@ app.use('/api/ventas', require('./routes/venta'));
 app.use('/api/promocions', require('./routes/promocion'));
 app.use('/api/shippings', require('./routes/shipping'));
 app.use('/api/pickups', require('./routes/pickup'));
-app.use('/api/payments', require('./routes/tipopago'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/videocursos', require('./routes/videocurso'));
 app.use('/api/favoritos', require('./routes/favorito'));
+app.use('/api/tipopago', require('./routes/tipopago'));
 app.use('/api/tiendas', require('./routes/tienda'));
 app.use('/api/transferencias', require('./routes/transferencia'));
 

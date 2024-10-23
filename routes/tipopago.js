@@ -1,40 +1,39 @@
 /*
- Ruta: /api/payments
+ Ruta: /api/tipopago
  */
 
 const { Router } = require('express');
 const router = Router();
 const {
-    getPayments,
-    crearPayment,
-    actualizarPayment,
-    borrarPayment,
-    getPayment,
-    listarPorUsuario
+    getPaymentMethods,
+    crearPaymentMethod,
+    actualizarPaymentMethod,
+    borrarPaymentMethod,
+    getPaymentMethod,
+    listarPorUsuario,
+    updateStatus
 } = require('../controllers/tipopagoController');
 const { validarJWT } = require('../middlewares/validar-jwt');
-const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
 
-router.get('/', getPayments);
-router.get('/payments/:id', listarPorUsuario);
+router.get('/', getPaymentMethods);
+router.get('/:id', getPaymentMethod);
 
-router.post('/payment/registro', [
+router.post('/store', [
     validarJWT,
-    check('type', 'El type es necesario').not().isEmpty(),
     validarCampos
-], crearPayment);
+], crearPaymentMethod);
 
-router.put('/payment/update/:id', [
+router.put('/update/:id', [
     validarJWT,
-    check('type', 'El type es necesario').not().isEmpty(),
     validarCampos
-], actualizarPayment);
+], actualizarPaymentMethod);
 
-router.delete('/payment/remove/:id', validarJWT, borrarPayment);
+router.delete('/remove/:id', borrarPaymentMethod);
 
-router.get('/payment/data/:id', getPayment);
+router.get('/user/:id', listarPorUsuario);
 
-
+router.put('/statusupdate/:id', updateStatus);
+ 
 
 module.exports = router;

@@ -2,14 +2,16 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var PaymentMethodSchema = Schema({
-    nombreCompleto: { type: String, required: true },
-    username: { type: String, required: true },
-    type: { type: String, required: true },
-    bankName: { type: String, required: false },
-    accountNumber: { type: String, required: false },
-    phone: { type: String, required: true },
-    email: { type: String, required: true },
+    tipo: { type: String, required: true },
+    bankName: { type: String, required: true },
+    bankAccountType: { type: String, required: false },
+    bankAccount: { type: String, required: false },
+    ciorif: { type: String, required: false },
+    username: { type: String, required: false },
+    phone: { type: String, required: false },
+    email: { type: String, required: false },
     user: { type: Schema.ObjectId, ref: 'user' },
+    status: { type: String, required: true, default: 'pending' },
     createdAt: { type: Date, default: Date.now, required: true },
     updatedAt: { type: Date }
 });
