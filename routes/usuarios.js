@@ -22,7 +22,8 @@ const {
     getTClients,
     actualizarStatusUsuario,
     getUsuariobyCedula,
-    crearCliente
+    crearCliente,
+    getTiendaLocalEmployees
     
 } = require('../controllers/usuarios');
 const {
@@ -35,7 +36,12 @@ const {
 
 router.get('/', validarJWT, getUsuarios);
 router.get('/all/', validarJWT, getAllUsers);
-router.get('/users_store/', validarJWT, getTiendaUsers);
+router.get('/users_store/:local/', 
+    // validarJWT, 
+    getTiendaUsers);
+router.get('/employe_store/:local/', 
+    // validarJWT, 
+    getTiendaLocalEmployees);
 router.get('/users_almacen/', validarJWT, getAlmacenUsers);
 router.get('/employees/', validarJWT, getTEmployees);
 router.get('/clients/', validarJWT, getTClients);

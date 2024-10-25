@@ -75,7 +75,8 @@ const getTClients = async(req, res) => {
     });
 };
 
-const getTiendaUsers = async(req, res) => {
+
+const getTiendaUsersRole = async(req, res) => {
 
     const desde = Number(req.query.desde) || 0;
 
@@ -89,8 +90,45 @@ const getTiendaUsers = async(req, res) => {
 
     res.json({
         ok: true,
-        tiendausers,
+        tiendauserslocal,
         
+    });
+};
+
+const getTiendaUsers = async(req, res) => {
+    var local = req.params['local'];
+
+    // Use find() to get all users associated with the local ID
+    Usuario.find({ local: local }).exec((err, tiendauserslocal) => {
+        if (err) {
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+        } else {
+            if (tiendauserslocal && tiendauserslocal.length > 0) {
+                res.status(200).send({ local: tiendauserslocal });
+            } else {
+                res.status(404).send({ message: 'No se encontró ningun dato en esta sección.' });
+            }
+        }
+    });
+};
+
+const getTiendaLocalEmployees = async(req, res) => {
+    var local = req.params['local'];
+
+    // Usar find() para obtener todos los usuarios asociados con el ID del local y los roles especificados
+    Usuario.find({ 
+        local: local, 
+        role: { $in: ['TIENDA', 'ALMACEN', 'VENTAS'] } 
+    }).exec((err, tiendauserslocal) => {
+        if (err) {
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+        } else {
+            if (tiendauserslocal && tiendauserslocal.length > 0) {
+                res.status(200).send({ local: tiendauserslocal });
+            } else {
+                res.status(404).send({ message: 'No se encontró ningun dato en esta sección.' });
+            }
+        }
     });
 };
 
@@ -551,5 +589,6 @@ module.exports = {
     getTClients,
     actualizarStatusUsuario,
     getUsuariobyCedula,
-    crearCliente
+    crearCliente,
+    getTiendaLocalEmployees
 };
