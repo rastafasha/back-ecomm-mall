@@ -1,6 +1,14 @@
 const { response } = require('express');
 const Transferencia = require('../models/transferencia');
+const nodemailer = require('nodemailer');
 
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_BACKEND,
+        pass: process.env.PASSWORD_APP
+    }
+});
 const getTransferencias = async(req, res) => {
 
     const transferencias = await Transferencia.find();
@@ -42,7 +50,7 @@ const getTransferencia = async(req, res) => {
 };
 
 const crearTransferencia = async(req, res) => {
-
+    
     const uid = req.uid;
     const transferencia = new Transferencia({
         usuario: uid,
@@ -52,6 +60,9 @@ const crearTransferencia = async(req, res) => {
     try {
 
         const transferenciaDB = await transferencia.save();
+        const id = transferenciaDB._id;
+
+        sendEmailAdmin(uid,id);
 
         res.json({
             ok: true,
@@ -183,6 +194,29 @@ const updateStatus = async(req, res) =>{
             msg: 'Error hable con el admin'
         });
     }
+}
+
+function sendEmailAdmin(user, id){
+    const texto = `Hola! El usuario ${user} ha realizado una compra con transferencia bancaria cuyo id es ${id}`;
+
+    const mailOptions = {
+        from: 'tu-email@gmail.com', // Remitente
+        to: process.env.EMAIL_DEST,
+        subject: 'Nueva Compra con Transferencia Bancaria',
+        text:texto,
+        html: `
+            <p>${texto}</p>
+        `
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if(error){
+            console.log(error);
+        }
+        else{
+            console.log('Correo enviado: ' + info.response);
+        }
+    })
 }
 
 
