@@ -7,7 +7,8 @@ var VentaSchema = Schema({
     codigo_cupon: { type: String },
     info_cupon: { type: String },
     idtransaccion: { type: String },
-    metodo_pago: { type: String },
+    metodo_pago: { type: String, ref: 'paymentmethod' },
+    // metodo_pago: { type: Schema.ObjectId, ref: 'paymentmethod' },
 
     tracking_number: { type: String },
     tipo_envio: { type: String, required: true },

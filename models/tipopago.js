@@ -11,7 +11,7 @@ var PaymentMethodSchema = Schema({
     phone: { type: String, required: false },
     email: { type: String, required: false },
     user: { type: Schema.ObjectId, ref: 'user' },
-    status: { type: String, required: true, default: 'pending' },
+    status: { type: String, required: true, default: 'INACTIVE' },
     createdAt: { type: Date, default: Date.now, required: true },
     updatedAt: { type: Date }
 });
