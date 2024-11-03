@@ -6,6 +6,12 @@ var TiendaSchema = Schema({
     local: { type: String, required: true },
     telefono: { type: String, required: false },
     redssociales: { type: Array, required: false },
+
+    direccion: { type: String, required: true },
+    pais: { type: String, required: true },
+    ciudad: { type: String, required: true },
+    zip: { type: String, required: true },
+    
     img: { type: String },
     state_banner: { type: Boolean },
     status: { type: String, required: false, default: 'Desactivado' },

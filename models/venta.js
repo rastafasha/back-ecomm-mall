@@ -15,9 +15,9 @@ var VentaSchema = Schema({
     precio_envio: { type: String, required: true },
     tiempo_estimado: { type: String, required: true },
 
+    tienda: { type: String,ref: 'tienda', required: false },
     direccion: { type: String, required: true },
-    destinatario: { type: String, required: true },
-    referencia: { type: String, required: true },
+    referencia: { type: String, required: false },
     pais: { type: String, required: true },
     ciudad: { type: String, required: true },
     zip: { type: String, required: true },

@@ -128,7 +128,7 @@ const borrarTienda = async(req, res) => {
             });
         }
 
-        await CatTiendaegoria.findByIdAndDelete(id);
+        await Tienda.findByIdAndDelete(id);
 
         res.json({
             ok: true,
