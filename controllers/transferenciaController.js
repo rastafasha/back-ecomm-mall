@@ -1,5 +1,6 @@
 const { response } = require('express');
 const Transferencia = require('../models/transferencia');
+const Transferencia = require('../models/transferencia');
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
@@ -11,11 +12,11 @@ const transporter = nodemailer.createTransport({
 });
 const getTransferencias = async(req, res) => {
 
-    const transferencias = await Transferencia.find();
+    const transferencias = await Transferencia.find().sort({ createdAt: -1 });
 
     res.json({
         ok: true,
-        transferencias
+        transferencias,
     });
 };
 
