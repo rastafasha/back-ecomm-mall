@@ -1,6 +1,5 @@
 const { response } = require('express');
 const Transferencia = require('../models/transferencia');
-const Transferencia = require('../models/transferencia');
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
