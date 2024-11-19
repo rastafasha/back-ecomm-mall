@@ -29,12 +29,19 @@ const {
     listar_cancelaciones,
     listarCancelacionPorUsuario,
     getCancelacion,
+    enviarFactura
 
 } = require('../controllers/ventaController');
 
 const { validarJWT } = require('../middlewares/validar-jwt');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
+
+// importamos multer, agregado por José Prados
+const multer = require('multer');
+// Configurar Multer
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 //ventas
 router.get('/', getVentas);
@@ -97,7 +104,7 @@ router.get('/cancelacion_venta/obtener_data/:id', obtener_data_cancelacion);
 
 router.get('/cancelacion_send/denegar/:id/:idticket', denegar);
 
-
+router.post('/enviar_factura', upload.single('facturacliente'), enviarFactura);
 
 
 
