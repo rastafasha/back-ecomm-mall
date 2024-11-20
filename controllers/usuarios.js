@@ -8,7 +8,6 @@ const getUsuarios = async(req, res) => {
 
     const desde = Number(req.query.desde) || 0;
 
-
     const [usuarios, total] = await Promise.all([
         Usuario
         .find({}, 'first_name email role google img') //esto ultimo filtra el resultado
@@ -18,8 +17,7 @@ const getUsuarios = async(req, res) => {
 
         Usuario.countDocuments()
     ]);
-
-
+    
     res.json({
         ok: true,
         usuarios,
@@ -367,7 +365,9 @@ const actualizarUAdmin = async(req, res = response) => {
 const actualizarUsuario = async(req, res = response) => {
     //todo: validar token y comprobar si el usuario es correcto
 
-    const uid = req.params.id;
+    // modificado por José Prados
+    const uid = req.body._id;
+    // const uid = req.params.id;
 
     try {
         const usuarioDB = await Usuario.findById(uid);
@@ -379,12 +379,27 @@ const actualizarUsuario = async(req, res = response) => {
         }
 
         //actualizaciones
-        const { password, google, email, ...campos } = req.body;
+        // const { password, google, email, ...campos } = req.body;
+        const data = {
+            first_name: req.body.first_name,
+            last_name: req.body.last_name,
+            local: req.body.local,
+            role: req.body.role,
+            telefono: req.body.telefono,
+            numdoc: req.body.numdoc,
+            email: req.body.email,
+            google: req.body.google
+        }
+        // si en el req viene una password se agrega al objeto data para realizar el update
+        if(req.body.password){
+            data.password = req.body.password;
+        }
+        // console.log('data: ',data)
+        const email = data.email;
 
+        if (usuarioDB.email !== data.email) {
 
-        if (usuarioDB.email !== email) {
-
-            const existeEmail = await Usuario.findOne({ email });
+            const existeEmail = await Usuario.findOne( {email: email} );
             if (existeEmail) {
                 return res.status(400).json({
                     ok: false,
@@ -395,15 +410,23 @@ const actualizarUsuario = async(req, res = response) => {
 
         if (!usuarioDB.google) {
 
-            campos.email = email;
+            // campos.email = email;
 
-        } else if (usuarioDB.email !== email) {
+        } else if (usuarioDB.email !== data.email) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Usuario de google no puede cambiar su correo'
             });
         }
-        const usuarioActualizado = await Usuario.findByIdAndUpdate(uid, campos, { new: true });
+
+        // verificar si en el req hay una password
+        if(req.body.password){
+            //encriptar password
+            const salt = bcrypt.genSaltSync();
+            data.password = bcrypt.hashSync(data.password, salt);
+        }
+
+        const usuarioActualizado = await Usuario.findByIdAndUpdate(uid, data, { new: true });
 
         res.json({
             ok: true,

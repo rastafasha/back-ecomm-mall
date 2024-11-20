@@ -3,6 +3,18 @@ const Venta = require('../models/venta');
 var Detalle = require('../models/detalle');
 var Cancelacion = require('../models/cancelacion');
 
+// importamos nodemailer, agregado por José Prados
+const nodemailer = require('nodemailer');
+// confirguramos el tarnsporter de nodemailer
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_BACKEND,
+        pass: process.env.PASSWORD_APP
+    }
+});
+
+
 const getVentas = async(req, res) => {
 
     const ventas = await Venta.find();
@@ -584,7 +596,49 @@ function denegar(req, res) {
 }
 
 
+// enviar factura al cliente, agregado por José Prados
+function enviarFactura(req, res) {
+    // Verifica que se recibió el archivo
+    if (!req.file) {
+        return res.status(400).json({
+            ok: false,
+            message: 'No se recibió ningún archivo'
+        });
+    }
 
+    // Configurar el correo con el archivo recibido
+    const texto = `Hola ${req.body.nombrecliente}! Adjunto encontraras la factura de tu compra.`;
+    const mailOptions = {
+        from: 'tu-email@gmail.com', //remitente
+        to: req.body.emailcliente, //destinatario: cliente en este caso
+        subject: `Hola ${req.body.nombrecliente}! Te enviamos la factura de tu compra`,
+        text: texto,
+        attachments: [
+          {
+            filename: req.file.originalname, // Nombre original del archivo
+            content: req.file.buffer, // Buffer en memoria
+          },
+        ],
+    };
+
+    // enviar email
+    transporter.sendMail(mailOptions, (error, info) => {
+        if(error){
+            console.error('Error al enviar el correo:', error);
+            res.status(500).json({
+                ok: false,
+                message: 'Error al enviar el correo, verifique el email del cliente por favor'
+            });
+        }
+        else{
+            console.log('Correo enviado: ' + info.response);
+            res.json({
+                ok: true,
+                message: 'Correo enviado con éxito'
+            });
+        }
+    })
+}
 
 
 
@@ -613,4 +667,5 @@ module.exports = {
     listarVentaPorUsuario,
     listarCancelacionPorUsuario,
     getCancelacion,
+    enviarFactura
 };
