@@ -5,6 +5,9 @@ const cors = require('cors');
 const path = require('path');
 const socketIO = require('socket.io');
 const http = require('http');
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
+
 
 //notifications
 const webpush = require('web-push');
