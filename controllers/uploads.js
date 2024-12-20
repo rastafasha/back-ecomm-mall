@@ -92,55 +92,55 @@ const retornaImagen = (req, res) => {
 };
 
 //optenemos las imagenes desde github
-const obtenerImagenes = async () => {
-    const url = 'https://github.com/rastafasha/back-ecomm-mall/tree/main/uploads/';
-    const respuesta = await axios.get(url);
-    const imagenes = respuesta.data;
-    return imagenes;
-    };
+// const obtenerImagenes = async () => {
+//     const url = 'https://github.com/rastafasha/back-ecomm-mall/tree/main/uploads/';
+//     const respuesta = await axios.get(url);
+//     const imagenes = respuesta.data;
+//     return imagenes;
+//     };
 
     //obtenemos las imagenes
-    const imagenes = await obtenerImagenes();
-    console.log(imagenes);
+    // const imagenes = await obtenerImagenes();
+    // console.log(imagenes);
     //guardamos las imagenes en la base de datos
-    imagenes.forEach(async (imagen) => {
-        const url = imagen.url;
-        const nombreArchivo = imagen.nombre;
-        const tipo = imagen.tipo;
-        const path = `./uploads/${tipo}/${nombreArchivo}`;
-        const pathViejo = `./uploads/${tipo}/${nombreArchivo}`;
-        const pathNuevo = `./uploads/${tipo}/${nombreArchivo}`;
-        const fs = require('fs');
-        const path = require('path');
-        const borrarImagen = require('./helpers/borrarImagen');
-        const subirImagen = require('./helpers/subirImagen');
-        const Slider = require('./models/slider');
-        const Tienda = require('./models/tienda');
-        const Producto = require('./models/producto');
-        const Categoria = require('./models/categoria');
-        const Carrito = require('./models/carrito');
-        const Usuario = require('./models/usuario');
-        const slider = new Slider();
+    // imagenes.forEach(async (imagen) => {
+    //     const url = imagen.url;
+    //     const nombreArchivo = imagen.nombre;
+    //     const tipo = imagen.tipo;
+    //     const path = `./uploads/${tipo}/${nombreArchivo}`;
+    //     const pathViejo = `./uploads/${tipo}/${nombreArchivo}`;
+    //     const pathNuevo = `./uploads/${tipo}/${nombreArchivo}`;
+    //     const fs = require('fs');
+    //     const path = require('path');
+    //     const borrarImagen = require('./helpers/borrarImagen');
+    //     const subirImagen = require('./helpers/subirImagen');
+    //     const Slider = require('./models/slider');
+    //     const Tienda = require('./models/tienda');
+    //     const Producto = require('./models/producto');
+    //     const Categoria = require('./models/categoria');
+    //     const Carrito = require('./models/carrito');
+    //     const Usuario = require('./models/usuario');
+    //     const slider = new Slider();
         
-        const tienda = new Tienda();
-        const producto = new Producto();
-        const categoria = new Categoria();
-        const carrito = new Carrito();
-        const usuario = new Usuario();
-        const existeImagen = await existeImagenEnDB(nombreArchivo, tipo);
-        if (existeImagen) {
-            const pathViejo = `./uploads/${tipo}/${nombreArchivo}`;
-            const pathNuevo = `./uploads/${tipo}/${nombreArchivo}`;
-            const borrarImagen = require('./helpers/borrarImagen');
-            await borrarImagen(pathViejo);
-            await subirImagen(pathNuevo);
-            } else {
-                const path = `./uploads/${tipo}/${nombreArchivo}`;
-                const subirImagen = require('./helpers/subirImagen');
-                await subirImagen(path);
-                }
-                }
-            );
+    //     const tienda = new Tienda();
+    //     const producto = new Producto();
+    //     const categoria = new Categoria();
+    //     const carrito = new Carrito();
+    //     const usuario = new Usuario();
+    //     const existeImagen = await existeImagenEnDB(nombreArchivo, tipo);
+    //     if (existeImagen) {
+    //         const pathViejo = `./uploads/${tipo}/${nombreArchivo}`;
+    //         const pathNuevo = `./uploads/${tipo}/${nombreArchivo}`;
+    //         const borrarImagen = require('./helpers/borrarImagen');
+    //         await borrarImagen(pathViejo);
+    //         await subirImagen(pathNuevo);
+    //         } else {
+    //             const path = `./uploads/${tipo}/${nombreArchivo}`;
+    //             const subirImagen = require('./helpers/subirImagen');
+    //             await subirImagen(path);
+    //             }
+    //             }
+    //         );
 
 
 
@@ -166,6 +166,5 @@ function imageByfotoName(req, res) {
 
 module.exports = {
     fileUpload,
-    retornaImagen,
-    obtenerImagenes
+    retornaImagen
 }
