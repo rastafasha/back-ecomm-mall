@@ -13,7 +13,7 @@ const { fileUpload, retornaImagen, obtenerImagenes } = require('../controllers/u
 router.use(expressfileUpload());
 
 router.put('/:tipo/:id', validarJWT, fileUpload);
-// router.get('/:tipo/:foto', retornaImagen);
-router.get('/:tipo/:foto', obtenerImagenes);
+router.get('/:tipo/:foto', retornaImagen);
+// router.get('/:tipo/:foto', obtenerImagenes);
 
 module.exports = router;
