@@ -23,7 +23,8 @@ const {
     actualizarStatusUsuario,
     getUsuariobyCedula,
     crearCliente,
-    getTiendaLocalEmployees
+    getTiendaLocalEmployees,
+    actualizarLanguage
     
 } = require('../controllers/usuarios');
 const {
@@ -73,7 +74,7 @@ router.put('/:id', [
 ], actualizarUsuario);
 
 router.put('/update/:id', [
-    validarJWT,
+    // validarJWT,
     check('first_name', 'el nombre es obligatorio').not().isEmpty(),
     check('email', 'el email es obligatorio').isEmail(),
     check('role', 'el role es obligatorio').not().isEmpty(),
@@ -94,6 +95,11 @@ router.put('/update/statusrole/:id', [
     validarJWT,
     validarCampos
 ], actualizarStatusUsuario);
+
+router.put('/update/language/:id', [
+    validarJWT,
+    validarCampos
+], actualizarLanguage);
 
 router.delete('/:id', [validarJWT, validarAdminRole], borrarUsuario);
 

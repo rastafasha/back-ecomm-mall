@@ -6,9 +6,10 @@ const UsuarioSchema = Schema({
     email: { type: String, require: true, unique: true },
     password: { type: String, require: true },
     img: { type: String, },
+    lang: { type: String,  },
     role: { type: String, require: true, default: 'USER' },
     local: { type: Schema.ObjectId, ref: 'tienda'},
-    // pais: { type: String, },
+    pais: { type: String, },
     telefono: { type: String, },
     numdoc: { type: String },
     google: { type: Boolean, default: false }

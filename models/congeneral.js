@@ -17,7 +17,7 @@ var CongeneralSchema = Schema({
     instagram: { type: String, required: false },
     youtube: { type: String, required: false },
     twitter: { type: String, required: false },
-    language: { type: String, required: false },
+    lang: { type: String, required: false },
     modoPaypal: { type: Boolean, required: true },
     sandbox: { type: String, required: false },
     clientePaypal: { type: String, required: false },

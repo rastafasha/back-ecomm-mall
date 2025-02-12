@@ -10,7 +10,7 @@ const getUsuarios = async(req, res) => {
 
     const [usuarios, total] = await Promise.all([
         Usuario
-        .find({}, 'first_name email role google img') //esto ultimo filtra el resultado
+        .find({}, 'first_name email role google img ') //esto ultimo filtra el resultado
         .skip(desde)
         .sort({ createdAt: -1 })
         .limit(5),
@@ -388,6 +388,8 @@ const actualizarUsuario = async(req, res = response) => {
             telefono: req.body.telefono,
             numdoc: req.body.numdoc,
             email: req.body.email,
+            lang: req.body.lang,
+            pais: req.body.pais,
             google: req.body.google
         }
         // si en el req viene una password se agrega al objeto data para realizar el update
@@ -441,6 +443,7 @@ const actualizarUsuario = async(req, res = response) => {
         });
     }
 };
+
 const actualizarStatusUsuario = async(req, res = response) => {
     //todo: validar token y comprobar si el usuario es correcto
 
@@ -464,6 +467,39 @@ const actualizarStatusUsuario = async(req, res = response) => {
         res.json({
             ok: true,
             usuario: usuarioActualizado.role
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error inesperado'
+        });
+    }
+};
+const actualizarLanguage= async(req, res = response) => {
+    //todo: validar token y comprobar si el usuario es correcto
+
+    const uid = req.params.id;
+
+    try {
+        // buscamos el usuarios
+        const usuarioDB = await Usuario.findById(uid);
+        if (!usuarioDB) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'No existe el usuario por ese id'
+            });
+        }
+
+        //actualizamos solo el language
+        const { lang } = req.body;
+        
+        const usuarioActualizado = await Usuario.findByIdAndUpdate(uid, lang, { new: true });
+
+        res.json({
+            ok: true,
+            usuario: usuarioActualizado.lang
         });
 
     } catch (error) {
@@ -611,6 +647,7 @@ module.exports = {
     getTEmployees,
     getTClients,
     actualizarStatusUsuario,
+    actualizarLanguage,
     getUsuariobyCedula,
     crearCliente,
     getTiendaLocalEmployees

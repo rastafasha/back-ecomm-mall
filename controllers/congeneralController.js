@@ -3,7 +3,8 @@ const Congeneral = require('../models/congeneral');
 
 const getCongenerals = async(req, res) => {
 
-    const congenerals = await Congeneral.find().populate('titulo img');
+    // const congenerals = await Congeneral.find().populate('titulo img lang');
+    const congenerals = await Congeneral.find();
 
     res.json({
         ok: true,
