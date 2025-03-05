@@ -7,10 +7,18 @@ const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 const cloudinary = require('cloudinary').v2;
 
+// configurar cloudinary
+cloudinary.config({
+    api_key: process.env.API_KEY_CLOUDINARY,
+    api_secret: process.env.API_SECRET_CLOUDINARY,
+    cloud_name: process.env.CLOUD_NAME
+})
+
 const fileUpload = async (req, res = response) => {
 
     const tipo = req.params.tipo;
     const id = req.params.id;
+
 
     const tiposValidos = [
         'productos', 'marcas', 'categorias', 'galerias', 'promocions',
@@ -62,7 +70,22 @@ const fileUpload = async (req, res = response) => {
 
         // subir a Cloudinary
         const result = await cloudinary.uploader.upload(path); //directo
-        // const result = await cloudinary.uploader.upload(`mallConnect/${path}`)
+        // // cargar imagen en cloudinary
+        // const result = await new Promise((resolve, reject) => {
+        //     cloudinary.uploader.upload_stream(
+        //       {
+        //         resource_type: 'image',
+        //         folder: 'media_nodejs'
+        //     }, // Especificamos que estamos subiendo una imagen
+        //       (error, result) => {
+        //         if (error) {
+        //           return reject(error);
+        //         }
+        //         resolve(result);
+        //       }
+        //     ).end(file.buffer); // Enviamos el archivo en buffer a Cloudinary
+        // });
+
 
 
         //actualizar bd
