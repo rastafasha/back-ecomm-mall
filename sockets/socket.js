@@ -1,17 +1,23 @@
-const { io } = require('../index');
 const express = require('express');
+const http = require('http');
 const socketIO = require('socket.io');
 
-
 const app = express();
+const server = http.createServer(app);
+const io = socketIO(server);
 
-
-// var server = require('http').Server(app);
-// const io = require('socket.io')(server);
 var authenticate = false;
 
-
 io.on('connection', function(socket) {
+    const idHandShake = socket.id; //genera un id unico por conexion
+    let { nameRoom } = socket.handshake.query;
+
+    console.log(`Hola dispositivo: ${idHandShake} se union a ${nameRoom}`);
+    socket.join(nameRoom);
+
+    socket.on('evento', (res) => {
+        socket.to(nameRoom).emit('evento', res);
+    });
 
     socket.on('message', (msg) => {
         console.log('a user connected');
@@ -19,9 +25,6 @@ io.on('connection', function(socket) {
         socket.broadcast.emit('message', msg);
     });
 
-    socket.on('disconnect', function() {
-        console.log('User disconnected');
-    });
     socket.on('save-carrito', function(data) {
         io.emit('new-carrito', data);
         console.log(data);
@@ -39,44 +42,12 @@ io.on('connection', function(socket) {
     socket.on('save-stock', function(data) {
         io.emit('new-stock', data);
     });
+
+    socket.on('disconnect', function() {
+        console.log('user disconnected');
+    });
 });
 
-
-
-
-// io.on('connection', (client) => {
-//     console.log('Usuario conectado');
-
-//     //mensaje de bienvenida
-//     client.emit('enviarMensaje', {
-//         usuario: 'Administrador',
-//         mensaje: 'Bienvenido a chat app'
-//     });
-
-//     client.on('disconnect', () => {
-//         console.log('Usuario desconectado');
-//     });
-
-//     // escuchar el cliente
-//     client.on('enviarMensaje', (data, callback) => {
-
-//         console.log(data);
-
-//         client.broadcast.emit('enviarMensaje', data); //envia mensaje a todos los usuarios conectados
-
-//         // if (mensaje.usuario) {
-//         //     callback({
-//         //         resp: 'Todo salio bien!'
-//         //     });
-//         // } else {
-//         //     callback({
-//         //         resp: 'todo salio mal!'
-//         //     });
-//         // }
-
-//         // callback();
-
-//     });
-
-
-// });
+module.exports = {
+    io
+}

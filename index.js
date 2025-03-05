@@ -4,6 +4,7 @@ const { dbConnection } = require('./database/config');
 const cors = require('cors');
 const path = require('path');
 const socketIO = require('socket.io');
+// const io = socketIO(server);
 const http = require('http');
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
@@ -17,6 +18,7 @@ const bodyParser = require('body-parser');
 const app = express();
 
 const server = require('http').Server(app);
+
 
 
 
