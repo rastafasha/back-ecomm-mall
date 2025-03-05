@@ -4,11 +4,9 @@ const { dbConnection } = require('./database/config');
 const cors = require('cors');
 const path = require('path');
 const socketIO = require('socket.io');
-// const io = socketIO(server);
 const http = require('http');
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
-
 
 //notifications
 const webpush = require('web-push');
@@ -20,7 +18,7 @@ const app = express();
 const server = require('http').Server(app);
 app.use(cors());
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
     res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
     res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
     res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
@@ -29,37 +27,22 @@ app.use((req, res, next) => {
 
 const options = {
     cors: {
-        // origin: 'http://localhost:4200, http://localhost:4201, http://localhost:4202',
-        origin: 'http://localhost:3001/, http://localhost:4201/, http://localhost:4202/, http://localhost:4203/, https://adminstorenodejs.malcolmcordova.com/, https://storepwa.malcolmcordova.com/',
-        origin: '*'
+        origin: 'http://localhost:3001, http://localhost:4201, http://localhost:4202, http://localhost:4203, https://adminstorenodejs.malcolmcordova.com, https://storepwa.malcolmcordova.com',
     },
 };
-
 
 //sockets
 const io = require('socket.io')(server, options);
 
 io.on('connection', function(socket) {
-
     const idHandShake = socket.id; //genera un id unico por conexion
-
     let { nameRoom } = socket.handshake.query;
-
-    // console.log(`${chalk.green(`Nuevo dispositivo: ${handshake}`)} conentado a la ${nameRoom}`);
 
     console.log(`Hola dispositivo: ${idHandShake} se union a ${nameRoom}`);
     socket.join(nameRoom);
 
-
     socket.on('evento', (res) => {
-        // const data = res;
-        // console.log(res);
-
-        // Emite el mensaje a todos lo miembros de las sala menos a la persona que envia el mensaje   
-        socket.to(nameRoom).emit('evento', res); // envia los datos solo a los integrantes de la sala
-
-        // socket.emit(nameRoom).emit('evento', res);//usando emit transmite a todos incluyendo a la persona que envia
-
+        socket.to(nameRoom).emit('evento', res);
     });
 
     socket.on('message', (msg) => {
@@ -86,12 +69,10 @@ io.on('connection', function(socket) {
         io.emit('new-stock', data);
     });
 
-
     socket.on('disconnect', function() {
         console.log('user disconnected');
     });
 });
-
 
 //lectura y parseo del body
 app.use(express.json());
@@ -101,7 +82,6 @@ dbConnection();
 
 //directiorio publico de pruebas de google
 app.use(express.static('public'));
-
 
 //rutas
 app.use('/api/usuarios', require('./routes/usuarios'));
@@ -143,7 +123,6 @@ app.use('/api/transferencias', require('./routes/transferencia'));
 app.use('/api/pagoefectivo', require('./routes/pago.efectivo'));
 app.use('/api/cheques', require('./routes/cheque'));
 
-
 //test
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to nodejs." });
@@ -163,10 +142,7 @@ webpush.setVapidDetails(
     'mailto:example@youremail.com',
     vapidKeys.publicKey,
     vapidKeys.privateKey,
-
 );
-//notification
-
 
 //lo ultimo
 app.get('*', (req, res) => {
@@ -225,9 +201,7 @@ const html = `
     </section>
   </body>
 </html>
-`
-
-
+`;
 
 server.listen(process.env.PORT, () => {
     console.log('Servidor en puerto: ' + process.env.PORT);
