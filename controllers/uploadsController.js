@@ -83,6 +83,13 @@ const retornaImagen = (req, res) => {
     const foto = req.params.foto;
 
     const pathImg = path.join(__dirname, `../uploads/${tipo}/${foto}`);
+    
+    //traigo la foto desde cloudinary
+    const urlImg = cloudinary.url(foto, {
+        width: 300,
+        height: 300,
+        crop: 'fill'
+    });
 
     //imagen por defecto
     if (fs.existsSync(pathImg)) {
@@ -92,6 +99,9 @@ const retornaImagen = (req, res) => {
         const pathImg = path.join(__dirname, `../uploads/${tipo}/no-image.jpg`);
         res.sendFile(pathImg);
     }
+
+    
+    
 
 
 };
