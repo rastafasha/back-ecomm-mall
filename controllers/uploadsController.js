@@ -19,7 +19,6 @@ const fileUpload = async (req, res = response) => {
     const tipo = req.params.tipo;
     const id = req.params.id;
 
-
     const tiposValidos = [
         'productos', 'marcas', 'categorias', 'galerias', 'promocions',
         'congenerals', 'usuarios', 'ingresos', 'blogs', 'pages', 'cursos', 'sliders'
@@ -57,10 +56,11 @@ const fileUpload = async (req, res = response) => {
     const nombreArchivo = `${uuidv4()}.${extensionArchivo}`;
 
     //path para guardar la imagen
-    const path = `./uploads/${tipo}/${nombreArchivo}`;
+    const savePath = `./uploads/${tipo}/${nombreArchivo}`;
+    fs.mkdirSync(path.dirname(savePath), { recursive: true });
 
     // mover la imagen
-    file.mv(path, async (err) => {
+    file.mv(savePath, async (err) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
@@ -69,35 +69,27 @@ const fileUpload = async (req, res = response) => {
         }
 
         // subir a Cloudinary
-        const result = await cloudinary.uploader.upload(path); //directo
-        // // cargar imagen en cloudinary
-        // const result = await new Promise((resolve, reject) => {
-        //     cloudinary.uploader.upload_stream(
-        //       {
-        //         resource_type: 'image',
-        //         folder: 'media_nodejs'
-        //     }, // Especificamos que estamos subiendo una imagen
-        //       (error, result) => {
-        //         if (error) {
-        //           return reject(error);
-        //         }
-        //         resolve(result);
-        //       }
-        //     ).end(file.buffer); // Enviamos el archivo en buffer a Cloudinary
-        // });
+        try {
+            const result = await cloudinary.uploader.upload(savePath, {
+                folder: `mallConnect/${tipo}/`
+            });
+            console.log(result);
 
+            //actualizar bd
+            actualizarImagen(tipo, id, nombreArchivo);
 
-
-        //actualizar bd
-        actualizarImagen(tipo, id, nombreArchivo);
-
-        res.json({
-            ok: true,
-            msg: 'Archivo subido',
-            nombreArchivo
-        });
-
-        console.log(result);
+            res.json({
+                ok: true,
+                msg: 'Archivo subido',
+                nombreArchivo
+            });
+        } catch (error) {
+            return res.status(500).json({
+                ok: false,
+                msg: 'Error al subir la imagen a Cloudinary',
+                error: error.message
+            });
+        }
     });
 };
 
@@ -117,12 +109,10 @@ const retornaImagen = (req, res) => {
     //imagen por defecto
     if (fs.existsSync(pathImg)) {
         res.sendFile(pathImg);
-
     } else {
         const pathImg = path.join(__dirname, `../uploads/${tipo}/no-image.jpg`);
         res.sendFile(pathImg);
     }
-
 };
 
 module.exports = {
