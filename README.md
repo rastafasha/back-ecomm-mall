@@ -24,3 +24,7 @@ CLOUD_NAME = ********
 API_KEY_CLOUDINARY = ********
 API_SECRET_CLOUDINARY = ********
 API_environment_variable=********
+
+- vapikey 
+VAPI_KEY_PUBLIC = ********
+VAPI_KEY_PRIVATE = ********

@@ -100,10 +100,6 @@ const retornaImagen = (req, res) => {
         res.sendFile(pathImg);
     }
 
-    
-    
-
-
 };
 
 module.exports = {

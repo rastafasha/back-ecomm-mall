@@ -18,10 +18,6 @@ const bodyParser = require('body-parser');
 const app = express();
 
 const server = require('http').Server(app);
-
-
-
-
 app.use(cors());
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
@@ -159,8 +155,8 @@ app.use(bodyParser.json());
 
 //notification
 const vapidKeys = {
-    "publicKey": "BOD_CraUESbh9BhUEccgqin8vbZSKHAziTtpqvUFl8B8LO9zrMnfbectiViqWIsTLglTqEx3c0XsmqQQ5A-KALg",
-    "privateKey": "34CA-EpxLdIf8fmJBj2zoDg5OIQIvveBcu7zWkTkPnw"
+    "publicKey": process.env.VAPI_KEY_PUBLIC,
+    "privateKey": process.env.VAPI_KEY_PRIVATE
 };
 
 webpush.setVapidDetails(

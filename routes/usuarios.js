@@ -75,10 +75,10 @@ router.put('/:id', [
 
 router.put('/update/:id', [
     // validarJWT,
-    check('first_name', 'el nombre es obligatorio').not().isEmpty(),
-    check('email', 'el email es obligatorio').isEmail(),
-    check('role', 'el role es obligatorio').not().isEmpty(),
-    validarCampos
+    // check('first_name', 'el nombre es obligatorio').not().isEmpty(),
+    // check('email', 'el email es obligatorio').isEmail(),
+    // check('role', 'el role es obligatorio').not().isEmpty(),
+    // validarCampos
 ], actualizarUsuario);
 
 router.put('/admin_update/:id', [
