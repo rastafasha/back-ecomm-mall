@@ -5,8 +5,6 @@ const cors = require('cors');
 const path = require('path');
 const socketIO = require('socket.io');
 const http = require('http');
-const multer = require('multer');
-const upload = multer({ storage: multer.memoryStorage() });
 
 //notifications
 const webpush = require('web-push');
@@ -16,6 +14,9 @@ const bodyParser = require('body-parser');
 const app = express();
 
 const server = require('http').Server(app);
+
+
+
 app.use(cors());
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
@@ -33,18 +34,31 @@ const options = {
     },
 };
 
+
 //sockets
 const io = require('socket.io')(server, options);
 
 io.on('connection', function(socket) {
+
     const idHandShake = socket.id; //genera un id unico por conexion
+
     let { nameRoom } = socket.handshake.query;
+
+    // console.log(`${chalk.green(`Nuevo dispositivo: ${handshake}`)} conentado a la ${nameRoom}`);
 
     console.log(`Hola dispositivo: ${idHandShake} se union a ${nameRoom}`);
     socket.join(nameRoom);
 
+
     socket.on('evento', (res) => {
-        socket.to(nameRoom).emit('evento', res);
+        // const data = res;
+        // console.log(res);
+
+        // Emite el mensaje a todos lo miembros de las sala menos a la persona que envia el mensaje   
+        socket.to(nameRoom).emit('evento', res); // envia los datos solo a los integrantes de la sala
+
+        // socket.emit(nameRoom).emit('evento', res);//usando emit transmite a todos incluyendo a la persona que envia
+
     });
 
     socket.on('message', (msg) => {
@@ -71,10 +85,12 @@ io.on('connection', function(socket) {
         io.emit('new-stock', data);
     });
 
+
     socket.on('disconnect', function() {
         console.log('user disconnected');
     });
 });
+
 
 //lectura y parseo del body
 app.use(express.json());
@@ -84,6 +100,7 @@ dbConnection();
 
 //directiorio publico de pruebas de google
 app.use(express.static('public'));
+
 
 //rutas
 app.use('/api/usuarios', require('./routes/usuarios'));
@@ -123,7 +140,7 @@ app.use('/api/tipopago', require('./routes/tipopago'));
 app.use('/api/tiendas', require('./routes/tienda'));
 app.use('/api/transferencias', require('./routes/transferencia'));
 app.use('/api/pagoefectivo', require('./routes/pago.efectivo'));
-app.use('/api/cheques', require('./routes/cheque'));
+
 
 //test
 app.get("/", (req, res) => {
@@ -136,15 +153,18 @@ app.use(bodyParser.json());
 
 //notification
 const vapidKeys = {
-    "publicKey": process.env.VAPI_KEY_PUBLIC,
-    "privateKey": process.env.VAPI_KEY_PRIVATE
+    "publicKey": "BOD_CraUESbh9BhUEccgqin8vbZSKHAziTtpqvUFl8B8LO9zrMnfbectiViqWIsTLglTqEx3c0XsmqQQ5A-KALg",
+    "privateKey": "34CA-EpxLdIf8fmJBj2zoDg5OIQIvveBcu7zWkTkPnw"
 };
 
 webpush.setVapidDetails(
     'mailto:example@youremail.com',
     vapidKeys.publicKey,
     vapidKeys.privateKey,
+
 );
+//notification
+
 
 //lo ultimo
 app.get('*', (req, res) => {
@@ -203,7 +223,9 @@ const html = `
     </section>
   </body>
 </html>
-`;
+`
+
+
 
 server.listen(process.env.PORT, () => {
     console.log('Servidor en puerto: ' + process.env.PORT);
