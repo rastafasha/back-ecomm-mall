@@ -18,7 +18,7 @@ const app = express();
 const server = require('http').Server(app);
 app.use(cors());
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3001', 'http://localhost:4203', 'https://adminstorenodejs.malcolmcordova.com', 'https://storepwa.malcolmcordova.com');
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3001', 'http://localhost:4203', 'https://adminstorenodejs.malcolmcordova.com/', 'https://storepwa.malcolmcordova.com/');
     res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
     res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
     res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');

@@ -71,7 +71,7 @@ const fileUpload = async (req, res = response) => {
         // subir a Cloudinary
         try {
             const result = await cloudinary.uploader.upload(savePath, {
-                folder: `mallConnect/${tipo}/`
+                folder: `mallConnect/uploads/${tipo}/`
             });
             console.log(result);
 
