@@ -19,21 +19,20 @@ const server = require('http').Server(app);
 
 app.use(cors());
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-    res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
-    next();
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+  res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+  next();
 });
 
-const options = {
-    cors: {
-        // origin: 'http://localhost:4200, http://localhost:4201, http://localhost:4202',
-        origin: 'http://localhost:4200, http://localhost:4201, http://localhost:4202, http://localhost:4203, https://adminecomnodejs.malcolmcordova.com, https://appecmnodejs.malcolmcordova.com,',
-        origin: '*'
-    },
-};
 
+
+const options = {
+  cors: {
+      origin: 'http://localhost:4200',
+  },
+};
 
 //sockets
 const io = require('socket.io')(server, options);
