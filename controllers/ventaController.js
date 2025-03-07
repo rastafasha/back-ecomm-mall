@@ -220,7 +220,7 @@ function data_detalle(req, res) {
 
 const listarVentaPorUsuario = (req, res) => {
     var id = req.params['id'];
-    Venta.find({ user: id }, (err, data_venta) => {
+    Venta.find({ user: id }).sort({ createdAt: -1 }).exec((err, data_venta) => {
         if (!err) {
             if (data_venta) {
                 res.status(200).send({ ventas: data_venta });
@@ -235,7 +235,20 @@ const listarVentaPorUsuario = (req, res) => {
 
 //Cancelaciones
 
-
+const listarCancelacionPorUsuario = (req, res) => {
+    var id = req.params['id'];
+    Cancelacion.find({ user: id }).sort({ createdAt: -1 }).exec((err, data_cancelacion) => {
+        if (!err) {
+            if (data_cancelacion) {
+                res.status(200).send({ cancelacion: data_cancelacion });
+            } else {
+                res.status(500).send({ error: err });
+            }
+        } else {
+            res.status(500).send({ error: err });
+        }
+    });
+}
 
 const getCancelacion = async(req, res) => {
 
@@ -243,6 +256,7 @@ const getCancelacion = async(req, res) => {
     const uid = req.uid;
 
     Cancelacion.findById(id)
+    .sort({ createdAt: -1 })
         .exec((err, cancelacion) => {
             if (err) {
                 return res.status(500).json({
@@ -349,20 +363,7 @@ function obtener_data_cancelacion(req, res) {
     });
 }
 
-const listarCancelacionPorUsuario = (req, res) => {
-    var id = req.params['id'];
-    Cancelacion.find({ user: id }, (err, data_cancelacion) => {
-        if (!err) {
-            if (data_cancelacion) {
-                res.status(200).send({ cancelacion: data_cancelacion });
-            } else {
-                res.status(500).send({ error: err });
-            }
-        } else {
-            res.status(500).send({ error: err });
-        }
-    });
-}
+
 
 
 
