@@ -77,7 +77,7 @@ const fileUpload = async (req, res = response) => {
 
             //actualizar bd
             actualizarImagen(tipo, id, nombreArchivo);
-
+            console.log(nombreArchivo);
             res.json({
                 ok: true,
                 msg: 'Archivo subido',

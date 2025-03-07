@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 });
 const getTransferencias = async(req, res) => {
 
-    const transferencias = await Transferencia.find();
+    const transferencias = await Transferencia.find().sort({ createdAt: -1 });
 
     res.json({
         ok: true,
