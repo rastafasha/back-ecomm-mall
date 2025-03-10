@@ -59,6 +59,21 @@ const actualizarImagen = async(tipo, id, nombreArchivo) => {
             return true;
             break;
 
+        case 'tiendas':
+                const tienda = await Tienda.findById(id);
+                if (!tienda) {
+                    console.log('No es un tienda por id');
+                    return false;
+                }
+                pathViejo = `./uploads/tiendas/${tienda.img}`;
+    
+                borrarImagen(pathViejo);
+    
+                slider.img = nombreArchivo;
+                await slider.save();
+                return true;
+                break;
+
         case 'galerias':
             const galeria = await Galeria.findById(id);
             if (!galeria) {
@@ -104,21 +119,7 @@ const actualizarImagen = async(tipo, id, nombreArchivo) => {
             return true;
             break;
 
-        case 'categorias':
-            const categoria = await Categoria.findById(id);
-            if (!categoria) {
-                console.log('No es un categoria por id');
-                return false;
-            }
-            pathViejo = `./uploads/categorias/${categoria.img}`;
-
-            borrarImagen(pathViejo);
-
-            categoria.img = nombreArchivo;
-            await categoria.save();
-            return true;
-            break;
-
+        
         case 'usuarios':
             const usuario = await Usuario.findById(id);
             if (!usuario) {
@@ -211,22 +212,7 @@ const actualizarImagen = async(tipo, id, nombreArchivo) => {
             return true;
             break;
         
-        case 'tiendas':
-            const tienda = await Tienda.findById(id);
-            if (!tienda) {
-                console.log('No es un slider por id');
-                return false;
-            }
-            pathViejo = `./uploads/tiendas/${tienda.img}`;
-
-            borrarImagen(pathViejo);
-
-            slider.img = nombreArchivo;
-            await slider.save();
-            return true;
-            break;
-
-
+       
 
 
     }
