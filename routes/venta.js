@@ -48,7 +48,7 @@ router.get('/', getVentas);
 router.get('/:id', getVenta);
 
 router.post('/store', [
-    validarJWT,
+    // validarJWT,
     check('direccion', 'La direccion es necesario').not().isEmpty(),
     validarCampos
 ], registro);

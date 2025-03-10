@@ -20,7 +20,7 @@ const fileUpload = async (req, res = response) => {
     const id = req.params.id;
 
     const tiposValidos = [
-        'productos', 'marcas', 'categorias', 'galerias', 'promocions',
+        'productos', 'marcas', 'tiendas', 'galerias', 'promocions',
         'congenerals', 'usuarios', 'ingresos', 'blogs', 'pages', 'cursos', 'sliders'
     ];
     if (!tiposValidos.includes(tipo)) {
