@@ -74,7 +74,8 @@ const fileUpload = async (req, res = response) => {
                 folder: `mallConnect/uploads/${tipo}/`
             });
             console.log(result);
-
+            const nombreArchivo = result.secure_url;
+            console.log(nombreArchivo);
             //actualizar bd
             actualizarImagen(tipo, id, nombreArchivo);
             console.log(nombreArchivo);
