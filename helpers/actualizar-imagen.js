@@ -59,13 +59,13 @@ const actualizarImagen = async(tipo, id, nombreArchivo) => {
             return true;
             break;
 
-        case 'tiendas':
+        case 'locaciones':
                 const tienda = await Tienda.findById(id);
                 if (!tienda) {
                     console.log('No es un tienda por id');
                     return false;
                 }
-                pathViejo = `./uploads/tiendas/${tienda.img}`;
+                pathViejo = `./uploads/locaciones/${tienda.img}`;
     
                 borrarImagen(pathViejo);
     
