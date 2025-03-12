@@ -1,7 +1,7 @@
 const { response } = require('express');
 const Transferencia = require('../models/transferencia');
 const nodemailer = require('nodemailer');
-
+const Congeneral = require('../models/congeneral');
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -11,7 +11,10 @@ const transporter = nodemailer.createTransport({
 });
 const getTransferencias = async(req, res) => {
 
-    const transferencias = await Transferencia.find().sort({ createdAt: -1 });
+    const transferencias = await Transferencia.find()
+    .sort({ createdAt: -1 })
+    .populate('metodo_pago')
+    ;
 
     res.json({
         ok: true,
@@ -198,6 +201,9 @@ const updateStatus = async(req, res) =>{
 
 function sendEmailAdmin(user, id){
     const texto = `Hola! El usuario ${user} ha realizado una compra con transferencia bancaria cuyo id es ${id}`;
+    // traemos el email de congeneralController para enviar el correo
+    //buscamos en el modelo
+    // Congeneral.findById(id)
 
     const mailOptions = {
         from: 'tu-email@gmail.com', // Remitente

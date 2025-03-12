@@ -6,7 +6,7 @@ var TiendaSchema = Schema({
     local: { type: String, required: true },
     telefono: { type: String, required: false },
     redssociales: { type: Array, required: false },
-    img: { type: String },
+    img: { type: String, required: false },
     state_banner: { type: Boolean },
     status: { type: String, required: false, default: 'Desactivado' },
     categoria: { type: Schema.ObjectId, ref: 'categoria' },

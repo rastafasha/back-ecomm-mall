@@ -220,10 +220,13 @@ function data_detalle(req, res) {
 
 const listarVentaPorUsuario = (req, res) => {
     var id = req.params['id'];
-    Venta.find({ user: id }).sort({ createdAt: -1 }).exec((err, data_venta) => {
+    
+    Venta.find({ user: id }).sort({ createdAt: -1 }).exec((err, data_venta)  => {
         if (!err) {
             if (data_venta) {
-                res.status(200).send({ ventas: data_venta });
+                // res.status(200).send({ ventas: data_venta });
+                //paginamos el resultado de 10 en 10
+                res.status(200).send({ ventas: data_venta.slice(0, 10)});
             } else {
                 res.status(500).send({ error: err });
             }
