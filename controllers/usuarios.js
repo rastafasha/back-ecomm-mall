@@ -10,12 +10,13 @@ const getUsuarios = async(req, res) => {
 
     const [usuarios, total] = await Promise.all([
         Usuario
-        .find({}, 'first_name email role google img') //esto ultimo filtra el resultado
+        .find({}, 'first_name email role google img local') //esto ultimo filtra el resultado
         .skip(desde)
+        .populate('local')
         .sort({ createdAt: -1 })
         .limit(5),
-
         Usuario.countDocuments()
+
     ]);
     
     res.json({
@@ -28,7 +29,7 @@ const getUsuarios = async(req, res) => {
 
 const getAllUsers = async(req, res) => {
 
-    const allusuarios = await Usuario.find().populate('first_name email role google img');
+    const allusuarios = await Usuario.find().populate('first_name email role google img local');
 
     res.json({
         ok: true,
@@ -212,7 +213,6 @@ const crearUsuarios = async(req, res = response) => {
                 msg: 'El correo ya está registrado'
             })
         }
-
         const usuario = new Usuario({
             first_name: body.first_name,
             last_name: body.last_name,

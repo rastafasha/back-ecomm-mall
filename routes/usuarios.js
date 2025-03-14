@@ -34,8 +34,12 @@ const {
     validarUserRoleOMismoUsuario
 } = require('../middlewares/validar-jwt');
 
-router.get('/', validarJWT, getUsuarios);
-router.get('/all/', validarJWT, getAllUsers);
+router.get('/', 
+    validarJWT, 
+    getUsuarios);
+router.get('/all/', 
+    validarJWT, 
+    getAllUsers);
 router.get('/users_store/:local/', 
     // validarJWT, 
     getTiendaUsers);

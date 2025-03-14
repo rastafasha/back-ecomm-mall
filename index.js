@@ -46,7 +46,7 @@ io.on('connection', function(socket) {
 
     // console.log(`${chalk.green(`Nuevo dispositivo: ${handshake}`)} conentado a la ${nameRoom}`);
 
-    console.log(`Hola dispositivo: ${idHandShake} se union a ${nameRoom}`);
+    console.log(`Hola dispositivo: ${idHandShake} se unio a ${nameRoom}`);
     socket.join(nameRoom);
 
 

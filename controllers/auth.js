@@ -66,7 +66,7 @@ const googleSignIn = async(req, res = response) => {
                 email,
                 password: '@@@',
                 img: picture,
-                google: true
+                google: true,
 
             });
         } else {
