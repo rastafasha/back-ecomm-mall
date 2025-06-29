@@ -49,9 +49,19 @@ const getBlog = async(req, res) => {
 const crearBlog = async(req, res) => {
 
     const uid = req.uid;
+
+    // Convertir el título en slug
+    const titulo = req.body.titulo || '';
+    const slug = titulo.toLowerCase()
+        .trim()
+        .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
+        .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
+        .replace(/\-\-+/g, '-'); // reemplaza guiones múltiples por uno solo
+
     const blog = new Blog({
         usuario: uid,
-        ...req.body
+        ...req.body,
+        slug: slug
     });
 
     try {

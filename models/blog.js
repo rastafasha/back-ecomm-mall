@@ -5,6 +5,7 @@ var Schema = mongoose.Schema;
 
 var BlogSchema = Schema({
     titulo: { type: String, required: true, unique: true },
+    slug: { type: String, required: true, unique: true },
     img: { type: String, required: false },
     video_review: { type: String, required: false },
     descripcion: { type: String, required: true },
