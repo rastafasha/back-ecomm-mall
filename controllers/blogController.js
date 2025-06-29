@@ -45,6 +45,21 @@ const getBlog = async(req, res) => {
         });
 
 };
+function find_by_slug(req, res) {
+    var slug = req.params['slug'];
+
+    Blog.findOne({ slug: slug }).exec((err, blog_data) => {
+        if (err) {
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+        } else {
+            if (blog_data) {
+                res.status(200).send({ blog: blog_data });
+            } else {
+                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
+            }
+        }
+    });
+}
 
 const crearBlog = async(req, res) => {
 
@@ -196,7 +211,8 @@ module.exports = {
     actualizarBlog,
     borrarBlog,
     desactivar,
-    activar
+    activar,
+    find_by_slug
 
 
 };

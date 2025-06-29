@@ -100,6 +100,36 @@ const getProducto = async(req, res) => {
         });
 
 };
+const getProductoSlug = async(req, res) => {
+
+    const slug = req.params.slug;
+    const uid = req.uid;
+
+    Producto.find_by_slug(slug)
+        .populate('color')
+        .exec((err, producto) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar producto',
+                    errors: err
+                });
+            }
+            if (!producto) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El producto con el slug ' + slug + 'no existe',
+                    errors: { message: 'No existe un producto con ese slug' }
+                });
+
+            }
+            res.status(200).json({
+                ok: true,
+                producto: producto
+            });
+        });
+
+};
 
 const crearProducto = async(req, res) => {
 
@@ -1212,6 +1242,7 @@ module.exports = {
     getProductos,
     crearProducto,
     getProducto,
+    getProductoSlug,
     actualizarProducto,
     borrarProducto,
     find_by_slug,
