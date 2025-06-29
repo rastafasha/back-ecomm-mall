@@ -64,7 +64,15 @@ const crearMarca = async(req, res) => {
         .trim()
         .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
         .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
-        .replace(/\-\-+/g, '-'); // reemplaza guiones múltiples por uno solo
+        .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
+        // reemplaza acentos y caracteres especiales
+                .replace(/á/g, 'a')
+                .replace(/é/g, 'e')
+                .replace(/í/g, 'i')
+                .replace(/ó/g, 'o')
+                .replace(/ú/g, 'u')
+                .replace(/ñ/g, 'n')
+                .replace(/ü/g, 'u');
 
     const blog = new Blog({
         usuario: uid,
@@ -97,6 +105,8 @@ const actualizarMarca = async(req, res) => {
     const id = req.params.id;
     const uid = req.uid;
 
+    
+
     try {
 
         const marca = await Marca.findById(id);
@@ -110,6 +120,26 @@ const actualizarMarca = async(req, res) => {
         const cambiosMarca = {
             ...req.body,
             usuario: uid
+        }
+
+        // Si viene el título actualizado, actualizar el slug
+        if (req.body.nombre) {
+            const nombre = req.body.nombre;
+            const slug = nombre.toLowerCase()
+                .trim()
+                .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
+                .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
+                .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
+                // reemplaza acentos y caracteres especiales
+                .replace(/á/g, 'a')
+                .replace(/é/g, 'e')
+                .replace(/í/g, 'i')
+                .replace(/ó/g, 'o')
+                .replace(/ú/g, 'u')
+                .replace(/ñ/g, 'n')
+                .replace(/ü/g, 'u');
+        
+           cambiosMarca.slug = slug;
         }
 
         const marcaActualizado = await Marca.findByIdAndUpdate(id, cambiosMarca, { new: true });
