@@ -58,6 +58,20 @@ const crearMarca = async(req, res) => {
         ...req.body
     });
 
+     // Convertir el título en slug
+    const nombre = req.body.nombre || '';
+    const slug = nombre.toLowerCase()
+        .trim()
+        .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
+        .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
+        .replace(/\-\-+/g, '-'); // reemplaza guiones múltiples por uno solo
+
+    const blog = new Blog({
+        usuario: uid,
+        ...req.body,
+        slug: slug
+    });
+
     try {
 
         const marcaDB = await marca.save();

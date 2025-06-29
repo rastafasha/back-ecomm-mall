@@ -15,14 +15,24 @@ const {
 const { validarJWT } = require('../middlewares/validar-jwt');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
+const fs = require('fs');
+const pathModule = require('path');
 var multipart = require('connect-multiparty');
-var path = multipart({ uploadDir: './uploads/galerias' });
+
+const uploadDir = './uploads/galerias';
+
+// Ensure the upload directory exists
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+var path = multipart({ uploadDir: uploadDir });
 
 router.get('/', getGalerias);
 
 
 
-router.post('/galeria/registro', path, registro);
+router.post('/registro', path, registro);
 
 router.post('/', [
     validarJWT,

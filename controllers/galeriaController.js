@@ -1,6 +1,7 @@
 const { response } = require('express');
 const { actualizarImagen } = require('../helpers/actualizar-imagen');
 const Galeria = require('../models/galeria');
+const cloudinary = require('cloudinary').v2;
 
 const getGalerias = async(req, res) => {
 
@@ -147,36 +148,39 @@ const findByProduct = (req, res) => {
 
 }
 
-const registro = (req, res, next) => {
-    var params = req.body;
+const registro = async (req, res, next) => {
+    const params = req.body;
 
-    actualizarImagen();
+    if (!req.files || !req.files.imagenes) {
+        return res.status(400).json({
+            ok: false,
+            msg: 'No se han enviado imágenes'
+        });
+    }
 
-    // if (req.files.imagenes) {
+    const imagenes = req.files.imagenes;
+    const imagenesArray = Array.isArray(imagenes) ? imagenes : [imagenes];
 
-    //     req.files.imagenes.forEach((elem, index) => {
-    //         // console.log(elem);
+    try {
+        for (const imagen of imagenesArray) {
+            // Upload image buffer to Cloudinary
+            const result = await cloudinary.uploader.upload(imagen.tempFilePath || imagen.path, {
+                folder: `mallConnect/uploads/galerias/producto/`,
+            });
 
-    //         var imagen_path = elem.path;
-    //         var name = imagen_path.split('\\');
-    //         var imagen_name = name[2];
+            const galeria = new Galeria();
+            galeria.producto = params.producto;
+            galeria.imagen = result.secure_url;
 
-    //         var galeria = new Galeria();
-    //         galeria.producto = params.producto;
-    //         galeria.imagen = imagen_name;
+            await galeria.save();
+        }
 
-
-
-    //         galeria.save((err, img_save) => {
-    //             if (err) {
-    //                 res.status(500).send({ error: err });
-    //             }
-    //         });
-
-    //     });
-    //     res.status(200).send({ message: "Registrado" });
-    // }
-}
+        res.status(200).json({ ok: true, message: 'Imágenes registradas correctamente' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ ok: false, msg: 'Error al subir las imágenes', error: error.message });
+    }
+};
 
 
 
