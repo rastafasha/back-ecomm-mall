@@ -5,7 +5,7 @@ var Mensaje = require('../models/mensaje');
 
 const getTickets = async(req, res) => {
 
-    const tickets = await Ticket.find().populate('tema estado');
+    const tickets = await Ticket.find().populate('tema status estado user');
 
     res.json({
         ok: true,
