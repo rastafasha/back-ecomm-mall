@@ -55,6 +55,28 @@ const crearPage = async(req, res) => {
         ...req.body
     });
 
+     // Convertir el título en slug
+    const titulo = req.body.titulo || '';
+    const slug = titulo.toLowerCase()
+        .trim()
+        .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
+        .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
+        .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
+        // reemplaza acentos y caracteres especiales
+                .replace(/á/g, 'a')
+                .replace(/é/g, 'e')
+                .replace(/í/g, 'i')
+                .replace(/ó/g, 'o')
+                .replace(/ú/g, 'u')
+                .replace(/ñ/g, 'n')
+                .replace(/ü/g, 'u');
+
+    const blog = new Blog({
+        usuario: uid,
+        ...req.body,
+        slug: slug
+    });
+
     try {
 
         const pageDB = await page.save();
@@ -93,6 +115,25 @@ const actualizarPage = async(req, res) => {
         const cambiosPage = {
             ...req.body,
             usuario: uid
+        }
+
+         // Si viene el título actualizado, actualizar el slug
+        if (req.body.titulo) {
+            const titulo = req.body.titulo;
+            const slug = titulo.toLowerCase()
+                .trim()
+                .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
+                .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
+                .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
+                // reemplaza acentos y caracteres especiales
+                .replace(/á/g, 'a')
+                .replace(/é/g, 'e')
+                .replace(/í/g, 'i')
+                .replace(/ó/g, 'o')
+                .replace(/ú/g, 'u')
+                .replace(/ñ/g, 'n')
+                .replace(/ü/g, 'u');
+            cambiosBlog.slug = slug;
         }
 
         const pageActualizado = await Page.findByIdAndUpdate(id, cambiosPage, { new: true });

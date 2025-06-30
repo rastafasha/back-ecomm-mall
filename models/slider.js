@@ -9,6 +9,8 @@ const SliderSchema = Schema({
     status: { type: String, required: false },
     mostrarInfo: { type: Boolean, required: true },
     mostrarboton: { type: Boolean, required: true },
+    align: { type: String, required: false},
+    color: { type: String, required: false},
     img: { type: String, required: false },
     createdAt: { type: Date, default: Date.now, required: true },
     updatedAt: { type: Date, default: Date.now, required: true }

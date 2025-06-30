@@ -1,5 +1,6 @@
 const { response } = require('express');
 const Producto = require('../models/producto');
+const Marca = require('../models/marca');
 const fs = require('fs');
 
 
@@ -145,7 +146,15 @@ const crearProducto = async(req, res) => {
             .trim()
             .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
             .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
-            .replace(/\-\-+/g, '-'); // reemplaza guiones múltiples por uno solo
+            .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
+            // reemplaza acentos y caracteres especiales
+                .replace(/á/g, 'a')
+                .replace(/é/g, 'e')
+                .replace(/í/g, 'i')
+                .replace(/ó/g, 'o')
+                .replace(/ú/g, 'u')
+                .replace(/ñ/g, 'n')
+                .replace(/ü/g, 'u');
     
         const blog = new Blog({
             usuario: uid,
@@ -178,6 +187,8 @@ const actualizarProducto = async(req, res) => {
     const id = req.params.id;
     const uid = req.uid;
 
+     
+
     try {
 
         const producto = await Producto.findById(id);
@@ -192,6 +203,26 @@ const actualizarProducto = async(req, res) => {
             ...req.body,
             usuario: uid
         }
+
+        // Si viene el título actualizado, actualizar el slug
+        if (req.body.titulo) {
+            const titulo = req.body.titulo;
+            const slug = titulo.toLowerCase()
+                .trim()
+                .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
+                .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
+                .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
+                // reemplaza acentos y caracteres especiales
+                .replace(/á/g, 'a')
+                .replace(/é/g, 'e')
+                .replace(/í/g, 'i')
+                .replace(/ó/g, 'o')
+                .replace(/ú/g, 'u')
+                .replace(/ñ/g, 'n')
+                .replace(/ü/g, 'u');
+            cambiosProducto.slug = slug;
+        }
+
 
         const productoActualizado = await Producto.findByIdAndUpdate(id, cambiosProducto, { new: true });
 
@@ -243,7 +274,9 @@ const borrarProducto = async(req, res) => {
 function find_by_slug(req, res) {
     var slug = req.params['slug'];
 
-    Producto.findOne({ slug: slug }).exec((err, producto_data) => {
+    Producto.findOne({ slug: slug })
+    .populate('marca')
+    .exec((err, producto_data) => {
         if (err) {
             res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
         } else {
@@ -256,12 +289,48 @@ function find_by_slug(req, res) {
     });
 }
 
+async function find_by_brandig(req, res) {
+    try {
+        const brandSlugOrName = req.params['slug'] || req.params['marca'] ;
+
+        if (!brandSlugOrName) {
+            return res.status(400).send({ message: 'Marca no especificada en los parámetros.' });
+        }
+
+        // Buscar la marca por slug o nombre (case insensitive)
+        const brand = await Marca.findOne({
+            $or: [
+                { slug: brandSlugOrName.toLowerCase() },
+                { nombre: new RegExp('^' + brandSlugOrName + '$', 'i') }
+            ]
+        });
+
+        if (!brand) {
+            return res.status(404).send({ message: 'Marca no encontrada.' });
+        }
+
+        // Buscar productos con la marca encontrada
+        const productos = await Producto.find({ marca: brand._id, status: ['Activo'] })
+            .populate('marca')
+            .exec();
+
+        if (productos.length > 0) {
+            return res.status(200).send({ productos: productos });
+        } else {
+            return res.status(404).send({ message: 'No se encontraron productos para esta marca.' });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: 'Error en el servidor.' });
+    }
+}
+
 function listar_newest(req, res) {
-    Producto.find()
+    Producto.find({  status: ['Activo'] })
     .populate('categoria')
     .sort({ createdAt: -1 }).limit(4).exec((err, data) => {
         if (data) {
-            res.status(200).send({ data: data });
+            res.status(200).send({ productos: data });
         }
     });
 }
@@ -1246,6 +1315,7 @@ module.exports = {
     actualizarProducto,
     borrarProducto,
     find_by_slug,
+    find_by_brandig,
     listar_newest,
     listar_best_sellers,
     listar_populares,

@@ -69,8 +69,8 @@ const actualizarImagen = async(tipo, id, nombreArchivo) => {
     
                 borrarImagen(pathViejo);
     
-                slider.img = nombreArchivo;
-                await slider.save();
+                tienda.img = nombreArchivo;
+                await tienda.save();
                 return true;
                 break;
 

@@ -6,7 +6,10 @@ const Categoria = require('../models/categoria');
 
 const getTiendas = async(req, res) => {
 
-    const tiendas = await Tienda.find();
+
+    const tiendas = await Tienda.find()
+    .sort({ createdAt: -1 })
+    .populate('categoria', 'nombre');
 
     res.json({
         ok: true,
