@@ -11,6 +11,7 @@ const {
     actualizarProducto,
     borrarProducto,
     find_by_slug,
+    find_by_brandig,
     listar_newest,
     listar_best_sellers,
     listar_populares,
@@ -71,6 +72,7 @@ router.get('/productos/papelera/:search?', validarJWT, listar_papelera);
 // router.get('/producto/:filtro?/:min?/:max?/:sub?/:cat?/:orden?/:marca?', validarJWT, listar);
 
 router.get('/producto_by_slug/:slug', find_by_slug);
+router.get('/producto_by_branding/:marca', find_by_brandig);
 router.get('/producto_cliente_autocomplete', validarJWT, listar_autocomplete);
 
 // router.put('/producto/:id/:banner?', path, validarJWT, actualizar);

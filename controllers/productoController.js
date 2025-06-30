@@ -1,5 +1,6 @@
 const { response } = require('express');
 const Producto = require('../models/producto');
+const Marca = require('../models/marca');
 const fs = require('fs');
 
 
@@ -284,6 +285,42 @@ function find_by_slug(req, res) {
             }
         }
     });
+}
+
+async function find_by_brandig(req, res) {
+    try {
+        const brandSlugOrName = req.params['slug'] || req.params['marca'] ;
+
+        if (!brandSlugOrName) {
+            return res.status(400).send({ message: 'Marca no especificada en los parámetros.' });
+        }
+
+        // Buscar la marca por slug o nombre (case insensitive)
+        const brand = await Marca.findOne({
+            $or: [
+                { slug: brandSlugOrName.toLowerCase() },
+                { nombre: new RegExp('^' + brandSlugOrName + '$', 'i') }
+            ]
+        });
+
+        if (!brand) {
+            return res.status(404).send({ message: 'Marca no encontrada.' });
+        }
+
+        // Buscar productos con la marca encontrada
+        const productos = await Producto.find({ marca: brand._id })
+            .populate('marca')
+            .exec();
+
+        if (productos.length > 0) {
+            return res.status(200).send({ productos: productos });
+        } else {
+            return res.status(404).send({ message: 'No se encontraron productos para esta marca.' });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: 'Error en el servidor.' });
+    }
 }
 
 function listar_newest(req, res) {
@@ -1276,6 +1313,7 @@ module.exports = {
     actualizarProducto,
     borrarProducto,
     find_by_slug,
+    find_by_brandig,
     listar_newest,
     listar_best_sellers,
     listar_populares,
