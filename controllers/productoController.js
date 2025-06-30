@@ -274,7 +274,9 @@ const borrarProducto = async(req, res) => {
 function find_by_slug(req, res) {
     var slug = req.params['slug'];
 
-    Producto.findOne({ slug: slug }).exec((err, producto_data) => {
+    Producto.findOne({ slug: slug })
+    .populate('marca')
+    .exec((err, producto_data) => {
         if (err) {
             res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
         } else {
@@ -308,7 +310,7 @@ async function find_by_brandig(req, res) {
         }
 
         // Buscar productos con la marca encontrada
-        const productos = await Producto.find({ marca: brand._id })
+        const productos = await Producto.find({ marca: brand._id }, {  status: ['Activo'] })
             .populate('marca')
             .exec();
 
@@ -324,11 +326,11 @@ async function find_by_brandig(req, res) {
 }
 
 function listar_newest(req, res) {
-    Producto.find()
+    Producto.find({  status: ['Activo'] })
     .populate('categoria')
     .sort({ createdAt: -1 }).limit(4).exec((err, data) => {
         if (data) {
-            res.status(200).send({ data: data });
+            res.status(200).send({ productos: data });
         }
     });
 }

@@ -78,7 +78,7 @@ router.get('/producto_cliente_autocomplete', validarJWT, listar_autocomplete);
 // router.put('/producto/:id/:banner?', path, validarJWT, actualizar);
 
 
-router.get('/productos_nuevos/show_producto', validarJWT, listar_newest);
+router.get('/productos_nuevos/show_producto',  listar_newest);
 router.get('/productos_stock/reducir/:id/:cantidad', validarJWT, reducir_stock);
 router.get('/productos_stock/aumentar/:id/:cantidad', validarJWT, aumentar_stock);
 
