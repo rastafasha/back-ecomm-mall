@@ -310,7 +310,7 @@ async function find_by_brandig(req, res) {
         }
 
         // Buscar productos con la marca encontrada
-        const productos = await Producto.find({ marca: brand._id }, {  status: ['Activo'] })
+        const productos = await Producto.find({ marca: brand._id, status: ['Activo'] })
             .populate('marca')
             .exec();
 
