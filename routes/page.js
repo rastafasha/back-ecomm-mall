@@ -11,7 +11,8 @@ const {
     actualizarPage,
     borrarPage,
     activar,
-    desactivar
+    desactivar,
+    find_by_slug
 
 } = require('../controllers/pageController');
 const { validarJWT } = require('../middlewares/validar-jwt');
@@ -20,7 +21,7 @@ const { validarCampos } = require('../middlewares/validar-campos');
 
 router.get('/', getPages);
 
-router.post('/', [
+router.post('/store', [
     validarJWT,
     check('titulo', 'El nombre es necesario').not().isEmpty(),
     validarCampos
@@ -31,6 +32,8 @@ router.put('/:id', [
     check('titulo', 'El nombre es necesario').not().isEmpty(),
     validarCampos
 ], actualizarPage);
+
+router.get('/by_slug/:slug', find_by_slug);
 
 router.delete('/:id', validarJWT, borrarPage);
 
