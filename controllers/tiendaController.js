@@ -55,9 +55,26 @@ const getTienda = async(req, res) => {
 const crearTienda = async(req, res) => {
 
     const uid = req.uid;
+     // Convertir el nombre en slug
+    const nombre = req.body.nombre || '';
+    const slug = nombre.toLowerCase()
+        .trim()
+        .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
+        .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
+        .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
+        // reemplaza acentos y caracteres especiales
+                .replace(/á/g, 'a')
+                .replace(/é/g, 'e')
+                .replace(/í/g, 'i')
+                .replace(/ó/g, 'o')
+                .replace(/ú/g, 'u')
+                .replace(/ñ/g, 'n')
+                .replace(/ü/g, 'u');
+
     const tienda = new Tienda({
         usuario: uid,
-        ...req.body
+        ...req.body,
+        slug: slug
     });
 
     try {
@@ -98,6 +115,25 @@ const actualizarTienda = async(req, res) => {
         const cambiosTienda = {
             ...req.body,
             usuario: uid
+        }
+
+        // Si viene el nombre actualizado, actualizar el slug
+        if (req.body.nombre) {
+            const nombre = req.body.nombre;
+            const slug = nombre.toLowerCase()
+                .trim()
+                .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
+                .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
+                .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
+                // reemplaza acentos y caracteres especiales
+                .replace(/á/g, 'a')
+                .replace(/é/g, 'e')
+                .replace(/í/g, 'i')
+                .replace(/ó/g, 'o')
+                .replace(/ú/g, 'u')
+                .replace(/ñ/g, 'n')
+                .replace(/ü/g, 'u');
+            cambiosTienda.slug = slug;
         }
 
         const tiendaActualizado = await Tienda.findByIdAndUpdate(id, cambiosTienda, { new: true });
@@ -182,6 +218,24 @@ function find_by_name(req, res) {
     });
 }
 
+function find_by_slug(req, res) {
+    var slug = req.params['slug'];
+
+    Tienda.findOne({ slug: slug })
+    .exec((err, tienda_data) => {
+        if (err) {
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+        } else {
+            if (tienda_data) {
+                res.status(200).send({ tienda: tienda_data });
+            } else {
+                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
+            }
+        }
+    });
+}
+
+
 
 const getTiendasActivos = async(req, res) => {
 
@@ -243,5 +297,6 @@ module.exports = {
     find_by_name,
     getTiendasActivos,
     desactivar,
-    activar
+    activar,
+    find_by_slug
 };

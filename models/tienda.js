@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 
 var TiendaSchema = Schema({
     nombre: { type: String, required: true },
+    slug: { type: String, required: true, unique: true },
     local: { type: String, required: true },
     telefono: { type: String, required: false },
     redssociales: { type: Array, required: false },
