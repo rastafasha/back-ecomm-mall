@@ -12,6 +12,7 @@ function listarAdmin(req, res) {
         status: ['Activo', 'Desactivado', 'Edición'],
     }, ).populate('marca')
     .populate('categoria')
+    .populate('local')
     .populate('color')
     .populate('selector')
     .sort({ createdAt: -1 }).exec((err, producto_data) => {
@@ -127,6 +128,36 @@ const getProductoSlug = async(req, res) => {
             res.status(200).json({
                 ok: true,
                 producto: producto
+            });
+        });
+
+};
+const getProductosTiendaId= async(req, res) => {
+
+    const id = req.params.id;
+    const uid = req.uid;
+
+    Producto.find({ local: id })
+        .populate('local')
+        .exec((err, productos) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar producto',
+                    errors: err
+                });
+            }
+            if (!productos) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El producto con el id ' + id + ' no existe',
+                    errors: { message: 'No existe un producto con ese id' }
+                });
+
+            }
+            res.status(200).json({
+                ok: true,
+                productos: productos
             });
         });
 
@@ -1338,7 +1369,8 @@ module.exports = {
     getProductosActivos,
     ecoomerce,
     listar_productosColor,
-    listar_productosCategNombre
+    listar_productosCategNombre,
+    getProductosTiendaId
 
 
 };

@@ -80,11 +80,15 @@ const crearBlog = async(req, res) => {
                 .replace(/ú/g, 'u')
                 .replace(/ñ/g, 'n')
                 .replace(/ü/g, 'u');
+    const short_descripcion = req.body.descripcion || '';
+    //extraemos short_descripcion desde description con un liminte de caracteres de 100
+    const short_descripcion_limit = short_descripcion.substring(0, 100);
 
     const blog = new Blog({
         usuario: uid,
         ...req.body,
-        slug: slug
+        slug: slug,
+        short_descripcion: short_descripcion_limit
     });
 
     try {
@@ -144,6 +148,12 @@ const actualizarBlog = async(req, res) => {
                 .replace(/ñ/g, 'n')
                 .replace(/ü/g, 'u');
             cambiosBlog.slug = slug;
+        }
+
+        if(req.body.descripcion){
+            const short_descripcion = req.body.descripcion || '';
+            const short_descripcion_limit = short_descripcion.substring(0, 100);
+            cambiosBlog.short_descripcion = short_descripcion_limit;
         }
 
         const blogActualizado = await Blog.findByIdAndUpdate(id, cambiosBlog, { new: true });
