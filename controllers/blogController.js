@@ -237,6 +237,37 @@ function activar(req, res) {
 }
 
 
+const getPostsActivos = async(req, res) => {
+
+    Blog.find({  status: ['Activo'] }).populate('categoria').exec((err, blogs) => {
+        if (err) {
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+        } else {
+            if (blogs) {
+                res.status(200).send({ blogs: blogs });
+            } else {
+                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
+            }
+        }
+    });
+
+};
+const getPostsActivosDestacados = async(req, res) => {
+
+    Blog.find({  status: ['Activo'], isFeatured:true }).populate('categoria').exec((err, blogs) => {
+        if (err) {
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+        } else {
+            if (blogs) {
+                res.status(200).send({ blogs: blogs });
+            } else {
+                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
+            }
+        }
+    });
+
+};
+
 
 
 
@@ -249,7 +280,9 @@ module.exports = {
     borrarBlog,
     desactivar,
     activar,
-    find_by_slug
+    find_by_slug,
+    getPostsActivos,
+    getPostsActivosDestacados
 
 
 };

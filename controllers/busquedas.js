@@ -17,7 +17,7 @@ const getTodo = async(req, res = response) => {
     const medicos = await Medico.find({ nombre: regex });
     const hospitales = await Hospital.find({ nombre: regex });*/
 
-    const [usuarios, marcas, blogs, pages, productos, sliders, cursos] = await Promise.all([
+    const [usuarios, marcas, blogs, pages, productos, sliders, cursos, transferencias] = await Promise.all([
         Usuario.find({ nombre: regex }),
         Marca.find({ nombre: regex }),
         Blog.find({ nombre: regex }),
@@ -25,6 +25,7 @@ const getTodo = async(req, res = response) => {
         Producto.find({ nombre: regex }),
         Slider.find({ nombre: regex }),
         Curso.find({ nombre: regex }),
+        Transferencia.find({ nombre: regex }),
     ]);
 
     res.json({
@@ -35,7 +36,8 @@ const getTodo = async(req, res = response) => {
         pages,
         productos,
         sliders,
-        cursos
+        cursos,
+        transferencias
 
     });
 }

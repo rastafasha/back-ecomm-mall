@@ -12,7 +12,9 @@ const {
     borrarBlog,
     desactivar,
     activar,
-    find_by_slug
+    find_by_slug,
+    getPostsActivos,
+    getPostsActivosDestacados
 
 } = require('../controllers/blogController');
 const { validarJWT } = require('../middlewares/validar-jwt');
@@ -35,6 +37,8 @@ router.put('/:id', [
 
 router.delete('/:id', validarJWT, borrarBlog);
 router.get('/by_slug/:slug', find_by_slug);
+router.get('/activos/', getPostsActivos);
+router.get('/destacados/', getPostsActivosDestacados);
 router.get('/:id', getBlog);
 
 router.get('/blog_admin/admin/desactivar/:id', validarJWT, desactivar);
