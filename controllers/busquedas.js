@@ -22,7 +22,7 @@ const getTodo = async(req, res = response) => {
         Marca.find({ nombre: regex }),
         Blog.find({ nombre: regex }),
         Page.find({ nombre: regex }),
-        Producto.find({ nombre: regex }),
+        Producto.find({ titulo: regex }),
         Slider.find({ nombre: regex }),
         Curso.find({ nombre: regex }),
         Transferencia.find({ nombre: regex }),
@@ -62,7 +62,7 @@ const getDocumentosColeccion = async(req, res = response) => {
             break;
 
         case 'blogs':
-            data = await Blog.find({ nombre: regex });
+            data = await Blog.find({ titulo: regex });
             break;
 
         case 'pages':
@@ -74,14 +74,14 @@ const getDocumentosColeccion = async(req, res = response) => {
             break;
 
         case 'productos':
-            data = await Producto.find({ nombre: regex });
+            data = await Producto.find({ titulo: regex });
             break;
 
         case 'cursos':
             data = await Curso.find({ nombre: regex });
             break;
-        case 'transferencias':
-            data = await Transferencia.find({ nombre: regex });
+        case 'trasnferencias':
+            data = await Transferencia.find({ referencia: regex, monto: regex, fecha: regex });
             break;
 
 
@@ -96,30 +96,6 @@ const getDocumentosColeccion = async(req, res = response) => {
     res.json({
         ok: true,
         resultados: data
-    });
-
-    const [usuarios, marcas, blogs, pages, productos, sliders, cursos, transferencias] = await Promise.all([
-        Usuario.find({ nombre: regex }),
-        Marca.find({ nombre: regex }),
-        Blog.find({ nombre: regex }),
-        Page.find({ nombre: regex }),
-        Producto.find({ nombre: regex }),
-        Slider.find({ nombre: regex }),
-        Curso.find({ nombre: regex }),
-        Transferencia.find({ nombre: regex }),
-    ]);
-
-    res.json({
-        ok: true,
-        usuarios,
-        marcas,
-        blogs,
-        pages,
-        productos,
-        sliders,
-        cursos,
-        transferencias
-
     });
 }
 
