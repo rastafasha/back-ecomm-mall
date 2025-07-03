@@ -106,6 +106,63 @@ webpush.setVapidDetails(
     vapidKeys.privateKey,
 );
 
+//sockets
+const io = require('socket.io')(server, options);
+
+io.on('connection', function(socket) {
+
+    const idHandShake = socket.id; //genera un id unico por conexion
+
+    let { nameRoom } = socket.handshake.query;
+
+    // console.log(`${chalk.green(`Nuevo dispositivo: ${handshake}`)} conentado a la ${nameRoom}`);
+
+    console.log(`Hola dispositivo: ${idHandShake} se unio a ${nameRoom}`);
+    socket.join(nameRoom);
+
+
+    socket.on('evento', (res) => {
+        // const data = res;
+        // console.log(res);
+
+        // Emite el mensaje a todos lo miembros de las sala menos a la persona que envia el mensaje   
+        socket.to(nameRoom).emit('evento', res); // envia los datos solo a los integrantes de la sala
+
+        // socket.emit(nameRoom).emit('evento', res);//usando emit transmite a todos incluyendo a la persona que envia
+
+    });
+
+    socket.on('message', (msg) => {
+        console.log('a user connected');
+        console.log('message : ' + msg);
+        socket.broadcast.emit('message', msg);
+    });
+
+    socket.on('save-carrito', function(data) {
+        io.emit('new-carrito', data);
+        console.log(data);
+    });
+    socket.on('save-carrito_dos', function(data) {
+        io.emit('new-carrito_dos', data);
+        console.log(data);
+    });
+    socket.on('save-mensaje', function(data) {
+        io.emit('new-mensaje', data);
+    });
+    socket.on('save-formmsm', function(data) {
+        io.emit('new-formmsm', data);
+    });
+    socket.on('save-stock', function(data) {
+        io.emit('new-stock', data);
+    });
+
+
+    socket.on('disconnect', function() {
+        console.log('user disconnected');
+    });
+});
+
+
 //lo ultimo
 app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'public')); //ruta para produccion, evita perder la ruta
