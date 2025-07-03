@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+mongoose.set('strictQuery', true);
+
 const dbConnection = async() => {
 
     try {
@@ -7,7 +9,7 @@ const dbConnection = async() => {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
-        console.log('DB on line')
+        console.log('DB on line');
     } catch (error) {
         console.log(error);
         throw new Error('error al conectar');
