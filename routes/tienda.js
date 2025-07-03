@@ -14,7 +14,8 @@
     find_by_name,
     getTiendasActivos,
     desactivar,
-    activar
+    activar,
+    find_by_slug
  } = require('../controllers/tiendaController');
  
  const { validarJWT } = require('../middlewares/validar-jwt');
@@ -24,6 +25,7 @@
  router.get('/', getTiendas);
  router.get('/:id', getTienda);
  router.get('/cat/activas', getTiendasActivos);
+ router.get('/by_slug/:slug', find_by_slug);
  
  
  router.get('/one/:id?', list_one);

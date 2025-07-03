@@ -50,10 +50,7 @@ const getPage = async(req, res) => {
 const crearPage = async(req, res) => {
 
     const uid = req.uid;
-    const page = new Page({
-        usuario: uid,
-        ...req.body
-    });
+    
 
      // Convertir el título en slug
     const titulo = req.body.titulo || '';
@@ -71,7 +68,7 @@ const crearPage = async(req, res) => {
                 .replace(/ñ/g, 'n')
                 .replace(/ü/g, 'u');
 
-    const blog = new Blog({
+    const page = new Page({
         usuario: uid,
         ...req.body,
         slug: slug
@@ -99,56 +96,57 @@ const crearPage = async(req, res) => {
 
 const actualizarPage = async(req, res) => {
 
-    const id = req.params.id;
-    const uid = req.uid;
-
-    try {
-
-        const page = await Page.findById(id);
-        if (!page) {
-            return res.status(500).json({
+      const id = req.params.id;
+        const uid = req.uid;
+    
+        try {
+    
+            const page = await Page.findById(id);
+            if (!page) {
+                return res.status(500).json({
+                    ok: false,
+                    msg: 'page no encontrado por el id'
+                });
+            }
+    
+            const cambiosPage = {
+                ...req.body,
+                usuario: uid
+            }
+    
+            // Si viene el título actualizado, actualizar el slug
+            if (req.body.titulo) {
+                const titulo = req.body.titulo;
+                const slug = titulo.toLowerCase()
+                    .trim()
+                    .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
+                    .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
+                    .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
+                    // reemplaza acentos y caracteres especiales
+                    .replace(/á/g, 'a')
+                    .replace(/é/g, 'e')
+                    .replace(/í/g, 'i')
+                    .replace(/ó/g, 'o')
+                    .replace(/ú/g, 'u')
+                    .replace(/ñ/g, 'n')
+                    .replace(/ü/g, 'u');
+                cambiosPage.slug = slug;
+            }
+    
+            const pageActualizado = await Page.findByIdAndUpdate(id, cambiosPage, { new: true });
+    
+            res.json({
+                ok: true,
+                pageActualizado
+            });
+    
+        } catch (error) {
+    
+            res.status(500).json({
                 ok: false,
-                msg: 'page no encontrado por el id'
+                msg: 'Error hable con el admin'
             });
         }
-
-        const cambiosPage = {
-            ...req.body,
-            usuario: uid
-        }
-
-         // Si viene el título actualizado, actualizar el slug
-        if (req.body.titulo) {
-            const titulo = req.body.titulo;
-            const slug = titulo.toLowerCase()
-                .trim()
-                .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
-                .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
-                .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
-                // reemplaza acentos y caracteres especiales
-                .replace(/á/g, 'a')
-                .replace(/é/g, 'e')
-                .replace(/í/g, 'i')
-                .replace(/ó/g, 'o')
-                .replace(/ú/g, 'u')
-                .replace(/ñ/g, 'n')
-                .replace(/ü/g, 'u');
-            cambiosBlog.slug = slug;
-        }
-
-        const pageActualizado = await Page.findByIdAndUpdate(id, cambiosPage, { new: true });
-
-        res.json({
-            ok: true,
-            pageActualizado
-        });
-
-    } catch (error) {
-        res.status(500).json({
-            ok: false,
-            msg: 'Error hable con el admin'
-        });
-    }
 
 
 };
@@ -216,6 +214,22 @@ function activar(req, res) {
 }
 
 
+function find_by_slug(req, res) {
+    var slug = req.params['slug'];
+
+    Page.findOne({ slug: slug }).exec((err, page_data) => {
+        if (err) {
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+        } else {
+            if (page_data) {
+                res.status(200).send({ page: page_data });
+            } else {
+                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
+            }
+        }
+    });
+}
+
 
 
 module.exports = {
@@ -225,7 +239,8 @@ module.exports = {
     actualizarPage,
     borrarPage,
     desactivar,
-    activar
+    activar,
+    find_by_slug
 
 
 };
