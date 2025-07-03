@@ -21,12 +21,22 @@ var multipart = require('connect-multiparty');
 
 const uploadDir = './uploads/galerias';
 
-// Ensure the upload directory exists
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
+// In serverless environments like Vercel, local filesystem is ephemeral and not writable.
+// Commenting out directory creation and multipart uploadDir to avoid runtime errors.
 
-var path = multipart({ uploadDir: uploadDir });
+// if (!fs.existsSync(uploadDir)) {
+//     fs.mkdirSync(uploadDir, { recursive: true });
+// }
+
+// var path = multipart({ uploadDir: uploadDir });
+
+// Temporary middleware to reject uploads in serverless environment
+const path = (req, res, next) => {
+    return res.status(503).json({
+        ok: false,
+        msg: 'File uploads are not supported in the serverless environment. Please use cloud storage.'
+    });
+};
 
 router.get('/', getGalerias);
 
