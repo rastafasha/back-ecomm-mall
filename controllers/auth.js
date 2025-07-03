@@ -36,6 +36,7 @@ const login = async(req, res) => {
         res.json({
             ok: true,
             token,
+            usuario: usuarioDB,
             menu: getMenuFrontEnd(usuarioDB.role)
         })
 
