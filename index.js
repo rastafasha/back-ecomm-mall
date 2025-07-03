@@ -3,8 +3,6 @@ const express = require('express');
 const { dbConnection } = require('./database/config');
 const cors = require('cors');
 const path = require('path');
-const socketIO = require('socket.io');
-const http = require('http');
 
 //notifications
 const webpush = require('web-push');
@@ -13,82 +11,12 @@ const bodyParser = require('body-parser');
 //crear server de express
 const app = express();
 
-const server = require('http').Server(app);
-
-
-
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
     allowedHeaders: ['Authorization', 'X-API-KEY', 'Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Access-Control-Allow-Request-Method']
 }));
 app.options('*', cors());
-
-const options = {
-    cors: {
-        // origin: 'http://localhost:4200, http://localhost:4201, http://localhost:4202',
-        // origin: 'http://localhost:4200, http://localhost:4201, http://localhost:4202, http://localhost:4203, https://adminstorenodejs.malcolmcordova.com, https://storepwa.malcolmcordova.com, ',
-        origin: '*'
-    },
-};
-
-
-//sockets
-const io = require('socket.io')(server, options);
-
-io.on('connection', function(socket) {
-
-    const idHandShake = socket.id; //genera un id unico por conexion
-
-    let { nameRoom } = socket.handshake.query;
-
-    // console.log(`${chalk.green(`Nuevo dispositivo: ${handshake}`)} conentado a la ${nameRoom}`);
-
-    console.log(`Hola dispositivo: ${idHandShake} se unio a ${nameRoom}`);
-    socket.join(nameRoom);
-
-
-    socket.on('evento', (res) => {
-        // const data = res;
-        // console.log(res);
-
-        // Emite el mensaje a todos lo miembros de las sala menos a la persona que envia el mensaje   
-        socket.to(nameRoom).emit('evento', res); // envia los datos solo a los integrantes de la sala
-
-        // socket.emit(nameRoom).emit('evento', res);//usando emit transmite a todos incluyendo a la persona que envia
-
-    });
-
-    socket.on('message', (msg) => {
-        console.log('a user connected');
-        console.log('message : ' + msg);
-        socket.broadcast.emit('message', msg);
-    });
-
-    socket.on('save-carrito', function(data) {
-        io.emit('new-carrito', data);
-        console.log(data);
-    });
-    socket.on('save-carrito_dos', function(data) {
-        io.emit('new-carrito_dos', data);
-        console.log(data);
-    });
-    socket.on('save-mensaje', function(data) {
-        io.emit('new-mensaje', data);
-    });
-    socket.on('save-formmsm', function(data) {
-        io.emit('new-formmsm', data);
-    });
-    socket.on('save-stock', function(data) {
-        io.emit('new-stock', data);
-    });
-
-
-    socket.on('disconnect', function() {
-        console.log('user disconnected');
-    });
-});
-
 
 //lectura y parseo del body
 app.use(express.json());
@@ -98,7 +26,6 @@ dbConnection();
 
 //directiorio publico de pruebas de google
 app.use(express.static('public'));
-
 
 //rutas
 app.use('/api/usuarios', require('./routes/usuarios'));
@@ -139,7 +66,6 @@ app.use('/api/tiendas', require('./routes/tienda'));
 app.use('/api/transferencias', require('./routes/transferencia'));
 app.use('/api/pagoefectivo', require('./routes/pago.efectivo'));
 
-
 //test
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to nodejs." });
@@ -159,18 +85,12 @@ webpush.setVapidDetails(
     'mailto:example@youremail.com',
     vapidKeys.publicKey,
     vapidKeys.privateKey,
-
 );
-//notification
-
 
 //lo ultimo
 app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'public')); //ruta para produccion, evita perder la ruta
 });
-
-server.keepAliveTimeout = 120 * 1000;
-server.headersTimeout = 120 * 1000;
 
 const html = `
 <!DOCTYPE html>
@@ -223,8 +143,4 @@ const html = `
 </html>
 `
 
-
-
-server.listen(process.env.PORT, () => {
-    console.log('Servidor en puerto: ' + process.env.PORT);
-});
+module.exports = app;
