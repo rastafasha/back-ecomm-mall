@@ -21,26 +21,18 @@ var multipart = require('connect-multiparty');
 
 const uploadDir = './uploads/galerias';
 
-// In serverless environments like Vercel, local filesystem is ephemeral and not writable.
-// Commenting out directory creation and multipart uploadDir to avoid runtime errors.
-
+// Ensure the upload directory exists
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
 var path = multipart({ uploadDir: uploadDir });
 
-const multer = require('multer');
-
-// Configure multer storage in memory for direct upload to Cloudinary
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
 router.get('/', getGalerias);
 
 
 
-router.post('/registro', upload.array('imagenes'), registro);
+router.post('/registro', path, registro);
 
 router.post('/', [
     validarJWT,
