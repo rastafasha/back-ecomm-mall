@@ -8,6 +8,8 @@ const path = require('path');
 const webpush = require('web-push');
 const bodyParser = require('body-parser');
 
+const serverless = require('serverless-http');
+
 //crear server de express
 const app = express();
 
@@ -166,11 +168,12 @@ const html = `
 </html>
 `
 
+if (process.env.VERCEL) {
+  module.exports = serverless(app);
+} else {
+  const PORT = process.env.PORT || 3000;
 
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
-
-module.exports = app;
+  app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+  });
+}
