@@ -87,7 +87,7 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to nodejs." });
 });
 
-app.get("/welcome", (req, res) => res.type('html').send(html));
+app.get("/", (req, res) => res.type('html').send(html));
 
 app.use(bodyParser.json());
 
