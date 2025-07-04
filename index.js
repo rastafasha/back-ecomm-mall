@@ -12,7 +12,6 @@ const bodyParser = require('body-parser');
 
 //crear server de express
 const app = express();
-const server = require('http').Server(app);
 
 
 //cors
@@ -162,7 +161,8 @@ const html = `
   </body>
 </html>
 `
+const PORT = process.env.PORT || 3000;
 
-server.listen(process.env.PORT, () => {
-    console.log('Servidor en puerto: ' + process.env.PORT);
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
