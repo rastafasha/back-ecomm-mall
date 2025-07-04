@@ -20,13 +20,23 @@ const pathModule = require('path');
 var multipart = require('connect-multiparty');
 
 const uploadDir = pathModule.resolve(__dirname, '../uploads/galerias');
+const parentDir = pathModule.resolve(__dirname, '../uploads');
 
 console.log('Upload directory path:', uploadDir);  // Added log to verify path
+
+// Ensure the parent upload directory exists
+try {
+    if (!fs.existsSync(parentDir)) {
+        fs.mkdirSync(parentDir);
+    }
+} catch (error) {
+    console.error('Error creating parent upload directory:', error);
+}
 
 // Ensure the upload directory exists
 try {
     if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
+        fs.mkdirSync(uploadDir);
     }
 } catch (error) {
     console.error('Error creating upload directory:', error);
