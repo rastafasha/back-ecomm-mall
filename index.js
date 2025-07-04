@@ -178,4 +178,4 @@ app.use((err, req, res, next) => {
     });
 });
 
-module.exports.handler = serverless(app);  // export handler for serverless
+module.exports = serverless(app);  // export handler for serverless as default export
