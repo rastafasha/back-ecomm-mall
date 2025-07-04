@@ -39,6 +39,9 @@ io.on('connection', function(socket) {
     socket.on('save-stock', function(data) {
         io.emit('new-stock', data);
     });
+    socket.on('save-notification', function(data) {
+        io.emit('new-notification', data);
+    });
 });
 
 

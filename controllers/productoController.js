@@ -3,6 +3,24 @@ const Producto = require('../models/producto');
 const Marca = require('../models/marca');
 const fs = require('fs');
 
+// Internal function to reduce stock programmatically
+async function reducir_stock_internal(productoId, cantidad) {
+    try {
+        const producto = await Producto.findById(productoId);
+        if (producto) {
+            producto.stock = producto.stock - cantidad;
+            if (producto.stock < 0) producto.stock = 0;
+            await producto.save();
+            return producto;
+        } else {
+            throw new Error('Producto no encontrado');
+        }
+    } catch (error) {
+        console.error('Error reducing stock:', error);
+        throw error;
+    }
+}
+
 
 function listarAdmin(req, res) {
 

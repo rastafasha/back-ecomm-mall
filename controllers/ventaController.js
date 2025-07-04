@@ -3,6 +3,9 @@ const Venta = require('../models/venta');
 var Detalle = require('../models/detalle');
 var Cancelacion = require('../models/cancelacion');
 
+const { io } = require('../index');
+const ProductoController = require('./productoController');
+
 // importamos nodemailer, agregado por José Prados
 const nodemailer = require('nodemailer');
 // confirguramos el tarnsporter de nodemailer
@@ -55,6 +58,7 @@ const getVenta = async(req, res) => {
 
 };
 
+
 function registro(req, res) {
     let data = req.body;
 
@@ -86,12 +90,12 @@ function registro(req, res) {
 
     venta.estado = 'Venta en proceso';
 
-    venta.save((err, venta_save) => {
+    venta.save(async (err, venta_save) => {
         if (!err) {
             if (venta_save) {
                 var detalle = data.detalles;
                 console.log(detalle);
-                detalle.forEach(element => {
+                for (const element of detalle) {
                     var detalleveta = new Detalle();
                     detalleveta.user = data.user;
                     detalleveta.venta = venta_save._id;
@@ -101,14 +105,14 @@ function registro(req, res) {
                     detalleveta.color = element.color;
                     detalleveta.selector = element.selector;
 
-                    detalleveta.save((err, detalle_save) => {
-                        if (detalle_save) {
+                    await detalleveta.save();
 
-                        } else {
+                    // Reduce stock for the product
+                    await ProductoController.reducir_stock_internal(element.producto, element.cantidad);
 
-                        }
-                    });
-                });
+                    // Emit socket event for stock update
+                    io.emit('stock-updated', { productoId: element.producto, cantidad: element.cantidad });
+                }
                 res.status(200).send({ message: "Registrado" });
             } else {
                 res.status(403).send({ message: 'No se registro la venta, vuelva a intentar nuevamente.' });
