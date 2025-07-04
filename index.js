@@ -168,4 +168,14 @@ const html = `
 //     console.log(`Server running on port ${PORT}`);
 // });
 
+// Global error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Global error handler caught an error:', err);
+    res.status(500).json({
+        ok: false,
+        msg: 'Internal Server Error',
+        error: err.message || err.toString()
+    });
+});
+
 module.exports.handler = serverless(app);  // export handler for serverless
