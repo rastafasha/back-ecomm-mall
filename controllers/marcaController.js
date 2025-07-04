@@ -53,10 +53,7 @@ const getMarca = async(req, res) => {
 const crearMarca = async(req, res) => {
 
     const uid = req.uid;
-    const marca = new Marca({
-        usuario: uid,
-        ...req.body
-    });
+    
 
      // Convertir el título en slug
     const nombre = req.body.nombre || '';
@@ -74,7 +71,7 @@ const crearMarca = async(req, res) => {
                 .replace(/ñ/g, 'n')
                 .replace(/ü/g, 'u');
 
-    const blog = new Blog({
+    const marca = new Marca({
         usuario: uid,
         ...req.body,
         slug: slug

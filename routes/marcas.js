@@ -11,7 +11,7 @@ const { validarCampos } = require('../middlewares/validar-campos');
 
 router.get('/', getMarcas);
 
-router.post('/', [
+router.post('/store', [
     validarJWT,
     check('nombre', 'El nombre del marca es necesario').not().isEmpty(),
     validarCampos

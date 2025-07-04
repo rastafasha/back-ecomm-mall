@@ -153,11 +153,45 @@ const listar_active = async(req, res) => {
 
 };
 
+function desactivar(req, res) {
+    var id = req.params['id'];
+
+    Promocion.findByIdAndUpdate({ _id: id }, { estado: false }, (err, promocion_data) => {
+        if (err) {
+            res.status(500).send({ message: err });
+        } else {
+            if (promocion_data) {
+                res.status(200).send({ promocion: promocion_data });
+            } else {
+                res.status(403).send({ message: 'No se actualizó el promocion, vuelva a intentar nuevamente.' });
+            }
+        }
+    })
+}
+
+function activar(req, res) {
+    var id = req.params['id'];
+    // console.log(id);
+    Promocion.findByIdAndUpdate({ _id: id }, { estado: true }, (err, promocion_data) => {
+        if (err) {
+            res.status(500).send({ message: err });
+        } else {
+            if (promocion_data) {
+                res.status(200).send({ promocion: promocion_data });
+            } else {
+                res.status(403).send({ message: 'No se actualizó el promocion, vuelva a intentar nuevamente.' });
+            }
+        }
+    })
+}
+
 module.exports = {
     getPromocions,
     crearPromocion,
     actualizarPromocion,
     borrarPromocion,
     getPromocion,
-    listar_active
+    listar_active,
+    desactivar,
+    activar
 };

@@ -184,11 +184,7 @@ const getProductosTiendaId= async(req, res) => {
 const crearProducto = async(req, res) => {
 
     const uid = req.uid;
-    const producto = new Producto({
-        usuario: uid,
-        ...req.body
-    });
-
+    
     // Convertir el título en slug
         const titulo = req.body.titulo || '';
         const slug = titulo.toLowerCase()
@@ -205,7 +201,7 @@ const crearProducto = async(req, res) => {
                 .replace(/ñ/g, 'n')
                 .replace(/ü/g, 'u');
     
-        const blog = new Blog({
+        const producto = new Producto({
             usuario: uid,
             ...req.body,
             slug: slug

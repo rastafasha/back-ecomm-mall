@@ -7,7 +7,9 @@ const router = Router();
 const { 
     getPromocions, crearPromocion, 
     actualizarPromocion, borrarPromocion, 
-    getPromocion, listar_active
+    getPromocion, listar_active,
+    desactivar,
+    activar
 
  } = require('../controllers/promocionController');
 const { validarJWT } = require('../middlewares/validar-jwt');
@@ -16,6 +18,9 @@ const { validarCampos } = require('../middlewares/validar-campos');
 
 router.get('/', getPromocions);
 router.get('/active', listar_active);
+
+router.get('/desactivar/:id', validarJWT, desactivar);
+router.get('/activar/:id', validarJWT, activar);
 
 router.post('/', [
     validarJWT,
