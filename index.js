@@ -8,17 +8,12 @@ const path = require('path');
 const webpush = require('web-push');
 const bodyParser = require('body-parser');
 
-const serverless = require('serverless-http');
+// const serverless = require('serverless-http');
 
 //crear server de express
 const app = express();
+const server = require('http').Server(app);
 
-// app.use(cors({
-//     origin: '*',
-//     methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
-//     allowedHeaders: ['Authorization', 'X-API-KEY', 'Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Access-Control-Allow-Request-Method']
-// }));
-// app.options('*', cors());
 
 //cors
 app.use(cors());
@@ -168,12 +163,6 @@ const html = `
 </html>
 `
 
-if (process.env.VERCEL) {
-  module.exports = serverless(app);
-} else {
-  const PORT = process.env.PORT || 3000;
-
-  app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-  });
-}
+server.listen(process.env.PORT, () => {
+    console.log('Servidor en puerto: ' + process.env.PORT);
+});
