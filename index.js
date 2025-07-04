@@ -8,7 +8,7 @@ const path = require('path');
 const webpush = require('web-push');
 const bodyParser = require('body-parser');
 
-// const serverless = require('serverless-http');
+const serverless = require('serverless-http');  // uncommented and imported serverless-http
 
 //crear server de express
 const app = express();
@@ -161,8 +161,11 @@ const html = `
   </body>
 </html>
 `
-const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// Removed app.listen for serverless compatibility
+// const PORT = process.env.PORT || 3000;
+// app.listen(PORT, () => {
+//     console.log(`Server running on port ${PORT}`);
+// });
+
+module.exports.handler = serverless(app);  // export handler for serverless
