@@ -19,11 +19,17 @@ const fs = require('fs');
 const pathModule = require('path');
 var multipart = require('connect-multiparty');
 
-const uploadDir = './uploads/galerias';
+const uploadDir = pathModule.resolve(__dirname, '../uploads/galerias');
+
+console.log('Upload directory path:', uploadDir);  // Added log to verify path
 
 // Ensure the upload directory exists
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
+try {
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+    }
+} catch (error) {
+    console.error('Error creating upload directory:', error);
 }
 
 var path = multipart({ uploadDir: uploadDir });
