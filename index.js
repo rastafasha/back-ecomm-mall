@@ -12,7 +12,7 @@ const serverless = require('serverless-http');  // uncommented and imported serv
 
 //crear server de express
 const app = express();
-
+const server = require('http').Server(app);
 
 //cors
 app.use(cors());
@@ -162,20 +162,18 @@ const html = `
 </html>
 `
 
-// Removed app.listen for serverless compatibility
-// const PORT = process.env.PORT || 3000;
-// app.listen(PORT, () => {
-//     console.log(`Server running on port ${PORT}`);
+
+server.listen(process.env.PORT, () => {
+    console.log('Servidor en puerto: ' + process.env.PORT);
+});
+// Global error handling middleware
+// app.use((err, req, res, next) => {
+//     console.error('Global error handler caught an error:', err);
+//     res.status(500).json({
+//         ok: false,
+//         msg: 'Internal Server Error',
+//         error: err.message || err.toString()
+//     });
 // });
 
-// Global error handling middleware
-app.use((err, req, res, next) => {
-    console.error('Global error handler caught an error:', err);
-    res.status(500).json({
-        ok: false,
-        msg: 'Internal Server Error',
-        error: err.message || err.toString()
-    });
-});
-
-module.exports = serverless(app);  // export handler for serverless as default export
+// module.exports = serverless(app);  // export handler for serverless as default export
