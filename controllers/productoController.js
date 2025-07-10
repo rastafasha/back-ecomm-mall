@@ -1384,7 +1384,8 @@ module.exports = {
     ecoomerce,
     listar_productosColor,
     listar_productosCategNombre,
-    getProductosTiendaId
+    getProductosTiendaId,
+    reducir_stock_internal
 
 
 };

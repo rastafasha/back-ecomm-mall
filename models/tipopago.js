@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 var PaymentMethodSchema = Schema({
     tipo: { type: String, required: true },
-    bankName: { type: String, required: true },
+    bankName: { type: String, required: false },
     bankAccountType: { type: String, required: false },
     bankAccount: { type: String, required: false },
     ciorif: { type: String, required: false },

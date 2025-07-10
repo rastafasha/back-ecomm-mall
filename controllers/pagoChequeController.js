@@ -39,7 +39,42 @@ const crearPagoCheque = async(req, res) => {
 
 };
 
+const updateStatus = async(req, res) =>{
+    const id = req.params.id;
+    const uid = req.uid;
+
+    try {
+
+        const pago_cheque = await PagoCheque.findById(id);
+        if (!pago_cheque) {
+            return res.status(500).json({
+                ok: false,
+                msg: 'Pago Cheque no encontrado por el id'
+            });
+        }
+
+        const cambiosPagoCheque = {
+            ...req.body,
+            usuario: uid
+        }
+
+        const pago_chequeActualizado = await PagoCheque.findByIdAndUpdate(id, cambiosPagoCheque, { new: true });
+
+        res.json({
+            ok: true,
+            pago_chequeActualizado
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Error hable con el admin'
+        });
+    }
+}
+
 module.exports = {
     getPagosCheque,
-    crearPagoCheque
+    crearPagoCheque,
+    updateStatus
 }

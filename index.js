@@ -3,6 +3,7 @@ const express = require('express');
 const { dbConnection } = require('./database/config');
 const cors = require('cors');
 const path = require('path');
+const socketIO = require('socket.io');
 
 //notifications
 const webpush = require('web-push');
@@ -13,6 +14,12 @@ const serverless = require('serverless-http');  // uncommented and imported serv
 //crear server de express
 const app = express();
 const server = require('http').Server(app);
+
+// Initialize socket.io with the server
+const io = socketIO(server);
+
+// Export io for use in other modules
+module.exports.io = io;
 
 //cors
 app.use(cors());

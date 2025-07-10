@@ -6,7 +6,8 @@ var PagoChequeSchema = Schema({
     amount: { type: String, required: true },
     name_person: {type: String, required: true},
     ncheck: {type: String, required: true},
-    // status: { type: String, required: true, default: 'pending' },
+    phone: {type: String, required: true},
+    status: { type: String, required: true, default: 'pending' },
     paymentday: { type: Date, default: Date.now, required: false },
     createdAt: { type: Date, default: Date.now, required: true },
     updatedAt: { type: Date }

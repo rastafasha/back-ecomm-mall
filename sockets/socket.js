@@ -42,6 +42,9 @@ io.on('connection', function(socket) {
     socket.on('save-notification', function(data) {
         io.emit('new-notification', data);
     });
+    socket.on('stock-update', function(data) {
+        io.emit('new-notification', data);
+    });
 });
 
 
