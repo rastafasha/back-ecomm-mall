@@ -11,6 +11,35 @@ const getPaymentMethods = async(req, res) => {
     });
 };
 
+const getPaymentMethodName = async(req, res) => {
+
+    const tipo = req.params.tipo;
+    const uid = req.uid;
+
+    PaymentMethod.find({ tipo: tipo })
+        .exec((err, paymentMethod) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar payment',
+                    errors: err
+                });
+            }
+            if (!paymentMethod) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El payment con el tipo ' + tipo + 'no existe',
+                    errors: { message: 'No existe un paymentMethod con ese tipo' }
+                });
+
+            }
+            res.status(200).json({
+                ok: true,
+                paymentMethod: paymentMethod
+            });
+        });
+
+};
 const getPaymentMethod = async(req, res) => {
 
     const id = req.params.id;
@@ -185,6 +214,23 @@ const updateStatus = async(req, res) =>{
     }
 }
 
+const listar_active = async(req, res) => {
+
+    PaymentMethod.find({  status: ['ACTIVE'] }).exec((err, paymentMethods_data) => {
+        if (err) {
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+        } else {
+            if (paymentMethods_data) {
+                res.status(200).send({ paymentMethods: paymentMethods_data });
+            } else {
+                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
+            }
+        }
+    });
+
+};
+
+
 
 module.exports = {
     getPaymentMethods,
@@ -192,6 +238,9 @@ module.exports = {
     actualizarPaymentMethod,
     borrarPaymentMethod,
     getPaymentMethod,
+    getPaymentMethodName,
     listarPorUsuario,
-    updateStatus
+    updateStatus,
+    listar_active
+    
 };
