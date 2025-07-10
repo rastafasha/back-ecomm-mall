@@ -9,7 +9,7 @@ const socketIO = require('socket.io');
 const webpush = require('web-push');
 const bodyParser = require('body-parser');
 
-const serverless = require('serverless-http');  // uncommented and imported serverless-http
+// const serverless = require('serverless-http');  // uncommented and imported serverless-http
 
 //crear server de express
 const app = express();
@@ -31,8 +31,6 @@ app.use((req, res, next) => {
     res.header('Allow', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
     next();
 });
-
-
 
 const options = {
     cors: {
