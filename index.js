@@ -80,6 +80,7 @@ app.use('/api/tipopago', require('./routes/tipopago'));
 app.use('/api/tiendas', require('./routes/tienda'));
 app.use('/api/transferencias', require('./routes/transferencia'));
 app.use('/api/pagoefectivo', require('./routes/pago.efectivo'));
+app.use('/api/pagocheque', require('./routes/pagocheque'));
 
 //test
 app.get("/", (req, res) => {
