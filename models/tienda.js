@@ -8,7 +8,7 @@ var TiendaSchema = Schema({
     telefono: { type: String, required: false },
     redssociales: { type: Array, required: false },
     img: { type: String, required: false },
-    state_banner: { type: Boolean },
+    iva: { type: Number, required: false, },
     status: { type: String, required: false, default: 'Desactivado' },
     categoria: { type: Schema.ObjectId, ref: 'categoria' },
     subcategoria: { type: String, required: false },
