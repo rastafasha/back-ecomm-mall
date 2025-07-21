@@ -225,6 +225,48 @@ function find_by_name(req, res) {
             });
     });
 }
+function find_by_subcategory(req, res) {
+    const id = req.params.id;
+
+    Categoria.findById(id)
+        .exec((err, categoria) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar categoria',
+                    errors: err
+                });
+            }
+            if (!categoria) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El categoria con el id ' + id + 'no existe',
+                    errors: { message: 'No existe un categoria con ese ID' }
+                });
+
+            }
+            Producto.find({ 
+                $or: [
+                    { categoria: categoria._id },
+                    { subcategoria: id }
+                ],
+                status: ['Activo'] 
+            })
+            .populate('categoria')
+            .exec((err, productos) => {
+                if (err) {
+                    return res.status(500).send({ message: 'Error al buscar productos.' });
+                }
+                res.json({
+                    ok: true,
+                    categoria: categoria,
+                    productos: productos
+                });
+            });
+    });
+
+    
+}
 
 
 const getCategoriasActivos = async(req, res) => {
@@ -286,6 +328,7 @@ module.exports = {
     get_car_slide,
     list_one,
     find_by_name,
+    find_by_subcategory,
     getCategoriasActivos,
     desactivar,
     activar

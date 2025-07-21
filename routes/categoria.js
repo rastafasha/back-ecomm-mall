@@ -13,6 +13,7 @@ const {
     get_car_slide,
     list_one,
     find_by_name,
+    find_by_subcategory,
     getCategoriasActivos,
     desactivar,
     activar
@@ -31,6 +32,7 @@ router.get('/slider', get_car_slide);
 router.get('/one/:id?', list_one);
 
 router.get('/category_by_nombre/nombre/:nombre', find_by_name);
+router.get('/category_by_subcategoria/:id', find_by_subcategory);
 
 router.get('/admin/desactivar/:id', validarJWT, desactivar);
 router.get('/admin/activar/:id', validarJWT, activar);
