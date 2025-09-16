@@ -381,7 +381,7 @@ const listarCancelacionPorUsuario = (req, res) => {
 //admin
 
 function init_data_admin(req, res) {
-    Venta.find().sort({ createdAt: -1 }).populate('user').exec((err, data) => {
+    Venta.find().sort({ createdAt: -1 }).populate('user').populate('local').exec((err, data) => {
         if (data) {
             res.status(200).send({ data: data });
         }
