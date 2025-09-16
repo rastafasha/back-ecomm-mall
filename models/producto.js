@@ -10,6 +10,7 @@ var ProductoSchema = Schema({
     precio_ahora: { type: Number, required: true },
     precio_antes: { type: Number, required: true },
     video_review: { type: String, required: false },
+    sku: { type: String, required: true },
     info_short: { type: String, required: true },
     detalle: { type: String, required: true },
     stock: { type: Number, required: true },
