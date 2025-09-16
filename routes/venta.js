@@ -29,7 +29,7 @@ const {
     listar_cancelaciones,
     listarCancelacionPorUsuario,
     getCancelacion,
-    enviarFactura
+    enviarFactura,
 
 } = require('../controllers/ventaController');
 
@@ -81,6 +81,7 @@ router.get('/venta_enviado/update/:id', update_enviado);
 router.get('/venta_data/dashboard', listar_ventas_dashboard);
 
 router.get('/venta_data/detalles/hoy', detalles_hoy);
+
 
 
 //cancelaciones

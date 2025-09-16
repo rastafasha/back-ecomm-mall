@@ -223,7 +223,9 @@ function sendEmailAdmin(user, id){
             console.log('Correo enviado: ' + info.response);
         }
     })
+    // enviarWhatsappSencillo();
 }
+
 
 
 

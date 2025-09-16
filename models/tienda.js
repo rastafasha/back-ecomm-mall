@@ -8,6 +8,7 @@ var TiendaSchema = Schema({
     pais: { type: String, required: false },
     ciudad: { type: String, required: false },
     zip: { type: String, required: false },
+    direccion: { type: String, required: false },
     telefono: { type: String, required: false },
     redssociales: { type: Array, required: false },
     img: { type: String, required: false },

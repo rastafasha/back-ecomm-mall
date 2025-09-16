@@ -1,5 +1,6 @@
 const { response } = require('express');
 const Venta = require('../models/venta');
+const Tienda = require('../models/tienda');
 var Detalle = require('../models/detalle');
 var Cancelacion = require('../models/cancelacion');
 
@@ -66,6 +67,7 @@ function registro(req, res) {
 
     var venta = new Venta();
     venta.user = data.user;
+    venta.local = data.local;
     venta.total_pagado = data.total_pagado;
     venta.codigo_cupon = data.codigo_cupon;
     venta.info_cupon = data.info_cupon;
@@ -98,6 +100,7 @@ function registro(req, res) {
                 for (const element of detalle) {
                     var detalleveta = new Detalle();
                     detalleveta.user = data.user;
+                    detalleveta.local = data.local;
                     detalleveta.venta = venta_save._id;
                     detalleveta.producto = element.producto;
                     detalleveta.cantidad = element.cantidad;
@@ -239,6 +242,7 @@ const listarVentaPorUsuario = (req, res) => {
         }
     });
 }
+
 
 //Cancelaciones
 
@@ -645,7 +649,42 @@ function enviarFactura(req, res) {
             });
         }
     })
+
+    // enviarWhatsappSencillo()
+    // enviarSMS()
 }
+
+//fin enviar factura
+
+//envio de sms y whatsapp
+// function enviarWhatsappSencillo(){
+//      // Configurar el correo con el archivo recibido
+//     const texto = `Hola ${req.body.nombrecliente}! Adjunto encontraras la factura de tu compra.`;
+//     <a
+//                     href="https://wa.me/{{tienda.telefono}}?text=Haz%20recibido%20una%20compra%20{{randomNum}}%20,%20favor%20verifica%20y,%20procesala%20pronto%20!"
+//                     target="_blank" rel="noopener noreferrer">
+//                     Notificar a la tienda
+//                     </a>
+    
+
+// }
+// function enviarWhatSMS(){
+//      // Configurar el correo con el archivo recibido
+//     const texto = `Hola ${req.body.nombrecliente}! Adjunto encontraras la factura de tu compra.`;
+//     const messageOptions = {
+//         from: 'tu-email@gmail.com', //remitente
+//         to: req.body.telefono, //destinatario: cliente en este caso
+//         subject: `Hola ${req.body.nombrecliente}! Te enviamos la factura de tu compra`,
+//         text: texto,
+//         attachments: [
+//           {
+//             filename: req.file.originalname, // Nombre original del archivo
+//             content: req.file.buffer, // Buffer en memoria
+//           },
+//         ],
+//     };
+
+// }
 
 
 
@@ -674,5 +713,5 @@ module.exports = {
     listarVentaPorUsuario,
     listarCancelacionPorUsuario,
     getCancelacion,
-    enviarFactura
+    enviarFactura,
 };

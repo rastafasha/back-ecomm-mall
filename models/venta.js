@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 
 var VentaSchema = Schema({
     user: { type: Schema.ObjectId, ref: 'user' },
+    local: { type: Schema.ObjectId, ref: 'tienda' },
     total_pagado: { type: Number, required: true },
     codigo_cupon: { type: String },
     info_cupon: { type: String },
