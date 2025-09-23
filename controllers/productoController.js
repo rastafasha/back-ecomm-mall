@@ -1,6 +1,7 @@
 const { response } = require('express');
 const Producto = require('../models/producto');
 const Marca = require('../models/marca');
+const Categoria = require('../models/categoria');
 const fs = require('fs');
 
 // Internal function to reduce stock programmatically
@@ -418,19 +419,32 @@ function listar_papelera(req, res) {
 }
 
 const cat_by_name = async(req, res) => {
+    try {
+        var nombre = req.params['nombre'];
 
+        // First, find the category by name to get its ObjectId
+        
+        const categoria = await Categoria.findOne({ nombre: new RegExp('^' + nombre + '$', 'i') });
 
-    await Producto.find({}, 'categoria').filter('categoria', 'nombre').populate('titulo').exec((err, producto_data) => {
-        if (err) {
-            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
-        } else {
-            if (producto_data) {
-                res.status(200).send({ productos: producto_data });
-            } else {
-                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
-            }
+        if (!categoria) {
+            return res.status(404).send({ message: 'Categoría no encontrada.' });
         }
-    });
+
+        // Then find products with that category ObjectId
+        const productos = await Producto.find({ categoria: categoria._id, status: ['Activo'] })
+            .populate('categoria')
+            .populate('titulo')
+            .exec();
+
+        if (productos && productos.length > 0) {
+            res.status(200).send({ productos: productos });
+        } else {
+            res.status(404).send({ message: 'No se encontraron productos para esta categoría.' });
+        }
+    } catch (error) {
+        console.error('Error in cat_by_name:', error);
+        res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+    }
 }
 
 
