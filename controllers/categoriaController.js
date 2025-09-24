@@ -75,9 +75,26 @@ const getCategoria = async(req, res) => {
 const crearCategoria = async(req, res) => {
 
     const uid = req.uid;
+     // Convertir el nombre en slug
+        const nombre = req.body.nombre || '';
+        const slug = nombre.toLowerCase()
+            .trim()
+            .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
+            .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
+            .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
+            // reemplaza acentos y caracteres especiales
+                .replace(/á/g, 'a')
+                .replace(/é/g, 'e')
+                .replace(/í/g, 'i')
+                .replace(/ó/g, 'o')
+                .replace(/ú/g, 'u')
+                .replace(/ñ/g, 'n')
+                .replace(/ü/g, 'u');
+
     const categoria = new Categoria({
         usuario: uid,
-        ...req.body
+        ...req.body,
+        slug: slug
     });
 
     try {
@@ -105,6 +122,7 @@ const actualizarCategoria = async(req, res) => {
     const id = req.params.id;
     const uid = req.uid;
 
+
     try {
 
         const categoria = await Categoria.findById(id);
@@ -118,6 +136,25 @@ const actualizarCategoria = async(req, res) => {
         const cambiosCategoria = {
             ...req.body,
             usuario: uid
+        }
+
+        // Si viene el nombre actualizado, actualizar el slug
+        if (req.body.nombre) {
+            const nombre = req.body.nombre;
+            const slug = nombre.toLowerCase()
+                .trim()
+                .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
+                .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
+                .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
+                // reemplaza acentos y caracteres especiales
+                .replace(/á/g, 'a')
+                .replace(/é/g, 'e')
+                .replace(/í/g, 'i')
+                .replace(/ó/g, 'o')
+                .replace(/ú/g, 'u')
+                .replace(/ñ/g, 'n')
+                .replace(/ü/g, 'u');
+            cambiosCategoria.slug = slug;
         }
 
         const categoriaActualizado = await Categoria.findByIdAndUpdate(id, cambiosCategoria, { new: true });
