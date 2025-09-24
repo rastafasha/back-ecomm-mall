@@ -5,7 +5,7 @@ var CategoriaSchema = Schema({
     nombre: { type: String, required: true },
     icono: { type: String, required: true },
     subcategorias: { type: String, required: false },
-    slug: { type: String, required: true, unique: true },
+    slug: { type: String, required: true, unique: false },
     img: { type: String },
     state_banner: { type: Boolean },
     status: { type: String, required: false, default: 'Desactivado' },

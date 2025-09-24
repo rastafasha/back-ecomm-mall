@@ -3,6 +3,7 @@ const Producto = require('../models/producto');
 const Marca = require('../models/marca');
 const Categoria = require('../models/categoria');
 const fs = require('fs');
+const { randomInt } = require('crypto');
 
 // Internal function to reduce stock programmatically
 async function reducir_stock_internal(productoId, cantidad) {
