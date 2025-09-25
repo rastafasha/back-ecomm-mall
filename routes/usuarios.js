@@ -35,10 +35,10 @@ const {
 } = require('../middlewares/validar-jwt');
 
 router.get('/', 
-    validarJWT, 
+    // validarJWT, 
     getUsuarios);
 router.get('/all/', 
-    validarJWT, 
+    // validarJWT, 
     getAllUsers);
 router.get('/users_store/:local/', 
     // validarJWT, 

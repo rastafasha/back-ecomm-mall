@@ -12,7 +12,7 @@ const getUsuarios = async(req, res) => {
         Usuario
         .find({}, 'first_name email role google img local') //esto ultimo filtra el resultado
         .skip(desde)
-        .populate('local')
+        .populate('first_name email role google img local')
         .sort({ createdAt: -1 })
         .limit(5),
         Usuario.countDocuments()
@@ -28,12 +28,17 @@ const getUsuarios = async(req, res) => {
 };
 
 const getAllUsers = async(req, res) => {
-
-    const allusuarios = await Usuario.find().populate('first_name email role google img local');
+    const desde = Number(req.query.desde) || 0;
+    
+    const usuarios = await Usuario.find()
+    .skip(desde)
+    .limit(5)
+    .populate('first_name email role google img local');
+    Usuario.countDocuments()
 
     res.json({
         ok: true,
-        allusuarios
+        usuarios
     });
 };
 

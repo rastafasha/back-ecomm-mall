@@ -3,11 +3,11 @@ const PagoEfectivo = require('../models/pago.efectivo');
 
 const getPagosEfectivo = async(req, res) => {
 
-    const pagos_efectivo = await PagoEfectivo.find().sort({ createdAt: -1 });
+    const pagoefectivos = await PagoEfectivo.find().sort({ createdAt: -1 });
 
     res.json({
         ok: true,
-        pagos_efectivo
+        pagoefectivos
     });
 };
 

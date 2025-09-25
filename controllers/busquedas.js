@@ -6,7 +6,12 @@ const Page = require('../models/page');
 const Slider = require('../models/slider');
 const Producto = require('../models/producto');
 const Curso = require('../models/curso');
+const Tienda = require('../models/tienda');
 const Transferencia = require('../models/transferencia');
+const PagoCheque = require('../models/pagocheque');
+const PagoEfectivo = require('../models/pago.efectivo');
+const Categoria = require('../models/categoria');
+const Promocion = require('../models/promocion');
 
 const getTodo = async(req, res = response) => {
 
@@ -17,15 +22,24 @@ const getTodo = async(req, res = response) => {
     const medicos = await Medico.find({ nombre: regex });
     const hospitales = await Hospital.find({ nombre: regex });*/
 
-    const [usuarios, marcas, blogs, pages, productos, sliders, cursos, transferencias] = await Promise.all([
-        Usuario.find({ nombre: regex }),
+    const [usuarios, marcas, blogs, pages, productos, 
+        sliders, cursos, tiendas,  
+        transferencias, pagoecheques, pagoefectivos, categorias,
+        promocions,
+        ] = await Promise.all([
+        Usuario.find({ first_name: regex }),
         Marca.find({ nombre: regex }),
-        Blog.find({ nombre: regex }),
-        Page.find({ nombre: regex }),
+        Blog.find({ titulo: regex }),
+        Page.find({ titulo: regex }),
         Producto.find({ titulo: regex }),
-        Slider.find({ nombre: regex }),
+        Slider.find({ first_title: regex }),
         Curso.find({ nombre: regex }),
-        Transferencia.find({ nombre: regex }),
+        Tienda.find({ nombre: regex }),
+        Transferencia.find({ referencia: regex}),
+        PagoCheque.find({ ncheck: regex }),
+        PagoEfectivo.find({ name_person: regex }),
+        Categoria.find({ nombre: regex }),
+        Promocion.find({ producto_title: regex }),
     ]);
 
     res.json({
@@ -37,7 +51,12 @@ const getTodo = async(req, res = response) => {
         productos,
         sliders,
         cursos,
-        transferencias
+        tiendas,
+        transferencias,
+        pagoecheques,
+        pagoefectivos,
+        categorias,
+        promocions,
 
     });
 }
@@ -58,7 +77,7 @@ const getDocumentosColeccion = async(req, res = response) => {
 
 
         case 'usuarios':
-            data = await Usuario.find({ nombre: regex });
+            data = await Usuario.find({ first_name: regex, email: regex });
             break;
 
         case 'blogs':
@@ -66,11 +85,11 @@ const getDocumentosColeccion = async(req, res = response) => {
             break;
 
         case 'pages':
-            data = await Page.find({ nombre: regex });
+            data = await Page.find({ titulo: regex });
             break;
 
         case 'sliders':
-            data = await Slider.find({ nombre: regex });
+            data = await Slider.find({ first_title: regex });
             break;
 
         case 'productos':
@@ -80,8 +99,23 @@ const getDocumentosColeccion = async(req, res = response) => {
         case 'cursos':
             data = await Curso.find({ nombre: regex });
             break;
+        case 'tiendas':
+            data = await Tienda.find({ nombre: regex });
+            break;
         case 'trasnferencias':
-            data = await Transferencia.find({ referencia: regex, monto: regex, fecha: regex });
+            data = await Transferencia.find({ referencia: regex, monto: regex, fecha: regex, bankName:regex });
+            break;
+        case 'pagoecheques':
+            data = await PagoCheque.find({ ncheck: regex, name_person: regex, amount:regex});
+            break;
+        case 'pagoefectivos':
+            data = await PagoEfectivo.find({ name_person: regex, amount:regex});
+            break;
+        case 'categorias':
+            data = await Categoria.find({ nombre: regex, subcategorias:regex });
+            break;
+        case 'promocions':
+            data = await Promocion.find({ producto_title: regex });
             break;
 
 
