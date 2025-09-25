@@ -117,7 +117,7 @@ const getTiendaLocalEmployees = async(req, res) => {
     // Usar find() para obtener todos los usuarios asociados con el ID del local y los roles especificados
     Usuario.find({ 
         local: local, 
-        role: { $in: ['TIENDA', 'ALMACEN', 'VENTAS'] } 
+        // role: { $in: ['TIENDA', 'ALMACEN', 'VENTAS'] } 
     }).exec((err, tiendauserslocal) => {
         if (err) {
             res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
