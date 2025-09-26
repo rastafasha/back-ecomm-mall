@@ -35,9 +35,9 @@ const getTodo = async(req, res = response) => {
         Slider.find({ first_title: regex }),
         Curso.find({ nombre: regex }),
         Tienda.find({ nombre: regex }),
-        Transferencia.find({ referencia: regex}),
-        PagoCheque.find({ ncheck: regex }),
-        PagoEfectivo.find({ name_person: regex }),
+        Transferencia.find({ $or: [{referencia: regex}, {fecha: regex}, {amount: regex}, {bankName: regex}]}),
+        PagoCheque.find({ $or: [{ncheck: regex}, {name_person: regex}, {amount: regex}] }),
+        PagoEfectivo.find({ $or: [{name_person: regex}, {amount: regex}] }),
         Categoria.find({ nombre: regex }),
         Promocion.find({ producto_title: regex }),
     ]);
@@ -72,7 +72,6 @@ const getDocumentosColeccion = async(req, res = response) => {
     switch (tabla) {
         case 'marcas':
             data = await Marca.find({ nombre: regex })
-                .populate('nombre img descripcion');
             break;
 
 
@@ -99,21 +98,27 @@ const getDocumentosColeccion = async(req, res = response) => {
         case 'cursos':
             data = await Curso.find({ nombre: regex });
             break;
+
         case 'tiendas':
             data = await Tienda.find({ nombre: regex });
             break;
+
         case 'trasnferencias':
-            data = await Transferencia.find({ referencia: regex, monto: regex, fecha: regex, bankName:regex });
+            data = await Transferencia.find({ $or: [{referencia: regex}, {fecha: regex}, {amount: regex}, {bankName: regex}]});
             break;
+
         case 'pagoecheques':
-            data = await PagoCheque.find({ ncheck: regex, name_person: regex, amount:regex});
+            data = await PagoCheque.find({ $or: [{ncheck: regex}, {name_person: regex}, {amount: regex}]});
             break;
+
         case 'pagoefectivos':
-            data = await PagoEfectivo.find({ name_person: regex, amount:regex});
+            data = await PagoEfectivo.find({ $or: [{name_person: regex}, {amount: regex}] });
             break;
+
         case 'categorias':
             data = await Categoria.find({ nombre: regex, subcategorias:regex });
             break;
+            
         case 'promocions':
             data = await Promocion.find({ producto_title: regex });
             break;

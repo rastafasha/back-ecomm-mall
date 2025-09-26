@@ -3,11 +3,11 @@ const PagoCheque = require('../models/pagocheque');
 
 const getPagosCheque = async(req, res) => {
 
-    const pagos_cheques = await PagoCheque.find().sort({ createdAt: -1 });
+    const pagoscheques = await PagoCheque.find().sort({ createdAt: -1 });
 
     res.json({
         ok: true,
-        pagos_cheques
+        pagoscheques
     });
 };
 
