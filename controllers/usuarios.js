@@ -13,8 +13,8 @@ const getUsuarios = async(req, res) => {
         .find({}, 'first_name email role google img local') //esto ultimo filtra el resultado
         .skip(desde)
         .populate('first_name email role google img local')
-        .sort({ createdAt: -1 })
-        .limit(5),
+        .sort({ createdAt: -1 }),
+        // .limit(5),
         Usuario.countDocuments()
 
     ]);
