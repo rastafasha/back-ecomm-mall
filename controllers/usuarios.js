@@ -371,7 +371,7 @@ const actualizarUsuario = async(req, res = response) => {
     //todo: validar token y comprobar si el usuario es correcto
 
     // modificado por José Prados
-    const uid = req.body._id;
+    const uid = req.body.uid;
     // const uid = req.params.id;
 
     try {
@@ -390,6 +390,8 @@ const actualizarUsuario = async(req, res = response) => {
             last_name: req.body.last_name,
             local: req.body.local,
             role: req.body.role,
+            pais: req.body.pais,
+            lang: req.body.lang,
             telefono: req.body.telefono,
             numdoc: req.body.numdoc,
             email: req.body.email,

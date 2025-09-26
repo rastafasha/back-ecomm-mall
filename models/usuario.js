@@ -8,7 +8,8 @@ const UsuarioSchema = Schema({
     img: { type: String, },
     role: { type: String, require: true, default: 'USER' },
     local: { type: Schema.ObjectId, ref: 'tienda'},
-    // pais: { type: String, },
+    pais: { type: String, },
+    lang: { type: String, },
     telefono: { type: String, },
     numdoc: { type: String },
     google: { type: Boolean, default: false }
