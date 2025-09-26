@@ -44,7 +44,7 @@ const fileUpload = async (req, res = response) => {
     const extensionArchivo = nombreCortado[nombreCortado.length - 1];
 
     //validar extension
-    const extensionesValidas = ['png', 'jpg', 'jpeg', 'gif'];
+    const extensionesValidas = ['png', 'jpg', 'jpeg', 'gif', 'ico', 'svg'];
     if (!extensionesValidas.includes(extensionArchivo)) {
         return res.status(400).json({
             ok: false,
