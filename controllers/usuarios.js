@@ -462,13 +462,16 @@ const actualizarStatusUsuario = async(req, res = response) => {
         }
 
         //actualizamos solo el role
-        const { role } = req.body;
+        // const { role } = req.body;
+        const role = {
+            role: req.body.role,
+        }
         
         const usuarioActualizado = await Usuario.findByIdAndUpdate(uid, role, { new: true });
 
         res.json({
             ok: true,
-            usuario: usuarioActualizado.role
+            role: usuarioActualizado.role
         });
 
     } catch (error) {
