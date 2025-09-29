@@ -31,7 +31,7 @@ const getTodo = async(req, res = response) => {
         Marca.find({ nombre: regex }),
         Blog.find({ titulo: regex }),
         Page.find({ titulo: regex }),
-        Producto.find({ titulo: regex }),
+        Producto.find({ $or: [{titulo: regex}, {sku: regex}] }),
         Slider.find({ first_title: regex }),
         Curso.find({ nombre: regex }),
         Tienda.find({ nombre: regex }),
@@ -92,7 +92,7 @@ const getDocumentosColeccion = async(req, res = response) => {
             break;
 
         case 'productos':
-            data = await Producto.find({ titulo: regex });
+            data = await Producto.find({ $or: [{titulo: regex}, {sku: regex}] });
             break;
 
         case 'cursos':
