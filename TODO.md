@@ -1,0 +1,1 @@
+- [x] Modify listar_newest function to return products in random order

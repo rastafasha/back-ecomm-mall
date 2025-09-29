@@ -373,11 +373,21 @@ async function find_by_brandig(req, res) {
 }
 
 function listar_newest(req, res) {
-    Producto.find({  status: ['Activo'] })
+    Producto.find({ status: ['Activo'] })
     .populate('categoria')
-    .sort({ createdAt: -1 }).limit(4).exec((err, data) => {
-        if (data) {
-            res.status(200).send({ productos: data });
+    .exec((err, productos) => {
+        if (err) {
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+        } else {
+            if (productos) {
+                // Shuffle the array
+                const shuffled = productos.sort(() => 0.5 - Math.random());
+                // Take first 4
+                const randomProductos = shuffled.slice(0, 4);
+                res.status(200).send({ productos: randomProductos });
+            } else {
+                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
+            }
         }
     });
 }
