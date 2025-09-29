@@ -211,6 +211,21 @@ const actualizarImagen = async(tipo, id, nombreArchivo) => {
             await slider.save();
             return true;
             break;
+
+        case 'categorias':
+            const categoria = await Categoria.findById(id);
+            if (!categoria) {
+                console.log('No es un categoria por id');
+                return false;
+            }
+            pathViejo = `./uploads/categorias/${categoria.img}`;
+
+            borrarImagen(pathViejo);
+
+            categoria.img = nombreArchivo;
+            await categoria.save();
+            return true;
+            break;
         
        
 
