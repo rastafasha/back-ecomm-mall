@@ -84,7 +84,13 @@ const destacado = async(req, res) => {
             res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
         } else {
             if (productos) {
-                res.status(200).send({ productos: productos });
+                // Shuffle the array
+                const shuffled = productos.sort(() => 0.5 - Math.random());
+                // Take first 4
+                const randomProductos = shuffled.slice(0, 4);
+                res.status(200).send({ productos: randomProductos });
+
+                // res.status(200).send({ productos: productos });
             } else {
                 res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
             }

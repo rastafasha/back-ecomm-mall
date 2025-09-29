@@ -86,8 +86,12 @@ router.get('/productos_stock/reducir/:id/:cantidad', validarJWT, reducir_stock);
 router.get('/productos_stock/aumentar/:id/:cantidad', validarJWT, aumentar_stock);
 
 router.get('/productos_ventas/aumentar/:id', validarJWT, aumentar_venta);
-router.get('/productos_ventas/best_sellers', validarJWT, listar_best_sellers);
-router.get('/productos_ventas/populares', validarJWT, listar_populares);
+router.get('/productos_ventas/best_sellers', 
+    // validarJWT, 
+    listar_best_sellers);
+router.get('/productos_ventas/populares', 
+    // validarJWT, 
+    listar_populares);
 
 router.get('/producto_general/general/data/:filtro?', listar_general_data);
 
