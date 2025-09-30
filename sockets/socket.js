@@ -24,11 +24,11 @@ io.on('connection', function(socket) {
     });
     socket.on('save-carrito', function(data) {
         io.emit('new-carrito', data);
-        console.log(data);
+        console.log('carrito',data);
     });
     socket.on('save-carrito_dos', function(data) {
         io.emit('new-carrito_dos', data);
-        console.log(data);
+        console.log('carrito2',data);
     });
     socket.on('save-mensaje', function(data) {
         io.emit('new-mensaje', data);
@@ -46,6 +46,15 @@ io.on('connection', function(socket) {
         io.emit('new-notification', data);
     });
 });
+
+// Configurar comunicación periódica cada 30 segundos
+setInterval(() => {
+    io.emit('ping', {
+        message: 'Conexión activa',
+        timestamp: new Date()
+    });
+    console.log('Ping enviado a todos los clientes');
+}, 30000);
 
 
 

@@ -55,6 +55,8 @@ const listarTicketPorVenta = (req, res) => {
             res.status(500).send({ error: err });
         }
     });
+
+    
 }
 
 const crearTicket = async(req, res) => {
@@ -227,7 +229,6 @@ const dataMessenger = (req, res) => {
             }]
         }, ]
     };
-
 
 
     Mensaje.find(data).sort({ createdAt: 1 }).exec(function(err, messages) {

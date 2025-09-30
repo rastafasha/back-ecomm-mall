@@ -153,7 +153,8 @@ const listarFavoritoPorUsuario = (req, res) => {
         } else {
             res.status(500).send({ error: err });
         }
-    }).populate('producto');
+    }).populate('producto')
+    .sort({createdAt: - 1});
 }
 
 

@@ -32,7 +32,7 @@ const getAllUsers = async(req, res) => {
     
     const usuarios = await Usuario.find()
     .skip(desde)
-    .limit(5)
+    // .limit(5)
     .populate('first_name email role google img local');
     Usuario.countDocuments()
 

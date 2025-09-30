@@ -38,7 +38,7 @@ router.get('/',
     validarJWT, 
     getUsuarios);
 router.get('/all/', 
-    validarJWT, 
+    // validarJWT, 
     getAllUsers);
 router.get('/users_store/:local/', 
     validarJWT, 

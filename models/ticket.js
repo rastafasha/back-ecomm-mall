@@ -6,6 +6,7 @@ var TicketSchema = Schema({
     estado: { type: String },
     status: { type: String },
     user: { type: Schema.ObjectId, ref: 'user' },
+    vendedor: { type: Schema.ObjectId, ref: 'user' },
     venta: { type: Schema.ObjectId, ref: 'venta' },
     createdAt: { type: Date, default: Date.now, required: true },
 });
