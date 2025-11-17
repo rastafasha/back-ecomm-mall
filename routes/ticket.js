@@ -14,7 +14,8 @@ const {
     send,
     listarTicketPorVenta,
     listar_tickets,
-    listar_todos
+    listar_todos,
+    dataMensajes
 } = require('../controllers/ticketController');
 const { validarJWT } = require('../middlewares/validar-jwt');
 const { check } = require('express-validator');

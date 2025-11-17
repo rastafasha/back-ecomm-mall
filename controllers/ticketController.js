@@ -207,7 +207,6 @@ const send = (req, res) => {
 
 }
 
-
 const dataMessenger = (req, res) => {
 
     var de = req.params['de'];
@@ -240,14 +239,16 @@ const dataMessenger = (req, res) => {
     });
 }
 
+
+
 function listar_tickets(req, res) {
     var id = req.params['id'];
-    Ticket.find({ venta: id }).sort({ createdAt: -1 }).exec((err, data_tickets) => {
+    Mensaje.find({ ticket: id }).sort({ createdAt: 1 }).exec((err, data_mansajes) => {
         if (err) {
             res.status(500).send({ error: err });
         } else {
-            if (data_tickets) {
-                res.status(200).send({ tickets: data_tickets });
+            if (data_mansajes) {
+                res.status(200).send({ mensajes: data_mansajes });
             }
         }
     });
