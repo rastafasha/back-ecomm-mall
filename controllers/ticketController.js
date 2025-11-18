@@ -139,6 +139,8 @@ const borrarTicket = async(req, res) => {
         }
 
         await Ticket.findByIdAndDelete(id);
+        // Eliminamos todos los mensajes asociados al ticket
+        await Mensaje.deleteMany({ ticket: id });
 
         res.json({
             ok: true,

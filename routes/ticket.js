@@ -37,7 +37,7 @@ router.put('/:id', [
     validarCampos
 ], actualizarTicket);
 
-router.delete('/:id', validarJWT, borrarTicket);
+router.delete('/delete/:id', validarJWT, borrarTicket);
 
 router.get('/:id', getTicket);
 
