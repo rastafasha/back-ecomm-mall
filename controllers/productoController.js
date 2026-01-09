@@ -693,6 +693,25 @@ function listar_productosCategNombre(req, res) {
     });
 
 }
+function listar_productosSubCategNombre(req, res) {
+
+    const nombre = req.params.nombre;
+
+    Producto.find({ subcategoria: nombre, status: ['Activo']  })
+    .populate('subcategoria')
+    .exec((err, productos) => {
+        if (err) {
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+        } else {
+            if (productos) {
+                res.status(200).send({ productos: productos });
+            } else {
+                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
+            }
+        }
+    });
+
+}
 
 function listar_productosColor(req, res) {
 
@@ -1415,6 +1434,7 @@ module.exports = {
     ecoomerce,
     listar_productosColor,
     listar_productosCategNombre,
+    listar_productosSubCategNombre,
     getProductosTiendaId,
     reducir_stock_internal
 

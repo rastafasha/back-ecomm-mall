@@ -35,6 +35,7 @@ const {
     getProductosActivos,
     listar_productosColor,
     listar_productosCategNombre,
+    listar_productosSubCategNombre,
     getProductosTiendaId
 
 } = require('../controllers/productoController');
@@ -104,6 +105,7 @@ router.get('/productos_general/destacado/', destacado);
 router.get('/productos_general/cat/:id', listar_productosCateg);
 router.get('/productos_general/color/:id', listar_productosColor);
 router.get('/categoria_nombre/cat/:name', listar_productosCategNombre);
+router.get('/subcategoria_nombre/cat/:name', listar_productosSubCategNombre);
 
 
 
