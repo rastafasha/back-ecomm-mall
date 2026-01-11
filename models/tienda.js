@@ -6,6 +6,7 @@ var TiendaSchema = Schema({
     slug: { type: String, required: true, unique: true },
     local: { type: String, required: true },
     pais: { type: String, required: false },
+    moneda: { type: String, required: false },
     ciudad: { type: String, required: false },
     zip: { type: String, required: false },
     direccion: { type: String, required: false },
