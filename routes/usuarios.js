@@ -101,7 +101,9 @@ router.put('/update/statusrole/:id', [
 
 router.delete('/:id', [validarJWT, validarAdminRole], borrarUsuario);
 
-router.get('/:id', [validarJWT], getUsuario);
+router.get('/:id', 
+    // [validarJWT], 
+    getUsuario);
 router.get('/numdoc/:numdoc', [validarJWT], getUsuariobyCedula);
 
 
