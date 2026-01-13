@@ -234,6 +234,23 @@ function find_by_slug(req, res) {
         }
     });
 }
+function find_by_userid(req, res) {
+    const userid = req.params.userid;
+
+    Tienda.find({ user: userid })
+    .populate('user')
+    .exec((err, tienda_data) => {
+        if (err) {
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+        } else {
+            if (tienda_data) {
+                res.status(200).send({ tiendas: tienda_data });
+            } else {
+                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
+            }
+        }
+    });
+}
 
 
 
@@ -298,5 +315,6 @@ module.exports = {
     getTiendasActivos,
     desactivar,
     activar,
-    find_by_slug
+    find_by_slug,
+    find_by_userid
 };
