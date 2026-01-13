@@ -85,6 +85,7 @@ router.get('/productos_nuevos/show_producto',  listar_newest);
 router.get('/productos_stock/reducir/:id/:cantidad', validarJWT, reducir_stock);
 router.get('/productos_stock/aumentar/:id/:cantidad', validarJWT, aumentar_stock);
 
+
 router.get('/productos_ventas/aumentar/:id', validarJWT, aumentar_venta);
 router.get('/productos_ventas/best_sellers', 
     // validarJWT, 

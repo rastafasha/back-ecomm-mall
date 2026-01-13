@@ -1,6 +1,7 @@
 const { response } = require('express');
 const Producto = require('../models/producto');
 const Marca = require('../models/marca');
+const Tienda = require('../models/tienda');
 const Categoria = require('../models/categoria');
 const fs = require('fs');
 const { randomInt } = require('crypto');
@@ -128,6 +129,7 @@ const getProducto = async(req, res) => {
         });
 
 };
+
 const getProductoSlug = async(req, res) => {
 
     const slug = req.params.slug;
@@ -158,6 +160,7 @@ const getProductoSlug = async(req, res) => {
         });
 
 };
+
 const getProductosTiendaId= async(req, res) => {
 
     const id = req.params.id;
@@ -342,6 +345,7 @@ function find_by_slug(req, res) {
     });
 }
 
+
 async function find_by_brandig(req, res) {
     try {
         const brandSlugOrName = req.params['slug'] || req.params['marca'] ;
@@ -377,6 +381,7 @@ async function find_by_brandig(req, res) {
         return res.status(500).send({ message: 'Error en el servidor.' });
     }
 }
+
 
 function listar_newest(req, res) {
     Producto.find({ status: ['Activo'] })
@@ -1417,7 +1422,7 @@ module.exports = {
     listar_productosColor,
     listar_productosCategNombre,
     getProductosTiendaId,
-    reducir_stock_internal
+    reducir_stock_internal,
 
 
 };
