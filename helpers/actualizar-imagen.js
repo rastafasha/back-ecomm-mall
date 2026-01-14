@@ -12,6 +12,7 @@ const Slider = require('../models/slider');
 const Curso = require('../models/curso');
 const Categoria = require('../models/categoria');
 const Tienda = require('../models/tienda');
+const Driver = require('../models/driverprofile');
 
 const borrarImagen = (path) => {
 
@@ -219,6 +220,21 @@ const actualizarImagen = async(tipo, id, nombreArchivo) => {
                 return false;
             }
             pathViejo = `./uploads/categorias/${categoria.img}`;
+
+            borrarImagen(pathViejo);
+
+            categoria.img = nombreArchivo;
+            await categoria.save();
+            return true;
+            break;
+
+        case 'drivers':
+            const driver = await Driver.findById(id);
+            if (!driver) {
+                console.log('No es un driver por id');
+                return false;
+            }
+            pathViejo = `./uploads/drivers/${driver.img}`;
 
             borrarImagen(pathViejo);
 

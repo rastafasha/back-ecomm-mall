@@ -1,21 +1,20 @@
 const { response } = require('express');
-const Asignacion = require('../models/asignardelivery');
 const Driverp = require('../models/driverprofile');
-const crearAsignacion = async(req, res) => {
+
+const crearDriver = async(req, res) => {
 
     const uid = req.uid;
-    const asignacion = new Asignacion({
+    const driver = new Driverp({
         usuario: uid,
         ...req.body
     });
 
     try {
-
-        const asignacionDB = await asignacion.save();
+        const driverDB = await driver.save();
 
         res.json({
             ok: true,
-            asignacion: asignacionDB
+            driver: driverDB
         });
 
     } catch (error) {
@@ -29,20 +28,13 @@ const crearAsignacion = async(req, res) => {
 
 };
 
-const actualizarAsignacion = async(req, res) => {
+const actualizarDriver = async(req, res) => {
 
     const id = req.params.id;
     const uid = req.uid;
 
     try {
 
-        const asignacion = await Asignacion.findById(id);
-        if (!asignacion) {
-            return res.status(500).json({
-                ok: false,
-                msg: 'asignacion no encontrado por el id'
-            });
-        }
         const driver = await Driverp.findById(id);
         if (!driver) {
             return res.status(500).json({
@@ -51,17 +43,16 @@ const actualizarAsignacion = async(req, res) => {
             });
         }
 
-        const cambiosAsignacion = {
+        const cambiosDriver = {
             ...req.body,
             usuario: uid
         }
 
-        const asignacionActualizado = await Asignacion.findByIdAndUpdate(id, cambiosAsignacion, { new: true });
+        const driverActualizado = await Driverp.findByIdAndUpdate(id, cambiosDriver, { new: true });
 
         res.json({
             ok: true,
-            asignacionActualizado,
-            driver
+            driverActualizado
         });
 
     } catch (error) {
@@ -75,63 +66,64 @@ const actualizarAsignacion = async(req, res) => {
 
 };
 
-const getAsignacions = async(req, res) => {
+const getDrivers = async(req, res) => {
 
-    const asignacions = await Asignacion.find()
-      
+    const drivers = await Driverp.find()
+        .populate('user')
 
     res.json({
         ok: true,
-        asignacions
+        drivers
     });
 };
 
-const getAsignacion = async(req, res) => {
+const getDriver = async(req, res) => {
 
     const id = req.params.id;
 
-    Asignacion.findById(id)
-        .populate('driver')
-        .exec((err, asignacion) => {
+    Driverp.findById(id)
+        .populate('user')
+        .populate('asignaciones')
+        .exec((err, driver) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,
-                    mensaje: 'Error al buscar asignacion',
+                    mensaje: 'Error al buscar driver',
                     errors: err
                 });
             }
-            if (!asignacion) {
+            if (!driver) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'El asignacion con el id ' + id + 'no existe',
-                    errors: { message: 'No existe un asignacion con ese ID' }
+                    mensaje: 'El driver con el id ' + id + 'no existe',
+                    errors: { message: 'No existe un driver con ese ID' }
                 });
 
             }
             res.status(200).json({
                 ok: true,
-                asignacion: asignacion
+                driver: driver
             });
         });
 
 };
 
 
-const borrarAsignacion = async(req, res) => {
+const borrarDriver = async(req, res) => {
 
     const id = req.params.id;
 
     try {
 
-        const asignacion = await Asignacion.findById(id);
-        if (!asignacion) {
+        const driver = await Driverp.findById(id);
+        if (!driver) {
             return res.status(500).json({
                 ok: false,
-                msg: 'asignacion no encontrado por el id'
+                msg: 'driver no encontrado por el id'
             });
         }
 
-        await asignacion.findByIdAndDelete(id);
+        await driver.findByIdAndDelete(id);
 
         res.json({
             ok: true,
@@ -146,30 +138,30 @@ const borrarAsignacion = async(req, res) => {
     }
 };
 
-const listarAsignacionPorUsuario = (req, res) => {
+const listarDriverPorUsuario = (req, res) => {
     var id = req.params['id'];
-    Asignacion.find({ usuario: id }, (err, data_asignacion) => {
+    Driverp.find({ usuario: id }, (err, data_driver) => {
         if (!err) {
-            if (data_asignacion) {
-                res.status(200).send({ asignacions: data_asignacion });
+            if (data_driver) {
+                res.status(200).send({ drivers: data_driver });
             } else {
                 res.status(500).send({ error: err });
             }
         } else {
             res.status(500).send({ error: err });
         }
-    }).populate('producto')
+    }).populate('user')
     .sort({createdAt: - 1});
 }
 
 
 
 module.exports = {
-    crearAsignacion,
-    actualizarAsignacion,
-    getAsignacions,
-    getAsignacion,
-    borrarAsignacion,
-    listarAsignacionPorUsuario
+    crearDriver,
+    actualizarDriver,
+    getDrivers,
+    getDriver,
+    borrarDriver,
+    listarDriverPorUsuario
 
 };
