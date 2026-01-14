@@ -23,8 +23,8 @@ var ProductoSchema = Schema({
     local: { type: Schema.ObjectId, ref: 'tienda' },
     stars: { type: Number },
     ventas: { type: Number },
-    status: { type: String, required: false, default: 'Desactivado' },
     isFeatured: { type: Boolean, required: false },
+    status: { type: String, required: false, default: 'Desactivado' },
     createdAt: { type: Date, default: Date.now, required: true },
     updatedAt: { type: Date }
 });
