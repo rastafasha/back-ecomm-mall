@@ -1,11 +1,12 @@
 const { response } = require('express');
 const Driverp = require('../models/driverprofile');
+const Usuario = require('../models/usuario');
 
 const crearDriver = async(req, res) => {
 
     const uid = req.uid;
     const driver = new Driverp({
-        usuario: uid,
+        user: uid,
         ...req.body
     });
 
@@ -45,7 +46,7 @@ const actualizarDriver = async(req, res) => {
 
         const cambiosDriver = {
             ...req.body,
-            usuario: uid
+            user: uid
         }
 
         const driverActualizado = await Driverp.findByIdAndUpdate(id, cambiosDriver, { new: true });
@@ -138,21 +139,46 @@ const borrarDriver = async(req, res) => {
     }
 };
 
-const listarDriverPorUsuario = (req, res) => {
-    var id = req.params['id'];
-    Driverp.find({ usuario: id }, (err, data_driver) => {
-        if (!err) {
-            if (data_driver) {
-                res.status(200).send({ drivers: data_driver });
-            } else {
-                res.status(500).send({ error: err });
-            }
-        } else {
-            res.status(500).send({ error: err });
+const listarDriverPorUsuario = async (req, res) => {
+    const userId = req.params['userId'];
+
+    try {
+        //traemos el id del usuario
+        const usuario = await Usuario.findById(userId);
+        console.log(userId);
+        //filtramos el id y lo comparamos con el user dentro de driver.user
+        const driver = await Driverp.findOne({user: userId});
+        console.log(driver);
+        if (!usuario) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: `El usuario con el id ${userId} no existe`,
+                errors: { message: 'No existe un usuario con ese ID' }
+            });
         }
-    }).populate('user')
-    .sort({createdAt: - 1});
-}
+
+        if (driver && driver.user && driver.user.toString() !== userId) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'El driver no pertenece al usuario especificado',
+                errors: { message: 'Driver does not belong to the user' }
+            });
+        }
+
+        res.status(200).json({
+            ok: true,
+            usuario: usuario,
+            driver: driver || null
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            mensaje: 'Error al buscar usuario y driver',
+            errors: error
+        });
+    }
+};
 
 
 

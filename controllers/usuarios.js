@@ -178,6 +178,7 @@ const getUsuario = async(req, res) => {
     const uid = req.uid;
 
     Usuario.findById(id)
+    .populate('driver')
         .exec((err, usuario) => {
             if (err) {
                 return res.status(500).json({

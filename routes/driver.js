@@ -19,7 +19,7 @@
  
  router.get('/', getDrivers);
  router.get('/:id', getDriver);
- router.get('/user/:id', listarDriverPorUsuario);
+ router.get('/user/:userId', listarDriverPorUsuario);
  
  router.post('/store', [
      validarJWT,
