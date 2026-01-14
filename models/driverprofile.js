@@ -6,7 +6,9 @@ const DriverProfileSchema = Schema({
     color: { type: String, require: true, unique: true },
     año: { type: String, require: true },
     img: { type: String, },
+    status: { type: String, required: false, default: 'PENDING' },
     user: { type: String, require: true, ref: 'USER' },
+    asignaciones: { type: String, require: false, ref: 'USER' },
     // rutas: { type: String, require: true, default: 'USER' },
 });
 

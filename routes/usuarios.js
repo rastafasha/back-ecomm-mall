@@ -19,6 +19,8 @@ const {
     getTiendaUsers,
     getAlmacenUsers,
     getTEmployees,
+    getTDrivers,
+    getTDriversLocal,
     getTClients,
     actualizarStatusUsuario,
     getUsuariobyCedula,
@@ -48,6 +50,14 @@ router.get('/employe_store/:local/',
     getTiendaLocalEmployees);
 router.get('/users_almacen/', validarJWT, getAlmacenUsers);
 router.get('/employees/', validarJWT, getTEmployees);
+router.get('/drivers/',
+    //  validarJWT, 
+     getTDrivers
+    );
+router.get('/drivers/local/:local',
+    //  validarJWT, 
+     getTDriversLocal
+    );
 router.get('/clients/', validarJWT, getTClients);
 
 router.get('/user_token/set/:email', set_token_recovery);

@@ -2,6 +2,7 @@ const { response } = require('express');
 const Usuario = require('../models/usuario');
 const bcrypt = require('bcryptjs');
 const { generarJWT } = require('../helpers/jwt');
+const Tienda = require('../models/tienda');
 
 
 const getUsuarios = async(req, res) => {
@@ -60,6 +61,41 @@ const getTEmployees = async(req, res) => {
         // total
     });
 };
+const getTDrivers = async(req, res) => {
+
+    // const desde = Number(req.query.desde) || 0;
+
+    const drivers = await Usuario.find()
+    .where('role')
+    .equals('CHOFER' )
+    // .skip(desde)
+    // .limit(5)
+    .populate('first_name email role google img local')
+    
+    .sort({ createdAt: -1 });
+    // Usuario.countDocuments()
+
+    res.json({
+        ok: true,
+        drivers,
+        // total
+    });
+};
+const getTDriversLocal = async(req, res) => {
+
+    const local = req.params.local;
+    const uid = req.uid;
+
+    const drivers = await Usuario.find({ local: local, role: 'CHOFER' })
+    .populate('first_name email role google img local')
+    .sort({ createdAt: -1 });
+
+    res.json({
+        ok: true,
+        drivers
+    });
+
+};
 const getTClients = async(req, res) => {
 
     const desde = Number(req.query.desde) || 0;
@@ -80,24 +116,6 @@ const getTClients = async(req, res) => {
 };
 
 
-const getTiendaUsersRole = async(req, res) => {
-
-    const desde = Number(req.query.desde) || 0;
-
-    const tiendausers = await Usuario.find()
-    .where('role')
-    .equals('TIENDA' )
-    .skip(desde)
-    .limit(5)
-    .sort({ createdAt: -1 });
-    Usuario.countDocuments()
-
-    res.json({
-        ok: true,
-        tiendauserslocal,
-        
-    });
-};
 
 const getTiendaUsers = async(req, res) => {
     var local = req.params['local'];
@@ -619,6 +637,8 @@ module.exports = {
     getTiendaUsers,
     getAlmacenUsers,
     getTEmployees,
+    getTDrivers,
+    getTDriversLocal,
     getTClients,
     actualizarStatusUsuario,
     getUsuariobyCedula,
