@@ -411,7 +411,7 @@ const actualizarUsuario = async(req, res = response) => {
             local: req.body.local,
             role: req.body.role,
             pais: req.body.pais,
-            city: req.body.city,
+            ciudad: req.body.ciudad,
             lang: req.body.lang,
             telefono: req.body.telefono,
             numdoc: req.body.numdoc,
