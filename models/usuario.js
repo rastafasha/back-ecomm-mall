@@ -7,6 +7,7 @@ const UsuarioSchema = Schema({
     password: { type: String, require: true },
     img: { type: String, },
     pais: { type: String, require: false, ref: 'PAIS' },
+    ciudad: { type: String, require: false },
     role: { type: String, require: true, default: 'USER' },
     driver: { type: Schema.ObjectId, require: false, ref: 'driver' },
     local: { type: Schema.ObjectId, ref: 'tienda'},
