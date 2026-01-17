@@ -12,7 +12,7 @@ const Slider = require('../models/slider');
 const Curso = require('../models/curso');
 const Categoria = require('../models/categoria');
 const Tienda = require('../models/tienda');
-const Driver = require('../models/driverprofile');
+const Driver = require('../models/driver');
 
 const borrarImagen = (path) => {
 
@@ -238,8 +238,8 @@ const actualizarImagen = async(tipo, id, nombreArchivo) => {
 
             borrarImagen(pathViejo);
 
-            categoria.img = nombreArchivo;
-            await categoria.save();
+            driver.img = nombreArchivo;
+            await driver.save();
             return true;
             break;
         

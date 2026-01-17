@@ -16,4 +16,4 @@ const DriverProfileSchema = Schema({
 });
 
 
-module.exports = model('driverp', DriverProfileSchema);
+module.exports = model('driver', DriverProfileSchema);

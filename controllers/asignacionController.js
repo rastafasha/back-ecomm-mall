@@ -1,6 +1,6 @@
 const { response } = require('express');
 const Asignacion = require('../models/asignardelivery');
-const Driverp = require('../models/driverprofile');
+const Driver = require('../models/driver');
 const crearAsignacion = async(req, res) => {
 
     const uid = req.uid;
@@ -43,7 +43,7 @@ const actualizarAsignacion = async(req, res) => {
                 msg: 'asignacion no encontrado por el id'
             });
         }
-        const driver = await Driverp.findById(id);
+        const driver = await Driver.findById(id);
         if (!driver) {
             return res.status(500).json({
                 ok: false,

@@ -4,7 +4,7 @@ const AsignarDeliverySchema = Schema({
    
     driver: {
         type: Schema.Types.ObjectId,
-        ref: 'user',
+        ref: 'driver',
         role:'CHOFER',
         require: true
     },

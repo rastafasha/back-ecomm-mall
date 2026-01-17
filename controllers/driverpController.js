@@ -1,11 +1,11 @@
 const { response } = require('express');
-const Driverp = require('../models/driverprofile');
+const Driver = require('../models/driver');
 const Usuario = require('../models/usuario');
 
 const crearDriver = async(req, res) => {
 
     const uid = req.uid;
-    const driver = new Driverp({
+    const driver = new Driver({
         user: uid,
         ...req.body
     });
@@ -36,7 +36,7 @@ const actualizarDriver = async(req, res) => {
 
     try {
 
-        const driver = await Driverp.findById(id);
+        const driver = await Driver.findById(id);
         if (!driver) {
             return res.status(500).json({
                 ok: false,
@@ -49,7 +49,7 @@ const actualizarDriver = async(req, res) => {
             user: uid
         }
 
-        const driverActualizado = await Driverp.findByIdAndUpdate(id, cambiosDriver, { new: true });
+        const driverActualizado = await Driver.findByIdAndUpdate(id, cambiosDriver, { new: true });
 
         res.json({
             ok: true,
@@ -69,7 +69,7 @@ const actualizarDriver = async(req, res) => {
 
 const getDrivers = async(req, res) => {
 
-    const drivers = await Driverp.find()
+    const drivers = await Driver.find()
         .populate('user')
 
     res.json({
@@ -82,7 +82,7 @@ const getDriver = async(req, res) => {
 
     const id = req.params.id;
 
-    Driverp.findById(id)
+    Driver.findById(id)
         .populate('user')
         .populate('asignaciones')
         .exec((err, driver) => {
@@ -116,7 +116,7 @@ const borrarDriver = async(req, res) => {
 
     try {
 
-        const driver = await Driverp.findById(id);
+        const driver = await Driver.findById(id);
         if (!driver) {
             return res.status(500).json({
                 ok: false,
@@ -147,7 +147,7 @@ const listarDriverPorUsuario = async (req, res) => {
         const usuario = await Usuario.findById(userId);
         console.log(userId);
         //filtramos el id y lo comparamos con el user dentro de driver.user
-        const driver = await Driverp.findOne({user: userId});
+        const driver = await Driver.findOne({user: userId});
         console.log(driver);
         if (!usuario) {
             return res.status(400).json({
