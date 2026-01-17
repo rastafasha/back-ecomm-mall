@@ -61,6 +61,7 @@ const getTEmployees = async(req, res) => {
         // total
     });
 };
+
 const getTDrivers = async(req, res) => {
 
     // const desde = Number(req.query.desde) || 0;
@@ -81,6 +82,7 @@ const getTDrivers = async(req, res) => {
         // total
     });
 };
+
 const getTDriversLocal = async(req, res) => {
 
     const local = req.params.local;
@@ -96,6 +98,7 @@ const getTDriversLocal = async(req, res) => {
     });
 
 };
+
 const getTClients = async(req, res) => {
 
     const desde = Number(req.query.desde) || 0;
@@ -114,8 +117,6 @@ const getTClients = async(req, res) => {
         // total
     });
 };
-
-
 
 const getTiendaUsers = async(req, res) => {
     var local = req.params['local'];
@@ -410,6 +411,7 @@ const actualizarUsuario = async(req, res = response) => {
             local: req.body.local,
             role: req.body.role,
             pais: req.body.pais,
+            city: req.body.city,
             lang: req.body.lang,
             telefono: req.body.telefono,
             numdoc: req.body.numdoc,
@@ -467,6 +469,7 @@ const actualizarUsuario = async(req, res = response) => {
         });
     }
 };
+
 const actualizarStatusUsuario = async(req, res = response) => {
     //todo: validar token y comprobar si el usuario es correcto
 
