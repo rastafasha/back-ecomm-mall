@@ -119,7 +119,7 @@ const borrarGaleria = async(req, res) => {
 const findByProduct = (req, res) => {
     var id = req.params['id'];
 
-    console.log(id);
+    // console.log(id);
     if (id == 'null') {
         Galeria.find().exec((err, galeria_data) => {
             if (err) {

@@ -9,6 +9,7 @@
     crearAsignacion,
     actualizarAsignacion,
     getAsignacions,
+    getAsignacionsTienda,
     getAsignacion,
     borrarAsignacion,
     listarAsignacionPorUsuario
@@ -20,6 +21,7 @@
  router.get('/', getAsignacions);
  router.get('/:id', getAsignacion);
  router.get('/user/:id', listarAsignacionPorUsuario);
+ router.get('/tienda/:tiendaid', getAsignacionsTienda);
  
  router.post('/store', [
      validarJWT,

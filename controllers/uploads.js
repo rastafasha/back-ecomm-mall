@@ -74,12 +74,12 @@ const fileUpload = async (req, res = response) => {
             const result = await cloudinary.uploader.upload(savePath, {
                 folder: `mallConnect/uploads/${tipo}/`
             });
-            console.log(result);
+            // console.log(result);
             const nombreArchivo = result.secure_url;
-            console.log(nombreArchivo);
+            // console.log(nombreArchivo);
             //actualizar bd
             actualizarImagen(tipo, id, nombreArchivo);
-            console.log(nombreArchivo);
+            // console.log(nombreArchivo);
             res.json({
                 ok: true,
                 msg: 'Archivo subido',

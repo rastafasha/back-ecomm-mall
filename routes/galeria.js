@@ -22,7 +22,7 @@ var multipart = require('connect-multiparty');
 const uploadDir = pathModule.resolve(__dirname, '../uploads/galerias');
 const parentDir = pathModule.resolve(__dirname, '../uploads');
 
-console.log('Upload directory path:', uploadDir);  // Added log to verify path
+// console.log('Upload directory path:', uploadDir);  // Added log to verify path
 
 // Ensure the parent upload directory exists
 try {

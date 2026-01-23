@@ -113,7 +113,7 @@ const borrarGaleria = async(req, res) => {
 function findByCurso(req, res) {
     var id = req.params['id'];
 
-    console.log(id);
+    // console.log(id);
     if (id == 'null') {
         GaleriaVideo.find().exec((err, galeria_data) => {
             if (err) {
