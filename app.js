@@ -1,8 +1,9 @@
+// Load environment variables FIRST
 require('dotenv').config();
+
 const express = require('express');
 const { dbConnection } = require('./database/config');
 const cors = require('cors');
-const serverless = require('serverless-http');
 const webpush = require('web-push');
 const bodyParser = require('body-parser');
 
@@ -99,26 +100,8 @@ webpush.setVapidDetails(
     vapidKeys.privateKey,
 );
 
-// Export serverless handler
-const handler = serverless(app);
-module.exports.handler = async (event, context) => {
-    // Handle CORS preflight requests for OPTIONS method
-    if (event.httpMethod === 'OPTIONS') {
-        return {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method',
-                'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
-                'Access-Control-Max-Age': '86400',
-            },
-            body: '',
-        };
-    }
-    
-    // Handle the actual request
-    return handler(event, context);
-};
+// Export the Express app (handler will be created in index.js)
+module.exports = app;
 
 // For local development
 if (process.env.NODE_ENV !== 'production') {
