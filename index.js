@@ -3,22 +3,26 @@ const express = require('express');
 const { dbConnection } = require('./database/config');
 const cors = require('cors');
 const path = require('path');
-const socketIO = require('socket.io');
+const serverless = require('serverless-http');
 
 //notifications
 const webpush = require('web-push');
 const bodyParser = require('body-parser');
-
-// const serverless = require('serverless-http');  // uncommented and imported serverless-http
 
 //crear server de express
 const app = express();
 const server = require('http').Server(app);
 
 // Initialize socket.io with the server
-const io = socketIO(server);
-// Export io for use in other modules
+const io = require('socket.io')(server, {
+    cors: {
+        origin: '*',
+    },
+});
+
+// Export io for use in other modules and create handler for Vercel
 module.exports.io = io;
+const handler = serverless(app);
 
 //cors
 app.use(cors());
@@ -93,8 +97,6 @@ app.use('/api/driver', require('./routes/driver'));
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to nodejs." });
 });
-
-app.get("/", (req, res) => res.type('html').send(html));
 
 app.use(bodyParser.json());
 
@@ -171,17 +173,12 @@ app.get('*', (req, res) => {
 // `
 
 
-server.listen(process.env.PORT, () => {
-    console.log('Servidor en puerto: ' + process.env.PORT);
-});
-// Global error handling middleware
-// app.use((err, req, res, next) => {
-//     console.error('Global error handler caught an error:', err);
-//     res.status(500).json({
-//         ok: false,
-//         msg: 'Internal Server Error',
-//         error: err.message || err.toString()
-//     });
-// });
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+    server.listen(process.env.PORT || 3000, () => {
+        console.log('Servidor en puerto: ' + (process.env.PORT || 3000));
+    });
+}
 
-// module.exports = serverless(app);  // export handler for serverless as default export
+// Export handler for Vercel
+module.exports.handler = serverless(app);
