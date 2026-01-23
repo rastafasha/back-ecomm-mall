@@ -2,10 +2,10 @@
   "name": "backendServer-MongDbAtlas-Mallconnect",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
-    "start:dev": "nodemon app.js",
-    "start": "node app.js",
+    "start:dev": "nodemon index.js",
+    "start": "node index.js",
     "seeders": "node seeders/paisSeeder.js"
   },
   "keywords": [],
