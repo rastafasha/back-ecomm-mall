@@ -5,12 +5,16 @@ const AsignarDeliverySchema = Schema({
     driver: {
         type: Schema.Types.ObjectId,
         ref: 'driver',
-        role:'CHOFER',
         require: true
     },
     venta: {
         type: Schema.Types.ObjectId,
         ref: 'venta',
+        require: true
+    },
+    tienda: {
+        type: Schema.Types.ObjectId,
+        ref: 'tienda',
         require: true
     },
     status: { type: String, required: false, default: 'POR-ASIGNAR' },

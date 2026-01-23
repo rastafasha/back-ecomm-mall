@@ -1,28 +1,63 @@
 const { response } = require('express');
-const Asignacion = require('../models/asignardelivery');
+const Tienda = require('../models/tienda');
+const Venta = require('../models/venta');
 const Driver = require('../models/driver');
+const Asignacion = require('../models/asignardelivery');
+
+
+
 const crearAsignacion = async(req, res) => {
 
-    const uid = req.uid;
-    const asignacion = new Asignacion({
-        usuario: uid,
-        ...req.body
-    });
+    const { driver, status, tienda, venta } = req.body;
 
+    const body = req.body;
     try {
 
-        const asignacionDB = await asignacion.save();
+        const existeDriver = await Driver.findById(body.driver);
+       
+        const existeTienda = await Tienda.findById(body.tienda);
+        const existeVenta = await Venta.findById(body.venta);
+
+        if (!existeDriver) {
+            return res.status(400).json({
+                ok: false,
+                 msg: 'El Conductor no existe'
+            })
+        }
+        if (!existeTienda) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'La tienda no existe'
+            });
+        }
+        if (!existeVenta) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'La venta no existe'
+            });
+        }
+
+        
+        const asignacion = new Asignacion({
+            driver: body.driver,
+            tienda: body.tienda,
+            venta: body.venta,
+            status: body.status,
+        });
+
+        //guardar asignacion
+        await asignacion.save();
 
         res.json({
             ok: true,
-            asignacion: asignacionDB
+            asignacion
         });
 
     } catch (error) {
         console.log(error);
         res.status(500).json({
             ok: false,
-            msg: 'Hable con el admin'
+            msg: 'Error inesperado... revisar logs'
         });
     }
 
@@ -83,6 +118,25 @@ const getAsignacions = async(req, res) => {
     res.json({
         ok: true,
         asignacions
+    });
+};
+const getAsignacionsTienda = async(req, res) => {
+
+    const asignacions = await Asignacion.find().populate('tienda')
+    .populate('driver');
+
+      
+    const tiendaid = req.params.tiendaid;
+    const tienda = await Tienda.findById(tiendaid);
+
+    const asignacionsTienda = asignacions.filter(asignacion => asignacion.tienda.toString() === tiendaid)
+    ;  
+
+
+    res.json({
+        ok: true,
+        // asignacionsTienda,
+        asignacions,
     });
 };
 
@@ -170,6 +224,7 @@ module.exports = {
     getAsignacions,
     getAsignacion,
     borrarAsignacion,
-    listarAsignacionPorUsuario
+    listarAsignacionPorUsuario,
+    getAsignacionsTienda
 
 };

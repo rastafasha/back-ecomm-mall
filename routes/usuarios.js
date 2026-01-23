@@ -120,3 +120,4 @@ router.get('/numdoc/:numdoc', [validarJWT], getUsuariobyCedula);
 
 
 module.exports = router;
+

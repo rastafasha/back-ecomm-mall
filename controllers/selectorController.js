@@ -136,7 +136,7 @@ const borrarSelector = async(req, res) => {
 const findByProduct = (req, res) => {
     var id = req.params['id'];
 
-    console.log(id);
+    // console.log(id);
     if (id == 'null') {
         Selector.find().exec((err, selector_data) => {
             if (err) {

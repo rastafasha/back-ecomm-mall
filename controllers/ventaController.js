@@ -96,7 +96,7 @@ function registro(req, res) {
         if (!err) {
             if (venta_save) {
                 var detalle = data.detalles;
-                console.log(detalle);
+                // console.log(detalle);
                 for (const element of detalle) {
                     var detalleveta = new Detalle();
                     detalleveta.user = data.user;
@@ -347,7 +347,7 @@ function obtener_data_cancelacion(req, res) {
     Cancelacion.findOne({ venta: id }).populate('user').populate('venta').exec((err, data_cancelacion) => {
         if (!err) {
             if (data_cancelacion) {
-                console.log(data_cancelacion);
+                // console.log(data_cancelacion);
                 res.status(200).send({ cancelacion: data_cancelacion });
             } else {
 

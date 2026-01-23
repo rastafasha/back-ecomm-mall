@@ -10,7 +10,7 @@ const getPaises = async (req, res) => {
             paises
         });
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         res.status(500).json({
             ok: false,
             msg: 'Error inesperado'
@@ -33,7 +33,7 @@ const getPais = async (req, res) => {
             pais
         });
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         res.status(500).json({
             ok: false,
             msg: 'Error inesperado'
@@ -56,7 +56,7 @@ const getPaisByCode = async (req, res) => {
             pais
         });
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         res.status(500).json({
             ok: false,
             msg: 'Error inesperado'
@@ -73,7 +73,7 @@ const crearPais = async (req, res) => {
             pais: paisDB
         });
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         res.status(500).json({
             ok: false,
             msg: 'Error al crear país'
@@ -100,7 +100,7 @@ const actualizarPais = async (req, res) => {
             pais: paisActualizado
         });
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         res.status(500).json({
             ok: false,
             msg: 'Error al actualizar país'
@@ -125,7 +125,7 @@ const borrarPais = async (req, res) => {
             msg: 'País eliminado'
         });
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         res.status(500).json({
             ok: false,
             msg: 'Error al eliminar país'

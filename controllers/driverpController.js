@@ -1,6 +1,7 @@
 const { response } = require('express');
 const Driver = require('../models/driver');
 const Usuario = require('../models/usuario');
+const Tienda = require('../models/tienda');
 
 const crearDriver = async(req, res) => {
 
@@ -145,10 +146,10 @@ const listarDriverPorUsuario = async (req, res) => {
     try {
         //traemos el id del usuario
         const usuario = await Usuario.findById(userId);
-        console.log(userId);
+        // console.log(userId);
         //filtramos el id y lo comparamos con el user dentro de driver.user
         const driver = await Driver.findOne({user: userId});
-        console.log(driver);
+        // console.log(driver);
         if (!usuario) {
             return res.status(400).json({
                 ok: false,
@@ -181,6 +182,43 @@ const listarDriverPorUsuario = async (req, res) => {
 };
 
 
+const listarDriverPorLocal = async (req, res) => {
+    const local = req.params['local'];
+
+    try {
+        //traemos el id dela tienda
+        const tienda = await Tienda.findById(local);
+        // console.log(local);
+        //filtramos el id y lo comparamos con el user dentro de driver.user
+        const drivers = await Driver.find()
+        .populate('user')
+        // console.log(drivers);
+        
+        if (!tienda) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: `El tienda con el id ${local} no existe`,
+                errors: { message: 'No existe un tienda con ese ID' }
+            });
+        }
+
+       
+
+        res.status(200).json({
+            ok: true,
+            tienda: tienda.nombre,
+            drivers: drivers || null
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            mensaje: 'Error al buscar usuario y driver',
+            errors: error
+        });
+    }
+};
+
 
 module.exports = {
     crearDriver,
@@ -188,6 +226,7 @@ module.exports = {
     getDrivers,
     getDriver,
     borrarDriver,
-    listarDriverPorUsuario
+    listarDriverPorUsuario,
+    listarDriverPorLocal
 
 };
