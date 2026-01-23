@@ -1,11 +1,15 @@
 {
-  "version": 2,
- 
-  "routes": [
-    {
-      "src": "/(.*)",
-      "destination": "/index.js"
-    }
-  ],
-  "framework": null
-}
+    "version": 2,
+    "builds": [
+      {
+        "src": "index.js",
+        "use": "@now/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "index.js"
+      }
+    ]
+  }
