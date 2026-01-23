@@ -12,9 +12,6 @@
       "dest": "/index.js"
     }
   ],
-  "env": {
-    "DB_MONGO": "@db_mongo"
-  },
   "framework": null
 }
 
