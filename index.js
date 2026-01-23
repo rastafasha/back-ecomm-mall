@@ -113,9 +113,15 @@ app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'public')); //ruta para produccion, evita perder la ruta
 });
 
-server.listen(process.env.PORT, () => {
-    console.log('Servidor en puerto: ' + process.env.PORT);
-});
+// Exportar app para Vercel (serverless)
+module.exports = app;
+
+// Solo iniciar servidor local si no estamos en Vercel
+if (process.env.VERCEL !== '1') {
+    server.listen(process.env.PORT, () => {
+        console.log('Servidor en puerto: ' + process.env.PORT);
+    });
+}
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
