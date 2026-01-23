@@ -12,7 +12,7 @@
     getAsignacionsTienda,
     getAsignacion,
     borrarAsignacion,
-    listarAsignacionPorUsuario
+    listarAsignacionPorUsuario,
  } = require('../controllers/asignacionController');
  const { validarJWT } = require('../middlewares/validar-jwt');
  const { validarCampos } = require('../middlewares/validar-campos');
