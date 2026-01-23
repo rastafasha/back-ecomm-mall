@@ -4,49 +4,19 @@ const Venta = require('../models/venta');
 const Driver = require('../models/driver');
 const Asignacion = require('../models/asignardelivery');
 
-// const crearAsignacion = async(req, res) => {
-
-//     const uid = req.uid;
-//     const asignacion = new Asignacion({
-//         usuario: uid,
-//         ...req.body
-//     });
-
-//     try {
-
-//         const asignacionDB = await asignacion.save();
-
-//         res.json({
-//             ok: true,
-//             asignacion: asignacionDB
-//         });
-
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({
-//             ok: false,
-//             msg: 'Hable con el admin'
-//         });
-//     }
-
-
-// };
 
 
 const crearAsignacion = async(req, res) => {
 
     const { driver, status, tienda, venta } = req.body;
-    console.log('req.body', req.body);
 
     const body = req.body;
     try {
 
         const existeDriver = await Driver.findById(body.driver);
-        console.log('existeDriver', existeDriver);
+       
         const existeTienda = await Tienda.findById(body.tienda);
-        console.log('existeTienda', existeTienda);
         const existeVenta = await Venta.findById(body.venta);
-        console.log('existeVenta', existeVenta);
 
         if (!existeDriver) {
             return res.status(400).json({
