@@ -91,12 +91,20 @@ app.use('/api/driver', require('./routes/driver'));
 
 //test
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to nodejs." });
+    res.json({ message: "Welcome to nodejs." });
 });
 
-app.get("/", (req, res) => res.type('html').send(html));
+app.get("/welcome", (req, res) => res.type('html').send(html));
 
 app.use(bodyParser.json());
+
+
+
+
+//lo ultimo
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'public')); //ruta para produccion, evita perder la ruta
+});
 
 //notification
 const vapidKeys = {
