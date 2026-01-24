@@ -88,6 +88,7 @@ app.use('/api/pagocheque', require('./routes/pagocheque'));
 app.use('/api/paises', require('./routes/pais'));
 app.use('/api/asignardelivery', require('./routes/asignardelivery'));
 app.use('/api/driver', require('./routes/driver'));
+app.use('/api/pedidomenu', require('./routes/pedidomenu'));
 
 //notification
 const vapidKeys = {
