@@ -33,7 +33,9 @@
      validarCampos
  ], actualizarPedidoMenu);
  
- router.delete('/remove/:id', validarJWT, borrarPedidoMenu);
+ router.delete('/remove/:id', 
+    
+    borrarPedidoMenu);
  
  
  

@@ -176,7 +176,7 @@ const borrarPedidoMenu = async(req, res) => {
             });
         }
 
-        await pedido.findByIdAndDelete(id);
+        await Pedido.findByIdAndDelete(id);
 
         res.json({
             ok: true,
@@ -184,6 +184,7 @@ const borrarPedidoMenu = async(req, res) => {
         });
 
     } catch (error) {
+        console.log(error)
         res.status(500).json({
             ok: false,
             msg: 'Error hable con el admin'
