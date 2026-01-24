@@ -146,6 +146,8 @@ const getAsignacion = async(req, res) => {
 
     Asignacion.findById(id)
         .populate('driver')
+        .populate('venta')
+        .populate('tienda')
         .exec((err, asignacion) => {
             if (err) {
                 return res.status(500).json({
@@ -200,9 +202,9 @@ const borrarAsignacion = async(req, res) => {
     }
 };
 
-const listarAsignacionPorUsuario = (req, res) => {
+const listarAsignacionPorDriver = (req, res) => {
     var id = req.params['id'];
-    Asignacion.find({ usuario: id }, (err, data_asignacion) => {
+    Asignacion.find({ driver: id }, (err, data_asignacion) => {
         if (!err) {
             if (data_asignacion) {
                 res.status(200).send({ asignacions: data_asignacion });
@@ -212,7 +214,7 @@ const listarAsignacionPorUsuario = (req, res) => {
         } else {
             res.status(500).send({ error: err });
         }
-    }).populate('producto')
+    })
     .sort({createdAt: - 1});
 }
 
@@ -224,7 +226,7 @@ module.exports = {
     getAsignacions,
     getAsignacion,
     borrarAsignacion,
-    listarAsignacionPorUsuario,
+    listarAsignacionPorDriver,
     getAsignacionsTienda
 
 };

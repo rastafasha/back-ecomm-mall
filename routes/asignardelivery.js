@@ -12,7 +12,7 @@
     getAsignacionsTienda,
     getAsignacion,
     borrarAsignacion,
-    listarAsignacionPorUsuario,
+    listarAsignacionPorDriver,
  } = require('../controllers/asignacionController');
  const { validarJWT } = require('../middlewares/validar-jwt');
  const { validarCampos } = require('../middlewares/validar-campos');
@@ -20,7 +20,7 @@
  
  router.get('/', getAsignacions);
  router.get('/:id', getAsignacion);
- router.get('/user/:id', listarAsignacionPorUsuario);
+ router.get('/driver/:id', listarAsignacionPorDriver);
  router.get('/tienda/:tiendaid', getAsignacionsTienda);
  
  router.post('/store', [
