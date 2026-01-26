@@ -17,6 +17,8 @@ const AsignarDeliverySchema = Schema({
         ref: 'tienda',
         require: true
     },
+    driverPosition: { type: String, required: false, default: '0' },
+    deliveryPosition: { type: String, required: false, default: '0' },
     status: { type: String, required: false, default: 'POR-ASIGNAR' },
     createdAt: { type: Date, default: Date.now, required: true },
     updatedAt: { type: Date }

@@ -14,6 +14,7 @@
     borrarAsignacion,
     listarAsignacionPorDriver,
     listarAsignacionPorUser,
+    actualizarAsignacionCoord,
     activar,
  } = require('../controllers/asignacionController');
  const { validarJWT } = require('../middlewares/validar-jwt');
@@ -37,6 +38,10 @@
      validarJWT,
      validarCampos
  ], actualizarAsignacion);
+
+ router.put('/update/coord/:id', [
+     validarCampos
+ ], actualizarAsignacionCoord);
  
  router.delete('/remove/:id', validarJWT, borrarAsignacion);
  
