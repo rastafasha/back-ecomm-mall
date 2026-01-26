@@ -218,6 +218,47 @@ const listarAsignacionPorDriver = (req, res) => {
     .sort({createdAt: - 1});
 }
 
+const listarAsignacionPorUser = async(req, res) => {
+    var id = req.params['id'];
+    try {
+        // First find all ventas for this user
+        const ventas = await Venta.find({ user: id });
+        const ventaIds = ventas.map(v => v._id);
+        
+        // Then find assignments for these ventas
+        Asignacion.find({ venta: { $in: ventaIds } }, (err, data_asignacion) => {
+            if (!err) {
+                if (data_asignacion) {
+                    res.status(200).send({ asignacions: data_asignacion });
+                } else {
+                    res.status(500).send({ error: err });
+                }
+            } else {
+                res.status(500).send({ error: err });
+            }
+        })
+        .sort({createdAt: -1});
+    } catch (err) {
+        res.status(500).send({ error: err });
+    }
+}
+
+
+function activar(req, res) {
+    var id = req.params['id'];
+    // console.log(id);
+    Asignacion.findByIdAndUpdate({ _id: id }, { status: 'En Camino' }, (err, asignacion_data) => {
+        if (err) {
+            res.status(500).send({ message: err });
+        } else {
+            if (asignacion_data) {
+                res.status(200).send({ asignacion: asignacion_data });
+            } else {
+                res.status(403).send({ message: 'No se actualizó el asignacion, vuelva a intentar nuevamente.' });
+            }
+        }
+    })
+}
 
 
 module.exports = {
@@ -227,6 +268,8 @@ module.exports = {
     getAsignacion,
     borrarAsignacion,
     listarAsignacionPorDriver,
-    getAsignacionsTienda
+    listarAsignacionPorUser,
+    getAsignacionsTienda,
+    activar
 
 };
