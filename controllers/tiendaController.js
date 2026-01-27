@@ -207,7 +207,9 @@ function find_by_name(req, res) {
 
     Tienda.findOne({ nombre: nombre }).exec((err, tienda_data) => {
         if (err) {
-            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.',
+                error: err
+             });
         } else {
             if (tienda_data) {
                 res.status(200).send({ tienda: tienda_data });

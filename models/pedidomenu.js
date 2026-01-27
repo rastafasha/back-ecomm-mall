@@ -14,7 +14,7 @@ const PedidoMenuSchema = Schema({
         ref: 'tienda',
         require: true
     },
-    
+    status: { type: String, required: false, default: 'PENDING' },
     createdAt: { type: Date, default: Date.now, required: true },
     updatedAt: { type: Date }
 });
