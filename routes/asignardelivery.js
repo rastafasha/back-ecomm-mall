@@ -16,6 +16,9 @@
     listarAsignacionPorUser,
     actualizarAsignacionCoord,
     activar,
+    entregado,
+    recibido,
+    getAsignacionsByStatus,
  } = require('../controllers/asignacionController');
  const { validarJWT } = require('../middlewares/validar-jwt');
  const { validarCampos } = require('../middlewares/validar-campos');
@@ -28,6 +31,9 @@
  router.get('/tienda/:tiendaid', getAsignacionsTienda);
 
  router.get('/activar/:id',  activar);
+ router.get('/entregado/:id',  entregado);
+ router.get('/recibido/:id',  recibido);
+ router.get('/status/:id/:status',  getAsignacionsByStatus);
 
  router.post('/store', [
      validarJWT,

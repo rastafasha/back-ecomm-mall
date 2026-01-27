@@ -8,6 +8,8 @@ var DireccionSchema = Schema({
     pais: { type: String, required: true },
     ciudad: { type: String, required: true },
     zip: { type: String, required: true },
+    latitud: { type: String, required: false },
+    longitud: { type: String, required: false },
     user: { type: Schema.ObjectId, ref: 'user' },
     createdAt: { type: Date, default: Date.now, required: true },
     updatedAt: { type: Date }

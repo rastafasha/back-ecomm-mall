@@ -286,7 +286,10 @@ const listarAsignacionPorUser = async(req, res) => {
 function activar(req, res) {
     var id = req.params['id'];
     // console.log(id);
-    Asignacion.findByIdAndUpdate({ _id: id }, { status: 'En Camino' }, (err, asignacion_data) => {
+    Asignacion.findByIdAndUpdate({ _id: id }, 
+        { status: 'En Camino' }, 
+        { statusD: 'En Camino' }, 
+        (err, asignacion_data) => {
         if (err) {
             res.status(500).send({ message: err });
         } else {
@@ -299,6 +302,63 @@ function activar(req, res) {
     })
 }
 
+function entregado(req, res) {
+    var id = req.params['id'];
+    // console.log(id);
+    Asignacion.findByIdAndUpdate({ _id: id }, 
+        { status: 'Entregado' }, 
+        { statusD: 'Entregado' }, 
+        (err, asignacion_data) => {
+        if (err) {
+            res.status(500).send({ message: err });
+        } else {
+            if (asignacion_data) {
+                res.status(200).send({ asignacion: asignacion_data });
+            } else {
+                res.status(403).send({ message: 'No se actualizó el asignacion, vuelva a intentar nuevamente.' });
+            }
+        }
+    })
+}
+
+function recibido(req, res) {
+    var id = req.params['id'];
+    // console.log(id);
+    Asignacion.findByIdAndUpdate({ _id: id }, 
+        { status: 'Confirmado' }, 
+        { statusC: 'Recibido' }, 
+        (err, asignacion_data) => {
+        if (err) {
+            res.status(500).send({ message: err });
+        } else {
+            if (asignacion_data) {
+                res.status(200).send({ asignacion: asignacion_data });
+            } else {
+                res.status(403).send({ message: 'No se actualizó el asignacion, vuelva a intentar nuevamente.' });
+            }
+        }
+    })
+}
+
+const getAsignacionsByStatus = async(req, res) => {
+
+    var id = req.params['id'];
+    var status = req.params['status'];
+    Asignacion.find({ driver: id, status: status }, (err, data_asignacion) => {
+        if (!err) {
+            if (data_asignacion) {
+                res.status(200).send({ asignacions: data_asignacion });
+            } else {
+                res.status(500).send({ error: err });
+            }
+        } else {
+            res.status(500).send({ error: err });
+        }
+    })
+    .sort({createdAt: - 1});
+};
+
+
 
 module.exports = {
     crearAsignacion,
@@ -310,7 +370,9 @@ module.exports = {
     listarAsignacionPorDriver,
     listarAsignacionPorUser,
     getAsignacionsTienda,
-    
-    activar
+    entregado,
+    activar,
+    recibido,
+    getAsignacionsByStatus
 
 };
