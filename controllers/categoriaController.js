@@ -241,7 +241,11 @@ async function find_by_name(req, res) {
     var nombre = req.params['nombre'];
      try {
 
-        const categoria = await Categoria.findOne({ nombre: nombre });
+        // Use case-insensitive regex for the search
+                const categoria = await Categoria.findOne({ 
+                    nombre: { $regex: nombre, $options: 'i' } 
+                });
+                
         if (!categoria) {
             return res.status(500).json({
                 ok: false,
