@@ -202,22 +202,31 @@ function list_one(req, res) {
 }
 
 
-function find_by_name(req, res) {
+async function find_by_name (req, res) {
     var nombre = req.params['nombre'];
 
-    Tienda.findOne({ nombre: nombre }).exec((err, tienda_data) => {
-        if (err) {
-            res.status(500).send({ message: 'Ocurrió un error en el servidor.',
-                error: err
-             });
-        } else {
-            if (tienda_data) {
-                res.status(200).send({ tienda: tienda_data });
-            } else {
-                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
-            }
+     try {
+
+        const tienda = await Tienda.findOne({ nombre: nombre });
+        if (!tienda) {
+            return res.status(500).json({
+                ok: false,
+                msg: 'Tienda no encontrado por el id'
+            });
         }
-    });
+
+
+        res.json({
+            ok: true,
+            tienda: tienda
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Error hable con el admin'
+        });
+    }
 }
 
 function find_by_slug(req, res) {
