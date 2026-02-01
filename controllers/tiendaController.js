@@ -50,8 +50,6 @@ const getTienda = async(req, res) => {
 
 };
 
-
-
 const crearTienda = async(req, res) => {
 
     const uid = req.uid;
@@ -181,7 +179,6 @@ const borrarTienda = async(req, res) => {
         });
     }
 };
-
 
 
 function list_one(req, res) {

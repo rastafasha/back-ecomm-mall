@@ -262,7 +262,8 @@ async function find_by_name(req, res) {
     } catch (error) {
         res.status(500).json({
             ok: false,
-            msg: 'Error hable con el admin'
+            msg: 'Error hable con el admin',
+            error: error.message
         });
     }
 }
