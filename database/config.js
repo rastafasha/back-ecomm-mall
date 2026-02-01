@@ -16,8 +16,8 @@ const dbConnection = async () => {
     }
 
     try {
-        // Configure mongoose for serverless
-        mongoose.set('bufferCommands', false);
+        // Enable buffering to handle connection timing in serverless
+        mongoose.set('bufferCommands', true);
         
         await mongoose.connect(process.env.DB_MONGO, {
             serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
