@@ -237,30 +237,30 @@ function list_one(req, res) {
 }
 
 
-function find_by_name(req, res) {
+async function find_by_name(req, res) {
     var nombre = req.params['nombre'];
+     try {
 
-    Categoria.findOne({ nombre: nombre }, (err, categoria_data) => {
-        if (err) {
-            return res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
-        }
-        if (!categoria_data) {
-            return res.status(404).send({ message: 'Categoría no encontrada.' });
-        }
-
-        Producto.find({ categoria: categoria_data._id, status: ['Activo'] })
-            .populate('categoria')
-            .exec((err, productos) => {
-                if (err) {
-                    return res.status(500).send({ message: 'Error al buscar productos.' });
-                }
-                res.json({
-                    ok: true,
-                    categoria: categoria_data,
-                    productos: productos
-                });
+        const categoria = await Categoria.findOne({ nombre: nombre });
+        if (!categoria) {
+            return res.status(500).json({
+                ok: false,
+                msg: 'categoria no encontrado por el id'
             });
-    });
+        }
+
+
+        res.json({
+            ok: true,
+            categoria: categoria
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Error hable con el admin'
+        });
+    }
 }
 function find_by_subcategory(req, res) {
     const id = req.params.id;
