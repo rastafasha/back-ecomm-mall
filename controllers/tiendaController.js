@@ -207,14 +207,17 @@ async function find_by_name (req, res) {
 
      try {
 
-        const tienda = await Tienda.findOne({ nombre: nombre });
+        // Use case-insensitive regex for the search
+        const tienda = await Tienda.findOne({ 
+            nombre: { $regex: nombre, $options: 'i' } 
+        });
+        
         if (!tienda) {
-            return res.status(500).json({
+            return res.status(404).json({
                 ok: false,
-                msg: 'Tienda no encontrado por el id'
+                msg: 'No se encontró ninguna tienda con el nombre: ' + nombre
             });
         }
-
 
         res.json({
             ok: true,
@@ -222,9 +225,11 @@ async function find_by_name (req, res) {
         });
 
     } catch (error) {
+        console.error('Error en find_by_name:', error);
         res.status(500).json({
             ok: false,
-            msg: 'Error hable con el admin'
+            msg: 'Error hable con el admin',
+            error: error.message
         });
     }
 }
