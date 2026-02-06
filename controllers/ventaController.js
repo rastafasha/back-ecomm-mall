@@ -578,6 +578,23 @@ function listar_ventas_dashboard(req, res) {
     });
 }
 
+function listar_ventas_Year(req, res) {
+    const year = req.params.year;
+    
+    let query = {};
+    if (year) {
+        query.year = year;
+    }
+    
+    Venta.find(query).sort({ createdAt: -1 }).exec((err, data) => {
+        if (data) {
+            res.status(200).send({ data: data });
+        } else {
+            res.status(500).send({ error: err });
+        }
+    });
+}
+
 function detalles_hoy(req, res) {
     var mydate = new Date();
 
@@ -709,6 +726,7 @@ module.exports = {
     set_track,
     update_enviado,
     listar_ventas_dashboard,
+    listar_ventas_Year,
     detalles_hoy,
     listarVentaPorUsuario,
     listarCancelacionPorUsuario,

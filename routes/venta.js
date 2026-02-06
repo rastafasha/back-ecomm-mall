@@ -24,6 +24,8 @@ const {
     set_track,
     update_enviado,
     listar_ventas_dashboard,
+    listar_ventas_Month,
+    listar_ventas_Year,
     detalles_hoy,
     cancelar,
     listar_cancelaciones,
@@ -79,6 +81,7 @@ router.post('/venta_track/set/:id', set_track);
 router.get('/venta_enviado/update/:id', update_enviado);
 
 router.get('/venta_data/dashboard', listar_ventas_dashboard);
+router.get('/venta_data/year/:year', listar_ventas_Year);
 
 router.get('/venta_data/detalles/hoy', detalles_hoy);
 
