@@ -8,7 +8,9 @@ const PedidoMenuSchema = Schema({
         require: true
     },
   
-    pedido: { type: Array, require: true },
+    pedidoList: { type: Array, require: true },
+    delivery: { type: String, require: false },
+    deliveryAddres: { type: String, require: false },
     tienda: {
         type: Schema.Types.ObjectId,
         ref: 'tienda',

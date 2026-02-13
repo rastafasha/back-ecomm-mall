@@ -6,7 +6,7 @@ const Pedido = require('../models/pedidomenu');
 
 
 const crearPedidoMenu = async(req, res) => {
-    const { user, pedido, tienda } = req.body;
+    const { user, pedidoList, tienda } = req.body;
 
     const body = req.body;
     try {
@@ -31,8 +31,11 @@ const crearPedidoMenu = async(req, res) => {
         
         const pedido = new Pedido({
             user: body.user,
-            pedido: body.pedido,
-            tienda: body.tienda
+            pedidoList: body.pedidoList,
+            tienda: body.tienda,
+            delivery: body.delivery,
+            deliveryAddres: body.deliveryAddres,
+            status: body.status,
         });
 
         //guardar pedido
@@ -69,7 +72,7 @@ const actualizarPedidoMenu = async(req, res) => {
                 msg: 'pedido no encontrado por el id'
             });
         }
-        const usuario = await Usuario.findById(id);
+        const usuario = await Usuario.findById(req.body.user);
         if (!usuario) {
             return res.status(500).json({
                 ok: false,
@@ -208,7 +211,41 @@ const listarPedidoPorUser = (req, res) => {
     .sort({createdAt: - 1});
 }
 
+const getPedidosByStatus = async(req, res) => {
 
+    var status = req.params['status'];
+    Pedido.find({ status: status })
+        .populate('tienda', 'nombre')
+        .populate('user', 'telefono numdoc first_name last_name')
+        .sort({createdAt: - 1})
+        .exec((err, data_pedido) => {
+            if (!err) {
+                if (data_pedido) {
+                    res.status(200).send({ pedidos: data_pedido });
+                } else {
+                    res.status(500).send({ error: err });
+                }
+            } else {
+                res.status(500).send({ error: err });
+            }
+        });
+};
+
+function activar(req, res) {
+    var id = req.params['id'];
+    // console.log(id);
+    Pedido.findByIdAndUpdate({ _id: id }, { status: 'INPROCESS' }, (err, pedido_data) => {
+        if (err) {
+            res.status(500).send({ message: err });
+        } else {
+            if (pedido_data) {
+                res.status(200).send({ pedido: pedido_data });
+            } else {
+                res.status(403).send({ message: 'No se actualizó el pedido, vuelva a intentar nuevamente.' });
+            }
+        }
+    })
+}
 
 module.exports = {
     crearPedidoMenu,
@@ -218,5 +255,7 @@ module.exports = {
     getPedidoMenu,
     borrarPedidoMenu,
     listarPedidoPorUser,
+    getPedidosByStatus,
+    activar
 
 };

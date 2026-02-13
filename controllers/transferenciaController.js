@@ -56,7 +56,7 @@ const crearTransferencia = async(req, res) => {
     
     const uid = req.uid;
     const transferencia = new Transferencia({
-        usuario: uid,
+        user: uid,
         ...req.body
     });
 
@@ -64,8 +64,8 @@ const crearTransferencia = async(req, res) => {
 
         const transferenciaDB = await transferencia.save();
         const id = transferenciaDB._id;
-
-        sendEmailAdmin(uid,id);
+        //nnotificamos a la tienda
+        // sendEmailAdmin(uid,id);
 
         res.json({
             ok: true,

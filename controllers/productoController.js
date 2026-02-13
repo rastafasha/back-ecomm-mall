@@ -1,10 +1,11 @@
 const { response } = require('express');
 const Producto = require('../models/producto');
 const Marca = require('../models/marca');
-const Tienda = require('../models/tienda');
 const Categoria = require('../models/categoria');
+const Color = require('../models/color');
 const fs = require('fs');
 const { randomInt } = require('crypto');
+const path = require('path');
 
 // Internal function to reduce stock programmatically
 async function reducir_stock_internal(productoId, cantidad) {
@@ -64,7 +65,11 @@ const getProductos = async(req, res) => {
 
 const getProductosActivos = async(req, res) => {
 
-    Producto.find({  status: ['Activo'] }).populate('categoria').exec((err, productos) => {
+    Producto.find({ status: ['Activo'] })
+    .populate('categoria')
+    .populate('color')
+    .sort({ createdAt: -1 })
+    .exec((err, productos) => {
         if (err) {
             res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
         } else {

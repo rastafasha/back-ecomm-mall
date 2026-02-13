@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var PagoEfectivoSchema = Schema({
-    // user: { type: Schema.ObjectId, ref: 'user' },
+    user: { type: Schema.ObjectId, ref: 'user' },
     amount: { type: String, required: true },
     name_person: {type: String, required: true},
     phone: {type: String, required: true},

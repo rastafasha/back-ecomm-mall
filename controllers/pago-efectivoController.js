@@ -15,7 +15,7 @@ const crearPagoEfectivo = async(req, res) => {
     
     const uid = req.uid;
     const pago_efectivo = new PagoEfectivo({
-        usuario: uid,
+        // usuario: uid,
         ...req.body
     });
 
@@ -29,7 +29,7 @@ const crearPagoEfectivo = async(req, res) => {
         });
 
     } catch (error) {
-        // console.log(error);
+        console.log(error);
         res.status(500).json({
             ok: false,
             msg: 'Hable con el admin'

@@ -34,7 +34,7 @@ router.put('/direccion/update/:id', [
     validarCampos
 ], actualizarDireccion);
 
-router.delete('/direccion/remove/:id', validarJWT, borrarDireccion);
+router.delete('/direccion/remove/:id', borrarDireccion);
 
 
 
