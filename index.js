@@ -5,7 +5,16 @@ const { dbConnection } = require('./database/config');
 const cors = require('cors');
 const path = require('path');
 const socketIO = require('socket.io');
-const serverless = require('serverless-http');
+
+// Check if we're running on a serverless platform
+const isServerless = process.env.RENDER === '1' || process.env.VERCEL === '1';
+const isRender = process.env.RENDER === '1';
+
+// Only require serverless-http if not on traditional server
+let serverless;
+if (!isServerless || isServerless && process.env.SERVERLESS) {
+    serverless = require('serverless-http');
+}
 
 //notifications
 const webpush = require('web-push');
@@ -141,9 +150,24 @@ startServer().catch(err => {
     process.exit(1);
 });
 
-// // Exportar app para Vercel (serverless)
-// module.exports = app;\
+// For traditional server (including Render.com)
+const PORT = process.env.PORT || 5000;
 
-// IMPORTANTE: En lugar de app.listen(), exportas el handler
-module.exports.handler = serverless(app);
+// Only start the HTTP server if not in serverless mode (Vercel)
+// On Render, we need to start the server normally (not serverless)
+// On Vercel, we export the handler for serverless
+if (process.env.VERCEL !== '1') {
+    server.listen(PORT, () => {
+        console.log(`✅ Servidor ejecutándose en puerto: ${PORT}`);
+        console.log(`🌐 Entorno: ${isRender ? 'Render.com' : 'Local/Production'}`);
+    });
+}
+
+// Export for serverless platforms (Vercel)
+if (typeof serverless !== 'undefined' && serverless) {
+    module.exports.handler = serverless(app);
+}
+
+// Export app for testing and other uses
+module.exports = { app, server, io };
 
