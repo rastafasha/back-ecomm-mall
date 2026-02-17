@@ -5,6 +5,7 @@ const { dbConnection } = require('./database/config');
 const cors = require('cors');
 const path = require('path');
 const socketIO = require('socket.io');
+const serverless = require('serverless-http');
 
 //notifications
 const webpush = require('web-push');
@@ -127,11 +128,11 @@ const startServer = async () => {
     });
 
     // Solo iniciar servidor local si no estamos en Vercel
-    if (process.env.VERCEL !== '1') {
-        server.listen(process.env.PORT, () => {
-            console.log('Servidor en puerto: ' + process.env.PORT);
-        });
-    }
+    // if (process.env.VERCEL !== '1') {
+    //     server.listen(process.env.PORT, () => {
+    //         console.log('Servidor en puerto: ' + process.env.PORT);
+    //     });
+    // }
 };
 
 // Start the server
@@ -140,6 +141,9 @@ startServer().catch(err => {
     process.exit(1);
 });
 
-// Exportar app para Vercel (serverless)
-module.exports = app;
+// // Exportar app para Vercel (serverless)
+// module.exports = app;\
+
+// IMPORTANTE: En lugar de app.listen(), exportas el handler
+module.exports.handler = serverless(app);
 
