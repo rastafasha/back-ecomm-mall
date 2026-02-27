@@ -105,7 +105,7 @@ function registro(req, res) {
                     detalleveta.producto = element.producto;
                     detalleveta.cantidad = element.cantidad;
                     detalleveta.precio = element.precio;
-                    detalleveta.color = element.color;
+                    detalleveta.color = element.color ;
                     detalleveta.selector = element.selector;
 
                     await detalleveta.save();

@@ -2,6 +2,7 @@ const { response } = require('express');
 const Producto = require('../models/producto');
 const Marca = require('../models/marca');
 const Categoria = require('../models/categoria');
+const Selector = require('../models/selector');
 const Color = require('../models/color');
 const fs = require('fs');
 const { randomInt } = require('crypto');
@@ -111,6 +112,8 @@ const getProducto = async(req, res) => {
 
     Producto.findById(id)
         .populate('color')
+        .populate('selector')
+        .populate('categoria')
         .exec((err, producto) => {
             if (err) {
                 return res.status(500).json({
@@ -337,6 +340,8 @@ function find_by_slug(req, res) {
 
     Producto.findOne({ slug: slug })
     .populate('marca')
+    .populate('color')
+    .populate('selector')
     .exec((err, producto_data) => {
         if (err) {
             res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
@@ -453,6 +458,7 @@ const cat_by_name = async(req, res) => {
         
         const categoria = await Categoria.findOne({ nombre: new RegExp('^' + nombre + '$', 'i') });
 
+
         if (!categoria) {
             return res.status(404).send({ message: 'Categoría no encontrada.' });
         }
@@ -460,7 +466,9 @@ const cat_by_name = async(req, res) => {
         // Then find products with that category ObjectId
         const productos = await Producto.find({ categoria: categoria._id, status: ['Activo'] })
             .populate('categoria')
-            .populate('titulo')
+            .populate('marca')
+            .populate('color')
+            .populate('selector')
             .exec();
 
         if (productos && productos.length > 0) {

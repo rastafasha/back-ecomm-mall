@@ -9,7 +9,7 @@ var CategoriaSchema = Schema({
     img: { type: String },
     state_banner: { type: Boolean },
     status: { type: String, required: false, default: 'Desactivado' },
-    productos: { type: Schema.ObjectId, ref: 'productos' },
+    productos: { type: Schema.ObjectId, ref: 'producto' },
     createdAt: { type: Date, default: Date.now, required: true },
     updatedAt: { type: Date }
 });

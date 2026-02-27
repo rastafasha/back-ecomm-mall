@@ -16,7 +16,7 @@ const { validarJWT } = require('../middlewares/validar-jwt');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
 
-router.get('/', getSelectors);
+router.get('/all', getSelectors);
 
 router.post('/', [
     validarJWT,
