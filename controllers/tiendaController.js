@@ -181,24 +181,6 @@ const borrarTienda = async(req, res) => {
 };
 
 
-function list_one(req, res) {
-    var id = req.params['id'];
-
-    Tienda.findOne({ _id: id }, (err, tienda_data) => {
-        if (err) {
-            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
-        } else {
-            if (tienda_data) {
-                res.status(200).send({ tienda: tienda_data });
-            } else {
-                res.status(500).send({ message: 'No se encontró ninguna tienda con este ID.' });
-            }
-        }
-    })
-
-}
-
-
 async function find_by_name (req, res) {
     var nombre = req.params['nombre'];
 
@@ -247,6 +229,7 @@ function find_by_slug(req, res) {
         }
     });
 }
+
 function find_by_userid(req, res) {
     const userid = req.params.userid;
 
@@ -265,8 +248,6 @@ function find_by_userid(req, res) {
     });
 }
 
-
-
 const getTiendasActivos = async(req, res) => {
 
     Tienda.find({  status: ['Activo'] }).exec((err, tienda_data) => {
@@ -282,8 +263,6 @@ const getTiendasActivos = async(req, res) => {
     });
 
 };
-
-
 
 function desactivar(req, res) {
     var id = req.params['id'];
@@ -317,13 +296,13 @@ function activar(req, res) {
     })
 }
 
+
 module.exports = {
     getTiendas,
     crearTienda,
     actualizarTienda,
     borrarTienda,
     getTienda,
-    list_one,
     find_by_name,
     getTiendasActivos,
     desactivar,

@@ -10,13 +10,12 @@
     actualizarTienda,
     borrarTienda,
     getTienda,
-    list_one,
     find_by_name,
     getTiendasActivos,
     desactivar,
     activar,
     find_by_slug,
-    find_by_userid
+    find_by_userid,
  } = require('../controllers/tiendaController');
  
  const { validarJWT } = require('../middlewares/validar-jwt');
@@ -25,13 +24,10 @@
  
  router.get('/', getTiendas);
  router.get('/:id', getTienda);
- router.get('/cat/activas', getTiendasActivos);
- router.get('/by_slug/:slug', find_by_slug);
  router.get('/by_user/:userid', find_by_userid);
- 
- 
- router.get('/one/:id?', list_one);
- 
+ router.get('/cat/activas', getTiendasActivos);
+
+ router.get('/by_slug/:slug', find_by_slug);
  router.get('/by_nombre/nombre/:nombre', find_by_name);
  
  router.get('/admin/desactivar/:id', validarJWT, desactivar);
