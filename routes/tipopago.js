@@ -37,7 +37,7 @@ router.put('/update/:id', [
 router.delete('/remove/:id', borrarPaymentMethod);
 
 router.get('/user/:id', listarPorUsuario);
- router.get('/tienda/:tiendaid', tiposbyTienda);
+ router.get('/tienda/:id', tiposbyTienda);
 router.put('/statusupdate/:id', updateStatus);
  
 

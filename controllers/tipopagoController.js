@@ -234,8 +234,8 @@ const tiposbyTienda = async(req, res) => {
 
     var id = req.params['id'];
     try {
-        const paymentMethods_data = await PaymentMethod.find({ tienda: id })
-            .populate('user', 'first_name last_name email telefono numdoc')
+        const paymentMethods_data = await PaymentMethod.find({ local: id })
+            // .populate('user', 'first_name last_name email telefono numdoc')
             .sort({ createdAt: -1 });
 
         res.status(200).send({ paymentMethods: paymentMethods_data });
