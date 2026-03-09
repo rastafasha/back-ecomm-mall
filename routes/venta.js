@@ -26,6 +26,7 @@ const {
     listar_ventas_dashboard,
     listar_ventas_Year,
     detalles_hoy,
+    detalles_hoy_local,
     cancelar,
     listar_cancelaciones,
     listarCancelacionPorUsuario,
@@ -33,6 +34,7 @@ const {
     enviarFactura,
     ventasbyTiendaId,
     listar_ventas_Year_local,
+    listar_ventas_dashboard_local
 
 } = require('../controllers/ventaController');
 
@@ -81,10 +83,13 @@ router.post('/venta_track/set/:id', set_track);
 router.get('/venta_enviado/update/:id', update_enviado);
 
 router.get('/venta_data/dashboard', listar_ventas_dashboard);
+router.get('/venta_data/dashboard/local/:id', listar_ventas_dashboard_local);
+
 router.get('/venta_data/year/:year', listar_ventas_Year);
 router.get('/venta_data/yearlocal/:id/:year', listar_ventas_Year_local);
 
 router.get('/venta_data/detalles/hoy', detalles_hoy);
+router.get('/venta_data/detalles/hoy/local/:id', detalles_hoy_local);
 
 router.get('/by_tiendaId/:id', ventasbyTiendaId);
 

@@ -420,9 +420,25 @@ function listar_best_sellers(req, res) {
         }
     });
 }
+function listar_best_sellers_local(req, res) {
+     const id = req.params.id;
+    Producto.find({local:id}).sort({ ventas: -1 }).limit(8).exec((err, data) => {
+        if (data) {
+            res.status(200).send({ data: data });
+        }
+    });
+}
 
 function listar_populares(req, res) {
     Producto.find().sort({ stars: -1 }).limit(4).exec((err, data) => {
+        if (data) {
+            res.status(200).send({ data: data });
+        }
+    });
+}
+function listar_populares_local(req, res) {
+    const id = req.params.id;
+    Producto.find({local:id}).sort({ stars: -1 }).limit(4).exec((err, data) => {
         if (data) {
             res.status(200).send({ data: data });
         }
@@ -1413,7 +1429,9 @@ module.exports = {
     find_by_brandig,
     listar_newest,
     listar_best_sellers,
+    listar_best_sellers_local,
     listar_populares,
+    listar_populares_local,
     cat_by_name,
     listar_papelera,
     listar_cat,

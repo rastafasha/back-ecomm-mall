@@ -577,6 +577,15 @@ function listar_ventas_dashboard(req, res) {
         }
     });
 }
+function listar_ventas_dashboard_local(req, res) {
+    const id = req.params.id;
+    Venta.find({ local: id }).exec((err, data) => {
+        if (data) {
+            // console.log(data);
+            res.status(200).send({ data: data });
+        }
+    });
+}
 
 function listar_ventas_Year(req, res) {
     const year = req.params.year;
@@ -599,6 +608,29 @@ function detalles_hoy(req, res) {
     var mydate = new Date();
 
     Detalle.find().sort({ _id: -1 }).populate('producto').limit(10).exec((err, data) => {
+        if (data) {
+            res.status(200).send({ data: data });
+        }
+    });
+}
+function detalles_hoy_local(req, res) {
+    const id = req.params.id;
+    var mongoose = require('mongoose');
+
+    Detalle.aggregate([
+        {
+            $lookup: {
+                from: 'productos',
+                localField: 'producto',
+                foreignField: '_id',
+                as: 'producto'
+            }
+        },
+        { $unwind: '$producto' },
+        { $match: { 'producto.local': mongoose.Types.ObjectId(id) } },
+        { $sort: { _id: -1 } },
+        { $limit: 10 }
+    ]).exec((err, data) => {
         if (data) {
             res.status(200).send({ data: data });
         }
@@ -777,10 +809,12 @@ module.exports = {
     listar_ventas_dashboard,
     listar_ventas_Year,
     detalles_hoy,
+    detalles_hoy_local,
     listarVentaPorUsuario,
     listarCancelacionPorUsuario,
     getCancelacion,
     enviarFactura,
     ventasbyTiendaId,
-    listar_ventas_Year_local
+    listar_ventas_Year_local,
+    listar_ventas_dashboard_local
 };

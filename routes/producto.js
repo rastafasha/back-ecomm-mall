@@ -14,7 +14,9 @@ const {
     find_by_brandig,
     listar_newest,
     listar_best_sellers,
+    listar_best_sellers_local,
     listar_populares,
+    listar_populares_local,
     cat_by_name,
     // listar,
     listar_papelera,
@@ -90,9 +92,15 @@ router.get('/productos_ventas/aumentar/:id', validarJWT, aumentar_venta);
 router.get('/productos_ventas/best_sellers', 
     // validarJWT, 
     listar_best_sellers);
+router.get('/productos_ventas/best_sellers/local/:id', 
+    // validarJWT, 
+    listar_best_sellers_local);
 router.get('/productos_ventas/populares', 
     // validarJWT, 
     listar_populares);
+router.get('/productos_ventas/populares/local/:id', 
+    // validarJWT, 
+    listar_populares_local);
 
 router.get('/producto_general/general/data/:filtro?', listar_general_data);
 
