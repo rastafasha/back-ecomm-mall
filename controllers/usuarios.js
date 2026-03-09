@@ -43,34 +43,17 @@ const getAllUsers = async(req, res) => {
     });
 };
 
-const getTEmployees = async(req, res) => {
-
-    const desde = Number(req.query.desde) || 0;
-
-    const employees = await Usuario.find()
-    .where('role')
-    .equals('ADMIN' )
-    .skip(desde)
-    .limit(5)
-    .sort({ createdAt: -1 });
-    Usuario.countDocuments()
-
-    res.json({
-        ok: true,
-        employees,
-        // total
-    });
-};
 
 const getTDrivers = async(req, res) => {
 
-    // const desde = Number(req.query.desde) || 0;
+    const desde = Number(req.query.desde) || 0;
+    const id = req.params.id;
 
-    const drivers = await Usuario.find()
+    const drivers = await Usuario.find({ local: id })
     .where('role')
     .equals('CHOFER' )
-    // .skip(desde)
-    // .limit(5)
+    .skip(desde)
+    .limit(5)
     .populate('first_name email role google img local')
     
     .sort({ createdAt: -1 });
@@ -640,7 +623,6 @@ module.exports = {
     change_password,
     getTiendaUsers,
     getAlmacenUsers,
-    getTEmployees,
     getTDrivers,
     getTDriversLocal,
     getTClients,

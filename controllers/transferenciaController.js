@@ -227,6 +227,23 @@ function sendEmailAdmin(user, id){
 }
 
 
+const byTienda = async(req, res) => {
+
+    var id = req.params['id'];
+    try {
+        const data_transferencia = await Transferencia.find({ tienda: id })
+            .populate('metodo_pago')
+             .populate('local')
+            .sort({ createdAt: -1 });
+
+        res.status(200).send({ transferencias: data_transferencia });
+    } catch (err) {
+        res.status(500).send({ error: err });
+    }
+
+};
+
+
 
 
 module.exports = {
@@ -237,4 +254,5 @@ module.exports = {
     getTransferencia,
     listarPorUsuario,
     updateStatus,
+    byTienda
 };

@@ -46,10 +46,9 @@ router.get('/users_store/:local/',
     validarJWT, 
     getTiendaUsers);
 router.get('/employe_store/:local/', 
-    validarJWT, 
+    // validarJWT, 
     getTiendaLocalEmployees);
 router.get('/users_almacen/', validarJWT, getAlmacenUsers);
-router.get('/employees/', validarJWT, getTEmployees);
 router.get('/drivers/',
     //  validarJWT, 
      getTDrivers

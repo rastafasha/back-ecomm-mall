@@ -704,6 +704,55 @@ function enviarFactura(req, res) {
 // }
 
 
+const ventasbyTiendaId= async(req, res) => {
+
+    const id = req.params.id;
+    const uid = req.uid;
+
+    Venta.find({ local: id })
+        .populate('local')
+        .exec((err, ventas) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar ventas',
+                    errors: err
+                });
+            }
+            if (!ventas) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'La venta con el id ' + id + ' no existe',
+                    errors: { message: 'No existe un ventas con ese id' }
+                });
+
+            }
+            res.status(200).json({
+                ok: true,
+                ventas: ventas
+            });
+        });
+
+};
+
+
+function listar_ventas_Year_local(req, res) {
+    const year = req.params.year;
+    const id = req.params.id;
+    let query = { local: id };
+    
+    if (year) {
+        query.year = year;
+    }
+    
+    Venta.find(query).sort({ createdAt: -1 }).exec((err, data) => {
+        if (data) {
+            res.status(200).send({ data: data });
+        } else {
+            res.status(500).send({ error: err });
+        }
+    });
+}
 
 
 module.exports = {
@@ -732,4 +781,6 @@ module.exports = {
     listarCancelacionPorUsuario,
     getCancelacion,
     enviarFactura,
+    ventasbyTiendaId,
+    listar_ventas_Year_local
 };

@@ -13,7 +13,8 @@ const {
     listarPorUsuario,
     updateStatus,
     getPaymentMethodName,
-    listar_active
+    listar_active,
+    tiposbyTienda
 } = require('../controllers/tipopagoController');
 const { validarJWT } = require('../middlewares/validar-jwt');
 const { validarCampos } = require('../middlewares/validar-campos');
@@ -36,7 +37,7 @@ router.put('/update/:id', [
 router.delete('/remove/:id', borrarPaymentMethod);
 
 router.get('/user/:id', listarPorUsuario);
-
+ router.get('/tienda/:tiendaid', tiposbyTienda);
 router.put('/statusupdate/:id', updateStatus);
  
 

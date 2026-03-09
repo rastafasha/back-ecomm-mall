@@ -235,6 +235,7 @@ function find_by_userid(req, res) {
 
     Tienda.find({ user: userid })
     .populate('user')
+    .populate('categoria')
     .exec((err, tienda_data) => {
         if (err) {
             res.status(500).send({ message: 'Ocurrió un error en el servidor.' });

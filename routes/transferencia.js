@@ -1,5 +1,5 @@
 /*
- Ruta: /api/payments
+ Ruta: /api/transferencias
  */
 
  const { Router } = require('express');
@@ -11,7 +11,8 @@
     borrarTransferencia,
     getTransferencia,
     listarPorUsuario,
-    updateStatus
+    updateStatus,
+    byTienda
  } = require('../controllers/transferenciaController');
  const { validarJWT } = require('../middlewares/validar-jwt');
  const { check } = require('express-validator');
@@ -31,6 +32,8 @@
  router.put('/statusupdate/:id', updateStatus);
  
  router.delete('/remove/:id', validarJWT, borrarTransferencia);
+
+ router.get('/tienda/:tiendaid', byTienda);
  
  
  

@@ -247,6 +247,22 @@ function activar(req, res) {
     })
 }
 
+const pedidosbyTiendaId = async(req, res) => {
+
+    var id = req.params['id'];
+    try {
+        const data_pedido = await Pedido.find({ tienda: id })
+            .populate('user', 'first_name last_name email telefono numdoc')
+            .sort({ createdAt: -1 });
+
+        res.status(200).send({ pedidos: data_pedido });
+    } catch (err) {
+        res.status(500).send({ error: err });
+    }
+
+};
+
+
 module.exports = {
     crearPedidoMenu,
     actualizarPedidoMenu,
@@ -256,6 +272,7 @@ module.exports = {
     borrarPedidoMenu,
     listarPedidoPorUser,
     getPedidosByStatus,
-    activar
+    activar,
+    pedidosbyTiendaId
 
 };

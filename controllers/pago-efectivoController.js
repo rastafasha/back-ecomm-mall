@@ -39,7 +39,24 @@ const crearPagoEfectivo = async(req, res) => {
 
 };
 
+const byTienda = async(req, res) => {
+
+    var id = req.params['id'];
+    try {
+        const data_efectivo = await PagoEfectivo.find({ tienda: id })
+            .populate('metodo_pago')
+            .populate('local')
+            .sort({ createdAt: -1 });
+
+        res.status(200).send({ pagoefectivos: data_efectivo });
+    } catch (err) {
+        res.status(500).send({ error: err });
+    }
+
+};
+
 module.exports = {
     getPagosEfectivo,
-    crearPagoEfectivo
+    crearPagoEfectivo,
+    byTienda
 }

@@ -15,6 +15,7 @@
     listarPedidoPorUser,
     getPedidosByStatus,
     activar,
+    pedidosbyTiendaId,
  } = require('../controllers/pedidoMenuController');
  const { validarJWT } = require('../middlewares/validar-jwt');
  const { validarCampos } = require('../middlewares/validar-campos');
@@ -25,6 +26,7 @@
  router.get('/user/:id', listarPedidoPorUser);
  router.get('/tienda/:tiendaid', getPedidoMenusTienda);
  router.get('/status/:status', getPedidosByStatus);
+ router.get('/by_tiendaId/:id', pedidosbyTiendaId);
  
  router.post('/store', [
     //  validarJWT,
