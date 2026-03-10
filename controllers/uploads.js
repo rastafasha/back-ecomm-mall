@@ -15,86 +15,84 @@ cloudinary.config({
 })
 
 const fileUpload = async (req, res = response) => {
-
     const tipo = req.params.tipo;
     const id = req.params.id;
 
+    // 1. Validar tipos de carpetas/colecciones
     const tiposValidos = [
         'productos', 'marcas', 'locaciones', 'galerias', 'promocions',
         'congenerals', 'usuarios', 'ingresos', 'blogs', 'pages', 'cursos', 
         'sliders', 'categorias', 'drivers'
     ];
+    
     if (!tiposValidos.includes(tipo)) {
-        return res.status(400).json({
-            ok: false,
-            msg: 'No es un tipo permitido (tipo)'
-        });
-    }
-    // validar que exista un archivo
-    if (!req.files || Object.keys(req.files).length === 0) {
-        return res.status(400).json({
-            ok: false,
-            msn: 'No hay ningun archivo'
-        });
+        return res.status(400).json({ ok: false, msg: 'Tipo de colección no permitido' });
     }
 
-    // procesar la imagen
+    // 2. Validar que venga un archivo
+    if (!req.files || Object.keys(req.files).length === 0) {
+        return res.status(400).json({ ok: false, msg: 'No se seleccionó ninguna imagen' });
+    }
+
     const file = req.files.imagen;
 
-    const nombreCortado = file.name.split('.');
-    const extensionArchivo = nombreCortado[nombreCortado.length - 1];
-
-    //validar extension
-    const extensionesValidas = ['png', 'jpg', 'jpeg', 'gif', 'ico', 'svg'];
-    if (!extensionesValidas.includes(extensionArchivo)) {
+    // 3. VALIDACIÓN estricta de 3MB
+    const MAX_SIZE_MB = 3;
+    const bytesLimit = MAX_SIZE_MB * 1024 * 1024;
+    
+    if (file.size > bytesLimit) {
         return res.status(400).json({
             ok: false,
-            msn: 'No es una extension permitida'
+            msg: `La imagen supera el límite de ${MAX_SIZE_MB}MB. Por favor, sube una más ligera.`
         });
     }
 
-    //generar el nombre del archivo
-    const nombreArchivo = `${uuidv4()}.${extensionArchivo}`;
+    // 4. Validar extensión
+    const nombreCortado = file.name.split('.');
+    const extensionArchivo = nombreCortado[nombreCortado.length - 1].toLowerCase();
+    const extensionesValidas = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
 
-    //path para guardar la imagen
-    const savePath = `./uploads/${tipo}/${nombreArchivo}`;
-    fs.mkdirSync(path.dirname(savePath), { recursive: true });
+    if (!extensionesValidas.includes(extensionArchivo)) {
+        return res.status(400).json({ ok: false, msg: 'Formato no permitido (usa jpg, png o webp)' });
+    }
 
-    // mover la imagen
-    file.mv(savePath, async (err) => {
-        if (err) {
-            return res.status(500).json({
-                ok: false,
-                msg: 'Error al mover la imagen'
-            });
-        }
+    try {
+        // 5. Convertir el Buffer a Data URI (Evita usar el disco duro de Render)
+        const base64Image = Buffer.from(file.data).toString('base64');
+        const dataURI = `data:${file.mimetype};base64,${base64Image}`;
 
-        // subir a Cloudinary
-        try {
-            const result = await cloudinary.uploader.upload(savePath, {
-                folder: `mallConnect/uploads/${tipo}/`
-            });
-            // console.log(result);
-            const nombreArchivo = result.secure_url;
-            // console.log(nombreArchivo);
-            //actualizar bd
-            actualizarImagen(tipo, id, nombreArchivo);
-            // console.log(nombreArchivo);
-            res.json({
-                ok: true,
-                msg: 'Archivo subido',
-                nombreArchivo
-            });
-        } catch (error) {
-            return res.status(500).json({
-                ok: false,
-                msg: 'Error al subir la imagen a Cloudinary',
-                error: error.message
-            });
-        }
-    });
+        // 6. Subir a Cloudinary con Transformaciones Automáticas
+        const result = await cloudinary.uploader.upload(dataURI, {
+            folder: `mallConnect/uploads/${tipo}/`,
+            public_id: uuidv4(),
+            transformation: [
+                { width: 1000, crop: "limit" }, // Redimensiona si es gigante
+                { quality: "auto" },            // Compresión inteligente (ahorra mucho ancho de banda)
+                { fetch_format: "auto" }        // Entrega el mejor formato según el navegador del cliente
+            ]
+        });
+
+        const urlImagen = result.secure_url;
+
+        // 7. Actualizar tu Base de Datos
+        // Nota: Asegúrate de que esta función use 'await' si es asíncrona
+        await actualizarImagen(tipo, id, urlImagen);
+
+        res.json({
+            ok: true,
+            msg: 'Imagen subida y optimizada con éxito',
+            nombreArchivo: urlImagen
+        });
+
+    } catch (error) {
+        console.error('Error Cloudinary:', error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Hubo un error al procesar la imagen en el servidor',
+            error: error.message
+        });
+    }
 };
-
 const retornaImagen = (req, res) => {
     const tipo = req.params.tipo;
     const foto = req.params.foto;
