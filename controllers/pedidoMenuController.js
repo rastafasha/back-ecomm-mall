@@ -261,6 +261,21 @@ const pedidosbyTiendaId = async(req, res) => {
     }
 
 };
+const pedidosbyTiendaIdUser = async(req, res) => {
+
+    var id = req.params['id'];
+    try {
+        const user = await Usuario.find({user:id})
+        const data_pedido = await Pedido.find({ tienda: id })
+            .populate('user', 'first_name last_name email telefono numdoc')
+            .sort({ createdAt: -1 });
+
+        res.status(200).send({ pedidos: data_pedido });
+    } catch (err) {
+        res.status(500).send({ error: err });
+    }
+
+};
 
 
 module.exports = {
@@ -273,6 +288,7 @@ module.exports = {
     listarPedidoPorUser,
     getPedidosByStatus,
     activar,
-    pedidosbyTiendaId
+    pedidosbyTiendaId,
+    pedidosbyTiendaIdUser
 
 };
