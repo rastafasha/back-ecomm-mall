@@ -65,12 +65,12 @@ const actualizarPaypal = async(req, res) => {
         }
 
         // 1. Extraemos los datos del body
-        const { sandboxPaypal, ...campos } = req.body;
+        const { clientSecret, ...campos } = req.body;
 
         // 2. Si el usuario envió una llave secreta nueva, la encriptamos
-        if (sandboxPaypal) {
+        if (clientSecret) {
             const salt = bcrypt.genSaltSync(10);
-            campos.sandboxPaypal = bcrypt.hashSync(sandboxPaypal, salt);
+            campos.clientSecret = bcrypt.hashSync(clientSecret, salt);
         }
 
         // 3. Agregamos el usuario que actualiza
