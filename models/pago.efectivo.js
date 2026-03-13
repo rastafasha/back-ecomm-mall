@@ -8,8 +8,8 @@ var PagoEfectivoSchema = Schema({
     phone: {type: String, required: true},
     // status: { type: String, required: true, default: 'pending' },
     paymentday: { type: Date, default: Date.now, required: false },
+    local: { type: Schema.ObjectId, ref: 'tienda' },
     createdAt: { type: Date, default: Date.now, required: true },
-    local: { type: Schema.ObjectId, ref: 'tienda' , default: null},
     updatedAt: { type: Date }
 });
 

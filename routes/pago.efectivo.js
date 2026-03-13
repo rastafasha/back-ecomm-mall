@@ -10,6 +10,6 @@ const { validarCampos } = require('../middlewares/validar-campos');
 router.get('/', getPagosEfectivo);
 
 router.post('/store', crearPagoEfectivo);
-router.get('/tienda/:tiendaid', byTienda);
+router.get('/tienda/:id', byTienda);
 
 module.exports = router;

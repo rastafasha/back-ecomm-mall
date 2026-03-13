@@ -229,9 +229,9 @@ function sendEmailAdmin(user, id){
 
 const byTienda = async(req, res) => {
 
-    var id = req.params['id'];
+    var tiendaid = req.params['tiendaid'];
     try {
-        const data_transferencia = await Transferencia.find({ tienda: id })
+        const data_transferencia = await Transferencia.find({ tienda: tiendaid })
             .populate('metodo_pago')
              .populate('local')
             .sort({ createdAt: -1 });
