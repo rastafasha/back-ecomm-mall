@@ -101,6 +101,7 @@ const startServer = async () => {
     app.use('/api/asignardelivery', require('./routes/asignardelivery'));
     app.use('/api/driver', require('./routes/driver'));
     app.use('/api/pedidomenu', require('./routes/pedidomenu'));
+    app.use('/api/paypal', require('./routes/paypal'));
 
     //notification
     const vapidKeys = {

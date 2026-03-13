@@ -105,7 +105,7 @@ const actualizarPaymentMethod = async(req, res) => {
 
     try {
 
-        const paymentMethod = await PaymentMethod.findById(id);
+        const payment = await PaymentMethod.findById(id);
         if (!payment) {
             return res.status(500).json({
                 ok: false,
@@ -126,9 +126,10 @@ const actualizarPaymentMethod = async(req, res) => {
         });
 
     } catch (error) {
+        console.log(error);
         res.status(500).json({
             ok: false,
-            msg: 'Error hable con el admin'
+            msg: 'Error hable con el admin',
         });
     }
 
