@@ -176,6 +176,7 @@ const getProductosTiendaId= async(req, res) => {
 
     Producto.find({ local: id })
         .populate('local')
+        .sort({ createdAt: -1 })
         .exec((err, productos) => {
             if (err) {
                 return res.status(500).json({
