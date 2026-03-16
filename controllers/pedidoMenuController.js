@@ -1,4 +1,5 @@
 const { response } = require('express');
+const mongoose = require('mongoose');
 const Tienda = require('../models/tienda');
 const Usuario = require('../models/usuario');
 const Pedido = require('../models/pedidomenu');
@@ -261,20 +262,28 @@ const pedidosbyTiendaId = async(req, res) => {
     }
 
 };
-const pedidosbyTiendaIdUser = async(req, res) => {
+const pedidosbyTiendaIdUser = async (req, res) => {
+    const { tiendaid, userid } = req.params;
 
-    var id = req.params['id'];
+    // 1. Validar que ambos IDs tengan el formato correcto de MongoDB
+    if (!mongoose.Types.ObjectId.isValid(tiendaid) || !mongoose.Types.ObjectId.isValid(userid)) {
+        return res.status(400).send({ 
+            message: 'Uno de los IDs proporcionados no es válido.' 
+        });
+    }
+
     try {
-        const user = await Usuario.find({user:id})
-        const data_pedido = await Pedido.find({ tienda: id })
-            .populate('user', 'first_name last_name email telefono numdoc')
-            .sort({ createdAt: -1 });
+        const data_pedido = await Pedido.find({ 
+            tienda: new mongoose.Types.ObjectId(tiendaid), 
+            user: new mongoose.Types.ObjectId(userid)
+        })
+        .populate('user')
+        .sort({ createdAt: -1 });
 
         res.status(200).send({ pedidos: data_pedido });
     } catch (err) {
-        res.status(500).send({ error: err });
+        res.status(500).send({ message: 'Error interno', error: err.message });
     }
-
 };
 
 

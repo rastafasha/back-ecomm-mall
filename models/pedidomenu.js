@@ -2,11 +2,7 @@ const { Schema, model } = require('mongoose');
 
 const PedidoMenuSchema = Schema({
    
-    user: {
-        type: Schema.Types.ObjectId,
-        ref: 'user',
-        require: true
-    },
+   user: { type: Schema.ObjectId, ref: 'user', require: true  },
   
     pedidoList: { type: Array, require: true },
     delivery: { type: String, require: false },

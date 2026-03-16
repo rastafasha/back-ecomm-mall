@@ -28,7 +28,7 @@
  router.get('/tienda/:tiendaid', getPedidoMenusTienda);
  router.get('/status/:status', getPedidosByStatus);
  router.get('/by_tiendaId/:id', pedidosbyTiendaId);
- router.get('/by_tiendaIduser/:id/:user',pedidosbyTiendaIdUser);
+ router.get('/by_tiendaiduser/:tiendaid/:userid',pedidosbyTiendaIdUser);
  
  router.post('/store', [
     //  validarJWT,
