@@ -14,7 +14,9 @@ const UsuarioSchema = Schema({
     lang: { type: String, },
     telefono: { type: String, },
     numdoc: { type: String },
-    google: { type: Boolean, default: false }
+    google: { type: Boolean, default: false },
+    recovery_token: { type: String, default: null },
+    recovery_expires: { type: Date, default: null }
 });
 
 UsuarioSchema.method('toJSON', function() { // modificar el _id a uid, esconde el password

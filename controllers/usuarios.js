@@ -3,6 +3,8 @@ const Usuario = require('../models/usuario');
 const bcrypt = require('bcryptjs');
 const { generarJWT } = require('../helpers/jwt');
 const Tienda = require('../models/tienda');
+const nodemailer = require('nodemailer');
+const smtpTransport = require('nodemailer-smtp-transport');
 
 
 const getUsuarios = async(req, res) => {
@@ -207,7 +209,7 @@ const getUsuariobyCedula = async(req, res) => {
 };
 const crearUsuarios = async(req, res = response) => {
 
-    const { email, password } = req.body;
+        const { email, password } = req.body;
 
     const body = req.body;
 
@@ -239,6 +241,42 @@ const crearUsuarios = async(req, res = response) => {
 
         //guardar usuario
         await usuario.save();
+
+        // Notificar al admin por email
+        try {
+            var transporter = nodemailer.createTransporter(smtpTransport({
+                service: 'gmail',
+                host: 'smtp.gmail.com',
+                port: 587,
+                auth: {
+                    user: 'mercadocreativo@gmail.com',
+                    pass: 'pdnknnhpjijutcau'
+                }
+            }));
+
+            var mailOptions = {
+                from: 'mercadocreativo@gmail.com',
+                to: 'mercadocreativo@gmail.com',
+                subject: 'Nuevo usuario creado en MallConnect',
+                text: `Nuevo usuario registrado:
+Nombre: ${usuario.first_name} ${usuario.last_name || ''}
+Email: ${usuario.email}
+Teléfono: ${usuario.telefono || 'N/A'}
+Role: ${usuario.role}
+Local: ${usuario.local || 'N/A'}
+ID: ${usuario.id}`
+            };
+
+            transporter.sendMail(mailOptions, function(error, info) {
+                if (error) {
+                    console.log('Error enviando email:', error);
+                } else {
+                    console.log('Email enviado: ' + info.response);
+                }
+            });
+        } catch (emailError) {
+            console.log('Error en notificación email:', emailError);
+        }
 
         //generar el token - JWT
         const token = await generarJWT(usuario.id);

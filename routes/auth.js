@@ -4,7 +4,12 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
-const { login, googleSignIn, renewToken } = require('../controllers/auth');
+const { login, googleSignIn, renewToken,
+    forgotPassword,
+changeforgotPassword,
+resetPassword,
+changePassword,
+ } = require('../controllers/auth');
 const { validarJWT } = require('../middlewares/validar-jwt');
 
 
@@ -22,6 +27,29 @@ router.post('/google', [
     validarCampos
 
 ], googleSignIn);
+
+router.post('/forgot-password', [
+    check('email', 'El email es obligatorio').isEmail().not().isEmpty(),
+    validarCampos
+], forgotPassword);
+
+router.post('/change-forgot-password', [
+    check('email', 'El email es obligatorio').isEmail().not().isEmpty(),
+    validarCampos
+], changeforgotPassword);
+
+router.post('/reset-password', [
+    check('email', 'El email es obligatorio').isEmail().not().isEmpty(),
+    check('token', 'El token es obligatorio').not().isEmpty(),
+    validarCampos
+], resetPassword);
+
+router.post('/change-password', [
+    check('email', 'El email es obligatorio').isEmail().not().isEmpty(),
+    check('token', 'El token es obligatorio').not().isEmpty(),
+    check('password', 'La nueva contraseña es obligatoria (mín 6 chars)').isLength({ min: 6 }),
+    validarCampos
+], changePassword);
 
 router.get('/renew', validarJWT, renewToken);
 

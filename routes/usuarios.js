@@ -18,7 +18,6 @@ const {
     change_password,
     getTiendaUsers,
     getAlmacenUsers,
-    getTEmployees,
     getTDrivers,
     getTDriversLocal,
     getTClients,

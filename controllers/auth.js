@@ -4,9 +4,11 @@ const bcrypt = require('bcryptjs');
 const { generarJWT } = require('../helpers/jwt');
 const { googleVerify } = require('../helpers/google-verify');
 const { getMenuFrontEnd } = require('../helpers/menu-frontend');
+const nodemailer = require('nodemailer');
+const smtpTransport = require('nodemailer-smtp-transport');
 
 
-const login = async(req, res) => {
+const login = async (req, res) => {
 
     const { email, password } = req.body;
 
@@ -49,7 +51,7 @@ const login = async(req, res) => {
     }
 };
 
-const googleSignIn = async(req, res = response) => {
+const googleSignIn = async (req, res = response) => {
 
     const googleToken = req.body.token;
 
@@ -98,7 +100,7 @@ const googleSignIn = async(req, res = response) => {
 
 };
 
-const renewToken = async(req, res = response) => {
+const renewToken = async (req, res = response) => {
 
     const uid = req.uid
 
@@ -116,9 +118,224 @@ const renewToken = async(req, res = response) => {
     });
 };
 
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const usuario = await Usuario.findOne({ email });
+        if (!usuario) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Email no encontrado'
+            });
+        }
+
+        // Generate 6-digit token
+        const token = Math.floor(Math.random() * (999999 - 100000) + 100000);
+        const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+
+        // Save token and expiry
+        usuario.recovery_token = token.toString();
+        usuario.recovery_expires = expires;
+        await usuario.save();
+
+        // Send email (fixed nodemailer)
+        var transporter = nodemailer.createTransport(smtpTransport({
+            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 587,
+            auth: {
+                user: 'mercadocreativo@gmail.com',
+                pass: 'pdnknnhpjijutcau'
+            }
+        }));
+
+        var mailOptions = {
+            from: 'mercadocreativo@gmail.com',
+            to: email,
+            subject: 'Código de recuperación de contraseña - MallConnect',
+            text: `Tu código de recuperación es: ${token}
+Válido por 10 minutos.`
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log('Error sending email:', error);
+            } else {
+                console.log('Recovery email sent: ' + info.response);
+            }
+        });
+
+        res.json({
+            ok: true,
+            msg: 'Código de recuperación enviado al email'
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error en servidor'
+        });
+    }
+};
+
+const resetPassword = async (req, res) => {
+    const { email, token } = req.body;
+
+    try {
+        const usuario = await Usuario.findOne({ email });
+        if (!usuario) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Usuario no encontrado'
+            });
+        }
+
+        if (!usuario.recovery_token || usuario.recovery_token !== token.toString()) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Token inválido'
+            });
+        }
+
+        if (usuario.recovery_expires && usuario.recovery_expires < new Date()) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Token expirado'
+            });
+        }
+
+        res.json({
+            ok: true,
+            msg: 'Token verificado correctamente. Proceda a cambiar la contraseña.'
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error en servidor'
+        });
+    }
+};
+
+const changeforgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const usuario = await Usuario.findOne({ email });
+        if (!usuario) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Email no encontrado'
+            });
+        }
+
+        // Generate new 6-digit token
+        const newToken = Math.floor(Math.random() * (999999 - 100000) + 100000);
+        const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+
+        usuario.recovery_token = newToken.toString();
+        usuario.recovery_expires = expires;
+        await usuario.save();
+
+        // Send email (fixed nodemailer)
+        var transporter = nodemailer.createTransport(smtpTransport({
+            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 587,
+            auth: {
+                user: 'mercadocreativo@gmail.com',
+                pass: 'pdnknnhpjijutcau'
+            }
+        }));
+
+        var mailOptions = {
+            from: 'mercadocreativo@gmail.com',
+            to: email,
+            subject: 'Nuevo código de recuperación - MallConnect',
+            text: `Tu nuevo código de recuperación es: ${newToken}
+Válido por 10 minutos.`
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log('Error sending email:', error);
+            } else {
+                console.log('New recovery email sent: ' + info.response);
+            }
+        });
+
+        res.json({
+            ok: true,
+            msg: 'Nuevo código de recuperación enviado al email'
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error en servidor'
+        });
+    }
+};
+
+const changePassword = async (req, res) => {
+    const { email, token, password } = req.body;
+
+    try {
+        const usuario = await Usuario.findOne({ email });
+        if (!usuario) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Usuario no encontrado'
+            });
+        }
+
+        if (!usuario.recovery_token || usuario.recovery_token !== token.toString()) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Token inválido'
+            });
+        }
+
+        if (usuario.recovery_expires && usuario.recovery_expires < new Date()) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Token expirado'
+            });
+        }
+
+        // Hash new password
+        const salt = bcrypt.genSaltSync();
+        usuario.password = bcrypt.hashSync(password, salt);
+
+        // Clear recovery data
+        usuario.recovery_token = null;
+        usuario.recovery_expires = null;
+        await usuario.save();
+
+        res.json({
+            ok: true,
+            msg: 'Contraseña actualizada exitosamente'
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error en servidor'
+        });
+    }
+};
+
 module.exports = {
     login,
     googleSignIn,
     renewToken,
-
+    forgotPassword,
+    changeforgotPassword,
+    resetPassword,
+    changePassword,
 };
