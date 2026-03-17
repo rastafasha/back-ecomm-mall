@@ -743,6 +743,7 @@ const ventasbyTiendaId= async(req, res) => {
 
     Venta.find({ local: id })
         .populate('local')
+        .sort({ createdAt: -1 })
         .exec((err, ventas) => {
             if (err) {
                 return res.status(500).json({
