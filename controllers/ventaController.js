@@ -387,6 +387,17 @@ function init_data_admin(req, res) {
         }
     });
 }
+function init_data_admin_local(req, res) {
+    var localid = req.params['localid'];
+    Venta.find({local:localid}).sort({ createdAt: -1 })
+    .populate('user')
+    .populate('local')
+    .exec((err, data) => {
+        if (data) {
+            res.status(200).send({ data: data });
+        }
+    });
+}
 
 function listar_admin(req, res) {
     var tipo = req.params['tipo'];
@@ -817,5 +828,6 @@ module.exports = {
     enviarFactura,
     ventasbyTiendaId,
     listar_ventas_Year_local,
-    listar_ventas_dashboard_local
+    listar_ventas_dashboard_local,
+    init_data_admin_local
 };

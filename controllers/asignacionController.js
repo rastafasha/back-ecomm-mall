@@ -161,22 +161,17 @@ const getAsignacions = async(req, res) => {
 };
 const getAsignacionsTienda = async(req, res) => {
 
-    const asignacions = await Asignacion.find().populate('tienda')
-    .populate('driver');
+    var tiendaid = req.params['tiendaid'];
 
-      
-    const tiendaid = req.params.tiendaid;
-    const tienda = await Tienda.findById(tiendaid);
-
-    const asignacionsTienda = asignacions.filter(asignacion => asignacion.tienda.toString() === tiendaid)
-    ;  
-
-
-    res.json({
-        ok: true,
-        // asignacionsTienda,
-        asignacions,
-    });
+    var tiendaid = req.params['tiendaid'];
+        Asignacion.find({tienda:tiendaid}).sort({ createdAt: -1 })
+        .populate('driver')
+        .populate('tienda')
+        .exec((err, data) => {
+            if (data) {
+                res.status(200).send({ asignacions: data });
+            }
+        }); 
 };
 
 const getAsignacion = async(req, res) => {

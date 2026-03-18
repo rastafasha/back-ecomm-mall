@@ -34,7 +34,8 @@ const {
     enviarFactura,
     ventasbyTiendaId,
     listar_ventas_Year_local,
-    listar_ventas_dashboard_local
+    listar_ventas_dashboard_local,
+    init_data_admin_local
 
 } = require('../controllers/ventaController');
 
@@ -73,6 +74,7 @@ router.get('/venta_track/detalle/:id', data_detalle);
 router.get('/venta_finalizar/venta/:id', finalizar);
 
 router.get('/venta_admin_init/init_data', init_data_admin);
+router.get('/venta_admin_init/init_data_local/:localid', init_data_admin_local);
 
 router.get('/evaluar_venta/data/:user/:producto', evaluar_orden_coment);
 
