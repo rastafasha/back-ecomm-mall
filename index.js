@@ -76,6 +76,7 @@ const startServer = async () => {
     app.use('/api/selectors', require('./routes/selector'));
     app.use('/api/carritos', require('./routes/carrito'));
     app.use('/api/comentarios', require('./routes/comentario'));
+    app.use('/api/comentariosapp', require('./routes/comentarioapp'));
     app.use('/api/congenerals', require('./routes/congeneral'));
     app.use('/api/contactos', require('./routes/contacto'));
     app.use('/api/cupons', require('./routes/cupon'));
