@@ -228,23 +228,23 @@ const actualizarImagen = async(tipo, id, nombreArchivo) => {
             return true;
             break;
 
-        case 'drivers':
+
+            case 'drivers':
             const driver = await Driver.findById(id);
             if (!driver) {
                 console.log('No es un driver por id');
                 return false;
             }
-            pathViejo = `./uploads/drivers/${driver.img}`;
-
-            borrarImagen(pathViejo);
+            if (driver.img) {
+                pathViejo = `./uploads/drivers/${driver.img}`;
+                borrarImagen(pathViejo);
+            }
 
             driver.img = nombreArchivo;
             await driver.save();
             return true;
             break;
         
-       
-
 
     }
 
