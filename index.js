@@ -25,7 +25,13 @@ const app = express();
 const server = require('http').Server(app);
 
 // Initialize socket.io with the server
-const io = socketIO(server);
+const io = socketIO(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
 
 // Export io for use in other modules
 module.exports.io = io;
@@ -34,7 +40,7 @@ module.exports.io = io;
 app.use(cors());
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Credentials', true); 
-    res.header('Access-Control-Allow-Origin', '*'); // Temporarily allow all origins for testing
+res.header('Access-Control-Allow-Origin', '*'); // Allow Angular dev server
     res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
     res.header('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
     res.header('Allow', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');

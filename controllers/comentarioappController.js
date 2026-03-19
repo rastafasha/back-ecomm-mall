@@ -65,6 +65,7 @@ const crearComentario = (req, res) => {
                 comentario.pros = data.pros;
                 comentario.cons = data.cons;
                 comentario.estrellas = data.estrellas;
+                comentario.tienda = data.tienda;
                 comentario.user = data.user;
                 comentario.save((err, comentario_save) => {
                     if (!err) {
@@ -164,179 +165,19 @@ function listarLast(req, res) {
     });
 }
 
-function listarLikes(req, res) {
-    var id = req.params['id'];
+const getComentarioTienda = async(req, res) => {
 
-    Likescoment.find({ comentario: id }).exec((err, data) => {
-        if (data) {
-            res.status(200).send({ data: data });
-        } else {
-            res.status(200).send({ data: {} });
-        }
-    });
-}
+    var tiendaid = req.params['tiendaid'];
 
-
-function listarDislikes(req, res) {
-    var id = req.params['id'];
-
-    Dislikescoment.find({ comentario: id }).exec((err, data) => {
-        if (data) {
-            res.status(200).send({ data: data });
-        } else {
-            res.status(200).send({ data: {} });
-        }
-    });
-}
-
-
-function addLike(req, res) {
-    let data = req.body;
-
-    Likescoment.findOne({ user: data.user, comentario: data.comentario }, (err, data_likes) => {
-        if (err) {
-            res.status(500).send({ error: err });
-        } else {
-
-            if (data_likes != null) {
-
-                Likescoment.findOneAndRemove({ _id: data_likes._id }).exec((err, likes) => {
-                    if (!err) {
-                        if (likes) {
-                            res.status(200).send({ likes: likes });
-                        } else {
-                            c
-                            res.status(500).send({ error: err });
-                        }
-                    } else {
-                        res.status(500).send({ error: err });
-                    }
-                });
-            } else {
-
-                var likescoment = new Likescoment;
-                likescoment.user = data.user;
-                likescoment.comentario = data.comentario;
-
-                likescoment.save((err, likes) => {
-                    if (!err) {
-                        if (likes) {
-                            res.status(200).send({ likes: likes });
-                        } else {
-                            c
-                            res.status(500).send({ error: err });
-                        }
-                    } else {
-                        res.status(500).send({ error: err });
-                    }
-                });
+    var tiendaid = req.params['tiendaid'];
+        Comentario.find({tienda:tiendaid}).sort({ createdAt: -1 })
+        .populate('user')
+        .exec((err, data) => {
+            if (data) {
+                res.status(200).send({ comentarios: data });
             }
-        }
-    });
-}
-
-function addDislike(req, res) {
-    let data = req.body;
-
-    Dislikescoment.findOne({ user: data.user, comentario: data.comentario }, (err, data_dislikes) => {
-        if (err) {
-            res.status(500).send({ error: err });
-        } else {
-
-            if (data_dislikes != null) {
-
-                Dislikescoment.findOneAndRemove({ _id: data_dislikes._id }).exec((err, likes) => {
-                    if (!err) {
-                        if (likes) {
-                            res.status(200).send({ dislikes: likes });
-                        } else {
-                            c
-                            res.status(500).send({ error: err });
-                        }
-                    } else {
-                        res.status(500).send({ error: err });
-                    }
-                });
-            } else {
-
-                var dislikescoment = new Dislikescoment;
-                dislikescoment.user = data.user;
-                dislikescoment.comentario = data.comentario;
-
-                dislikescoment.save((err, likes) => {
-                    if (!err) {
-                        if (likes) {
-                            res.status(200).send({ dislikes: likes });
-                        } else {
-                            c
-                            res.status(500).send({ error: err });
-                        }
-                    } else {
-                        res.status(500).send({ error: err });
-                    }
-                });
-            }
-        }
-    });
-}
-
-function getData(req, res) {
-
-    var id = req.params['id'];
-    var orden = req.params['orden'];
-    console.log(id);
-    if (orden == 'fecha') {
-        Comentario.find({ producto: id }).populate('producto').populate('user').sort({ createdAt: 1 }).exec((err, data_review) => {
-            if (!err) {
-                if (data_review) {
-                    res.status(200).send({ comentarios: data_review });
-                } else {
-                    res.status(500).send({ error: err });
-                }
-            } else {
-                res.status(500).send({ error: err });
-            }
-        });
-    }
-    if (orden == 'raiting') {
-        Comentario.find({ producto: id }).populate('producto').populate('user').sort({ estrellas: -1 }).exec((err, data_review) => {
-            if (!err) {
-                if (data_review) {
-                    res.status(200).send({ comentarios: data_review });
-                } else {
-                    res.status(500).send({ error: err });
-                }
-            } else {
-                res.status(500).send({ error: err });
-            }
-        });
-    }
-    if (orden == '-raiting') {
-        Comentario.find({ producto: id }).populate('producto').populate('user').sort({ estrellas: 1 }).exec((err, data_review) => {
-            if (!err) {
-                if (data_review) {
-                    res.status(200).send({ comentarios: data_review });
-                } else {
-                    res.status(500).send({ error: err });
-                }
-            } else {
-                res.status(500).send({ error: err });
-            }
-        });
-    }
-}
-
-function listarDislikes(req, res) {
-    var id = req.params['id'];
-
-    Dislikescoment.find({ comentario: id }).exec((err, data) => {
-        if (data) {
-            res.status(200).send({ data: data });
-        } else {
-            res.status(200).send({ data: {} });
-        }
-    });
-}
+        }); 
+};
 
 
 module.exports = {
@@ -346,9 +187,5 @@ module.exports = {
     borrarComentario,
     getComentario,
     listarLast,
-    listarLikes,
-    addDislike,
-    addLike,
-    getData,
-    listarDislikes
+    getComentarioTienda
 };

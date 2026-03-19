@@ -10,12 +10,7 @@ const {
     actualizarComentario,
     borrarComentario,
     getComentario,
-    listarLast,
-    listarLikes,
-    addDislike,
-    addLike,
-    getData,
-    listarDislikes
+    getComentarioTienda
 } = require('../controllers/comentarioappController');
 const { validarJWT } = require('../middlewares/validar-jwt');
 const { check } = require('express-validator');
@@ -36,14 +31,8 @@ router.put('/update/:id', [
 router.delete('/remove/:id', validarJWT, borrarComentario);
 
 router.get('/:id', validarJWT, getComentario);
+router.get('/tienda/:tiendaid', validarJWT, getComentarioTienda);
 
-router.get('/client/obtener/:id/:orden', getData);
-
-router.post('/likes/add', addLike);
-router.get('/likes/get/:id', listarLikes);
-
-router.post('/dislikes/add', addDislike);
-router.get('/dislikes/get/:id', listarDislikes);
 
 
 module.exports = router;

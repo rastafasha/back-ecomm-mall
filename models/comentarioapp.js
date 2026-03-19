@@ -6,6 +6,11 @@ var ComentarioappSchema = Schema({
     pros: { type: String, required: true },
     cons: { type: String, required: true },
     estrellas: { type: Number, required: true },
+    tienda: {
+        type: Schema.Types.ObjectId,
+        ref: 'tienda',
+        require: true
+    },
     user: { type: Schema.ObjectId, ref: 'user' },
     createdAt: { type: Date, default: Date.now, required: true },
 });
