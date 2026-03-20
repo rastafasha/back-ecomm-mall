@@ -23,7 +23,7 @@ const AsignarDeliverySchema = Schema({
     statusD: { type: String, required: false, default: 'POR-ASIGNAR' },
     statusC: { type: String, required: false, default: 'POR-ASIGNAR' },
     createdAt: { type: Date, default: Date.now, required: true },
-    updatedAt: { type: Date }
+    updatedAt: { type: Date, default: Date.now, required: true }
 });
 
 AsignarDeliverySchema.method('toJSON', function() {

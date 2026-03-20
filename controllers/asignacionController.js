@@ -166,6 +166,7 @@ const getAsignacionsTienda = async(req, res) => {
     var tiendaid = req.params['tiendaid'];
         Asignacion.find({tienda:tiendaid}).sort({ createdAt: -1 })
         .populate('driver')
+        .populate('user')
         .populate('tienda')
         .exec((err, data) => {
             if (data) {

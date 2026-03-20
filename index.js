@@ -25,33 +25,42 @@ const app = express();
 const server = require('http').Server(app);
 
 // Initialize socket.io with the server
-const io = socketIO(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-    credentials: true
-  }
-});
+const allowedOrigins = [
+  "http://localhost:4203",
+  "http://localhost:4206",
+  "http://localhost:4207",
+  "https://adminstorenodejs.malcolmcordova.com",
+  "https://menu-panaderia.vercel.app",
+  "https://slide-dish.vercel.app",
+  "https://menu-pizzeria-mauve.vercel.app",
+  "https://delivery-angular.vercel.app",
+];
 
-// Export io for use in other modules
-module.exports.io = io;
-
-//cors
-app.use(cors());
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Credentials', true); 
-res.header('Access-Control-Allow-Origin', '*'); // Allow Angular dev server
-    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
-    res.header('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.header('Allow', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    next();
-});
-
-const options = {
-    cors: {
-        origin: '*', // Temporarily allow all origins for testing
-    },
+// Configuración compartida
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Si el origen está en la lista o es una petición local (sin origen)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Origin no permitido por CORS'));
+    }
+  },
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 204
 };
+
+// 1. Aplicar a las rutas normales de Express (REST API)
+
+app.use(cors(corsOptions));
+
+// 2. Aplicar a Socket.io
+const io = socketIO(server, {
+  cors: corsOptions
+});
+
+module.exports.io = io;
 
 //lectura y parseo del body
 app.use(express.json());
