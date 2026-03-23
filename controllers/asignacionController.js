@@ -160,17 +160,34 @@ const getAsignacions = async(req, res) => {
     });
 };
 const getAsignacionsTienda = async(req, res) => {
+    try {
+        const tiendaid = req.params.tiendaid;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const skip = (page - 1) * limit;
 
-    var tiendaid = req.params['tiendaid'];
-        Asignacion.find({tienda:tiendaid}).sort({ createdAt: -1 })
-        .populate('driver')
-        .populate('user')
-        .populate('tienda')
-        .exec((err, data) => {
-            if (data) {
-                res.status(200).send({ asignacions: data });
-            }
-        }); 
+        const [asignacions, total] = await Promise.all([
+            Asignacion.find({ tienda: tiendaid })
+                .populate('driver')
+                .populate('tienda')
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+            Asignacion.countDocuments({ tienda: tiendaid })
+        ]);
+
+        res.json({
+            ok: true,
+            asignacions,
+            total,
+            page,
+            pages: Math.ceil(total / limit)
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ ok: false, msg: 'Error al obtener asignaciones' });
+    }
 };
 
 const getAsignacion = async(req, res) => {

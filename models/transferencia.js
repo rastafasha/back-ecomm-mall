@@ -16,4 +16,11 @@ var TransferenciaSchema = Schema({
     updatedAt: { type: Date }
 });
 
+TransferenciaSchema.pre('save', function(next) {
+  if (this.isModified('status')) {
+    this.updatedAt = new Date();
+  }
+  next();
+});
+
 module.exports = mongoose.model('transferencia', TransferenciaSchema);

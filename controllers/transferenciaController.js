@@ -98,12 +98,16 @@ const actualizarTransferencia = async(req, res) => {
             });
         }
 
-        const cambiosTransferencia = {
-            ...req.body,
-            usuario: uid
+        // Update fields
+        Object.assign(transferencia, req.body);
+        transferencia.usuario = uid;
+        
+        // Update updatedAt if status changed
+        if (req.body.status !== undefined && req.body.status !== transferencia.status) {
+            transferencia.updatedAt = new Date();
         }
 
-        const transferenciaActualizado = await Transferencia.findByIdAndUpdate(id, cambiosTransferencia, { new: true });
+        const transferenciaActualizado = await transferencia.save();
 
         res.json({
             ok: true,
@@ -179,12 +183,16 @@ const updateStatus = async(req, res) =>{
             });
         }
 
-        const cambiosTransferencia = {
-            ...req.body,
-            usuario: uid
+        // Update fields
+        Object.assign(transferencia, req.body);
+        transferencia.usuario = uid;
+        
+        // Update updatedAt if status changed
+        if (req.body.status !== undefined && req.body.status !== transferencia.status) {
+            transferencia.updatedAt = new Date();
         }
 
-        const transferenciaActualizado = await Transferencia.findByIdAndUpdate(id, cambiosTransferencia, { new: true });
+        const transferenciaActualizado = await transferencia.save();
 
         res.json({
             ok: true,
