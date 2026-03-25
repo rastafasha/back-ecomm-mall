@@ -11,7 +11,7 @@ const ProductoController = require('./productoController');
 const nodemailer = require('nodemailer');
 // confirguramos el tarnsporter de nodemailer
 const transporter = nodemailer.createTransport({
-    host: "mail.zlipmenu.com",
+    host: "zlipmenu.com",
     port: 465,
     secure: true, // true para puerto 465 (SSL)
     auth: {
@@ -20,12 +20,12 @@ const transporter = nodemailer.createTransport({
     },
     tls: {
         // Esto evita errores si el certificado SSL del servidor es autofirmado
-        rejectUnauthorized: false 
+        rejectUnauthorized: false
     }
 });
 
 
-const getVentas = async(req, res) => {
+const getVentas = async (req, res) => {
 
     const ventas = await Venta.find();
 
@@ -35,7 +35,7 @@ const getVentas = async(req, res) => {
     });
 };
 
-const getVenta = async(req, res) => {
+const getVenta = async (req, res) => {
 
     const id = req.params.id;
     const uid = req.uid;
@@ -111,7 +111,7 @@ function registro(req, res) {
                     detalleveta.producto = element.producto;
                     detalleveta.cantidad = element.cantidad;
                     detalleveta.precio = element.precio;
-                    detalleveta.color = element.color ;
+                    detalleveta.color = element.color;
                     detalleveta.selector = element.selector;
 
                     await detalleveta.save();
@@ -127,15 +127,15 @@ function registro(req, res) {
                 res.status(403).send({ message: 'No se registro la venta, vuelva a intentar nuevamente.' });
             }
         } else {
-            res.status(500).send({ 
+            res.status(500).send({
                 message: 'Ocurrió un error en el servidor.',
                 error: err
-             });
+            });
         }
     });
 }
 
-const actualizarVenta = async(req, res) => {
+const actualizarVenta = async (req, res) => {
 
     const id = req.params.id;
     const uid = req.uid;
@@ -172,7 +172,7 @@ const actualizarVenta = async(req, res) => {
 
 };
 
-const borrarVenta = async(req, res) => {
+const borrarVenta = async (req, res) => {
 
     const id = req.params.id;
 
@@ -233,13 +233,13 @@ function data_detalle(req, res) {
 
 const listarVentaPorUsuario = (req, res) => {
     var id = req.params['id'];
-    
-    Venta.find({ user: id }).sort({ createdAt: -1 }).exec((err, data_venta)  => {
+
+    Venta.find({ user: id }).sort({ createdAt: -1 }).exec((err, data_venta) => {
         if (!err) {
             if (data_venta) {
                 // res.status(200).send({ ventas: data_venta });
                 //paginamos el resultado de 10 en 10
-                res.status(200).send({ ventas: data_venta.slice(0, 10)});
+                res.status(200).send({ ventas: data_venta.slice(0, 10) });
             } else {
                 res.status(500).send({ error: err });
             }
@@ -254,7 +254,7 @@ const listarVentaPorUsuario = (req, res) => {
 
 
 
-const getCancelacion = async(req, res) => {
+const getCancelacion = async (req, res) => {
 
     const id = req.params.id;
     const uid = req.uid;
@@ -395,14 +395,14 @@ function init_data_admin(req, res) {
 }
 function init_data_admin_local(req, res) {
     var localid = req.params['localid'];
-    Venta.find({local:localid}).sort({ createdAt: -1 })
-    .populate('user')
-    .populate('local')
-    .exec((err, data) => {
-        if (data) {
-            res.status(200).send({ data: data });
-        }
-    });
+    Venta.find({ local: localid }).sort({ createdAt: -1 })
+        .populate('user')
+        .populate('local')
+        .exec((err, data) => {
+            if (data) {
+                res.status(200).send({ data: data });
+            }
+        });
 }
 
 function listar_admin(req, res) {
@@ -606,12 +606,12 @@ function listar_ventas_dashboard_local(req, res) {
 
 function listar_ventas_Year(req, res) {
     const year = req.params.year;
-    
+
     let query = {};
     if (year) {
         query.year = year;
     }
-    
+
     Venta.find(query).sort({ createdAt: -1 }).exec((err, data) => {
         if (data) {
             res.status(200).send({ data: data });
@@ -686,28 +686,28 @@ function enviarFactura(req, res) {
     // Configurar el correo con el archivo recibido
     const texto = `Hola ${req.body.nombrecliente}! Adjunto encontraras la factura de tu compra.`;
     const mailOptions = {
-       from: `"Soporte ZlipMenu" <${process.env.USER_EMAIL}>`, 
-    to: req.body.emailcliente, 
-    subject: `¡Hola ${req.body.nombrecliente}! Te enviamos la factura de tu compra`,
-    text: texto,
-    attachments: [
-      {
-        filename: req.file.originalname, 
-        content: req.file.buffer, 
-      },
-    ],
+        from: `"Soporte ZlipMenu" <${process.env.USER_EMAIL}>`,
+        to: req.body.emailcliente,
+        subject: `¡Hola ${req.body.nombrecliente}! Te enviamos la factura de tu compra`,
+        text: texto,
+        attachments: [
+            {
+                filename: req.file.originalname,
+                content: req.file.buffer,
+            },
+        ],
     };
 
     // enviar email
     transporter.sendMail(mailOptions, (error, info) => {
-        if(error){
+        if (error) {
             console.error('Error al enviar el correo:', error);
             res.status(500).json({
                 ok: false,
                 message: 'Error al enviar el correo, verifique el email del cliente por favor'
             });
         }
-        else{
+        else {
             console.log('Correo enviado: ' + info.response);
             res.json({
                 ok: true,
@@ -731,7 +731,7 @@ function enviarFactura(req, res) {
 //                     target="_blank" rel="noopener noreferrer">
 //                     Notificar a la tienda
 //                     </a>
-    
+
 
 // }
 // function enviarWhatSMS(){
@@ -753,7 +753,7 @@ function enviarFactura(req, res) {
 // }
 
 
-const ventasbyTiendaId= async(req, res) => {
+const ventasbyTiendaId = async (req, res) => {
 
     const id = req.params.id;
     const uid = req.uid;
@@ -790,11 +790,11 @@ function listar_ventas_Year_local(req, res) {
     const year = req.params.year;
     const id = req.params.id;
     let query = { local: id };
-    
+
     if (year) {
         query.year = year;
     }
-    
+
     Venta.find(query).sort({ createdAt: -1 }).exec((err, data) => {
         if (data) {
             res.status(200).send({ data: data });

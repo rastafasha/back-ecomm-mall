@@ -245,12 +245,12 @@ const crearUsuarios = async (req, res = response) => {
         // Notificar al admin por email
         try {
             var transporter = nodemailer.createTransporter(smtpTransport({
-               host: "mail.zlipmenu.com",
+               host: "zlipmenu.com",
                 port: 465,
                 secure: true,
                 auth: {
-                    user: env.USER_EMAIL,
-                    pass: env.PASS_email
+                    user: process.env.USER_EMAIL, // soporte@zlipmenu.com
+                    pass: process.env.PASS_email  // Tu contraseña real o de app
                 },
                 tls: {
                     rejectUnauthorized: false
@@ -500,7 +500,6 @@ const actualizarStatusUsuario = async (req, res = response) => {
     const uid = req.params.id;
 
     try {
-        // buscamos el usuarios
         const usuarioDB = await Usuario.findById(uid);
         if (!usuarioDB) {
             return res.status(404).json({
@@ -509,17 +508,74 @@ const actualizarStatusUsuario = async (req, res = response) => {
             });
         }
 
-        //actualizamos solo el role
-        // const { role } = req.body;
-        const role = {
-            role: req.body.role,
+        //actualizaciones
+        const { password, google, email, ...campos } = req.body;
+
+        if (usuarioDB.email !== email) {
+
+            const existeEmail = await Usuario.findOne({ email });
+            if (existeEmail) {
+                return res.status(400).json({
+                    ok: false,
+                    msg: 'Ya existe un usuario con ese email'
+                });
+            }
         }
 
-        const usuarioActualizado = await Usuario.findByIdAndUpdate(uid, role, { new: true });
+        if (!usuarioDB.google) {
+
+            campos.email = email;
+
+        } else if (usuarioDB.email !== email) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Usuario de google no puede cambiar su correo'
+            });
+        }
+        const usuarioActualizado = await Usuario.findByIdAndUpdate(uid, campos, { new: true });
+
+        // Send welcome email if role changed
+        if (campos.role && usuarioDB.role !== campos.role && usuarioActualizado.email) {
+            const transporter = nodemailer.createTransport({
+                host: "zlipmenu.com",
+                port: 465,
+                secure: true,
+                auth: {
+                    user: process.env.USER_EMAIL,
+                    pass: process.env.PASS_email
+                },
+                tls: {
+                    rejectUnauthorized: false
+                }
+            });
+
+
+            const mailOptions = {
+                from: `"Soporte ZlipMenu | CRM" <${process.env.USER_EMAIL}>`, 
+                to: usuarioActualizado.email,
+                subject: '¡Bienvenido! Tu rol ha sido actualizado',
+                html: `
+                    <h2>¡Hola, ${usuarioActualizado.username || 'Usuario'}!</h2>
+                    <p>Tu rol ha sido actualizado a <strong>${usuarioActualizado.role}</strong>.</p>
+                    <p>Ahora puedes acceder al sistema con tus nuevos permisos.</p>
+                    <p>Si tienes alguna duda, contacta al administrador.</p>
+                    <p>¡Gracias por usar Zlipmenu!</p>
+                    <p>No Responda este correo</p>
+                `
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error('Error sending welcome email:', error);
+                } else {
+                    console.log('Welcome email sent to', usuarioActualizado.email, info.response);
+                }
+            });
+        }
 
         res.json({
             ok: true,
-            role: usuarioActualizado.role
+            usuario: usuarioActualizado
         });
 
     } catch (error) {
