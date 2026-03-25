@@ -11,10 +11,16 @@ const ProductoController = require('./productoController');
 const nodemailer = require('nodemailer');
 // confirguramos el tarnsporter de nodemailer
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: "mail.zlipmenu.com",
+    port: 465,
+    secure: true, // true para puerto 465 (SSL)
     auth: {
-        user: process.env.EMAIL_BACKEND,
-        pass: process.env.PASSWORD_APP
+        user: process.env.USER_EMAIL, // soporte@zlipmenu.com
+        pass: process.env.PASS_email  // Tu contraseña real o de app
+    },
+    tls: {
+        // Esto evita errores si el certificado SSL del servidor es autofirmado
+        rejectUnauthorized: false 
     }
 });
 
@@ -680,16 +686,16 @@ function enviarFactura(req, res) {
     // Configurar el correo con el archivo recibido
     const texto = `Hola ${req.body.nombrecliente}! Adjunto encontraras la factura de tu compra.`;
     const mailOptions = {
-        from: 'tu-email@gmail.com', //remitente
-        to: req.body.emailcliente, //destinatario: cliente en este caso
-        subject: `Hola ${req.body.nombrecliente}! Te enviamos la factura de tu compra`,
-        text: texto,
-        attachments: [
-          {
-            filename: req.file.originalname, // Nombre original del archivo
-            content: req.file.buffer, // Buffer en memoria
-          },
-        ],
+       from: `"Soporte ZlipMenu" <${process.env.USER_EMAIL}>`, 
+    to: req.body.emailcliente, 
+    subject: `¡Hola ${req.body.nombrecliente}! Te enviamos la factura de tu compra`,
+    text: texto,
+    attachments: [
+      {
+        filename: req.file.originalname, 
+        content: req.file.buffer, 
+      },
+    ],
     };
 
     // enviar email

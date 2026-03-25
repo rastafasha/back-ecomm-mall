@@ -7,21 +7,21 @@ const nodemailer = require('nodemailer');
 const smtpTransport = require('nodemailer-smtp-transport');
 
 
-const getUsuarios = async(req, res) => {
+const getUsuarios = async (req, res) => {
 
     const desde = Number(req.query.desde) || 0;
 
     const [usuarios, total] = await Promise.all([
         Usuario
-        .find({}, 'first_name email role google img local') //esto ultimo filtra el resultado
-        .skip(desde)
-        .populate('first_name email role google img local')
-        .sort({ createdAt: -1 }),
+            .find({}, 'first_name email role google img local') //esto ultimo filtra el resultado
+            .skip(desde)
+            .populate('first_name email role google img local')
+            .sort({ createdAt: -1 }),
         // .limit(5),
         Usuario.countDocuments()
 
     ]);
-    
+
     res.json({
         ok: true,
         usuarios,
@@ -30,13 +30,13 @@ const getUsuarios = async(req, res) => {
     });
 };
 
-const getAllUsers = async(req, res) => {
+const getAllUsers = async (req, res) => {
     const desde = Number(req.query.desde) || 0;
-    
+
     const usuarios = await Usuario.find()
-    .skip(desde)
-    // .limit(5)
-    .populate('first_name email role google img local');
+        .skip(desde)
+        // .limit(5)
+        .populate('first_name email role google img local');
     Usuario.countDocuments()
 
     res.json({
@@ -46,19 +46,19 @@ const getAllUsers = async(req, res) => {
 };
 
 
-const getTDrivers = async(req, res) => {
+const getTDrivers = async (req, res) => {
 
     const desde = Number(req.query.desde) || 0;
     const id = req.params.id;
 
     const drivers = await Usuario.find({ local: id })
-    .where('role')
-    .equals('CHOFER' )
-    .skip(desde)
-    .limit(5)
-    .populate('first_name email role google img local')
-    
-    .sort({ createdAt: -1 });
+        .where('role')
+        .equals('CHOFER')
+        .skip(desde)
+        .limit(5)
+        .populate('first_name email role google img local')
+
+        .sort({ createdAt: -1 });
     // Usuario.countDocuments()
 
     res.json({
@@ -68,14 +68,14 @@ const getTDrivers = async(req, res) => {
     });
 };
 
-const getTDriversLocal = async(req, res) => {
+const getTDriversLocal = async (req, res) => {
 
     const local = req.params.local;
     const uid = req.uid;
 
     const drivers = await Usuario.find({ local: local, role: 'CHOFER' })
-    .populate('first_name email role google img local')
-    .sort({ createdAt: -1 });
+        .populate('first_name email role google img local')
+        .sort({ createdAt: -1 });
 
     res.json({
         ok: true,
@@ -84,16 +84,16 @@ const getTDriversLocal = async(req, res) => {
 
 };
 
-const getTClients = async(req, res) => {
+const getTClients = async (req, res) => {
 
     const desde = Number(req.query.desde) || 0;
 
     const clients = await Usuario.find()
-    .where('role')
-    .equals('USER' )
-    .skip(desde)
-    .limit(5)
-    .sort({ createdAt: -1 });
+        .where('role')
+        .equals('USER')
+        .skip(desde)
+        .limit(5)
+        .sort({ createdAt: -1 });
     Usuario.countDocuments()
 
     res.json({
@@ -103,7 +103,7 @@ const getTClients = async(req, res) => {
     });
 };
 
-const getTiendaUsers = async(req, res) => {
+const getTiendaUsers = async (req, res) => {
     var local = req.params['local'];
 
     // Use find() to get all users associated with the local ID
@@ -120,12 +120,12 @@ const getTiendaUsers = async(req, res) => {
     });
 };
 
-const getTiendaLocalEmployees = async(req, res) => {
+const getTiendaLocalEmployees = async (req, res) => {
     var local = req.params['local'];
 
     // Usar find() para obtener todos los usuarios asociados con el ID del local y los roles especificados
-    Usuario.find({ 
-        local: local, 
+    Usuario.find({
+        local: local,
         // role: { $in: ['TIENDA', 'ALMACEN', 'VENTAS'] } 
     }).exec((err, tiendauserslocal) => {
         if (err) {
@@ -140,16 +140,16 @@ const getTiendaLocalEmployees = async(req, res) => {
     });
 };
 
-const getAlmacenUsers = async(req, res) => {
+const getAlmacenUsers = async (req, res) => {
 
     const desde = Number(req.query.desde) || 0;
 
     const almacenusers = await Usuario.find()
-    .where('role')
-    .equals('ALMACEN' )
-    .skip(desde)
-    .limit(5)
-    .sort({ createdAt: -1 });
+        .where('role')
+        .equals('ALMACEN')
+        .skip(desde)
+        .limit(5)
+        .sort({ createdAt: -1 });
     Usuario.countDocuments()
 
     res.json({
@@ -158,13 +158,13 @@ const getAlmacenUsers = async(req, res) => {
     });
 };
 
-const getUsuario = async(req, res) => {
+const getUsuario = async (req, res) => {
 
     const id = req.params.id;
     const uid = req.uid;
 
     Usuario.findById(id)
-    .populate('driver')
+        .populate('driver')
         .exec((err, usuario) => {
             if (err) {
                 return res.status(500).json({
@@ -189,12 +189,12 @@ const getUsuario = async(req, res) => {
 };
 
 
-const getUsuariobyCedula = async(req, res) => {
+const getUsuariobyCedula = async (req, res) => {
 
 
-        var numdoc = req.params['numdoc'];
+    var numdoc = req.params['numdoc'];
 
-        Usuario.findOne({ numdoc: numdoc }).exec((err, numdoc_data) => {
+    Usuario.findOne({ numdoc: numdoc }).exec((err, numdoc_data) => {
         if (err) {
             res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
         } else {
@@ -207,9 +207,9 @@ const getUsuariobyCedula = async(req, res) => {
     });
 
 };
-const crearUsuarios = async(req, res = response) => {
+const crearUsuarios = async (req, res = response) => {
 
-        const { email, password } = req.body;
+    const { email, password } = req.body;
 
     const body = req.body;
 
@@ -245,29 +245,32 @@ const crearUsuarios = async(req, res = response) => {
         // Notificar al admin por email
         try {
             var transporter = nodemailer.createTransporter(smtpTransport({
-                service: 'gmail',
-                host: 'smtp.gmail.com',
-                port: 587,
+               host: "mail.zlipmenu.com",
+                port: 465,
+                secure: true,
                 auth: {
-                    user: 'mercadocreativo@gmail.com',
-                    pass: 'pdnknnhpjijutcau'
+                    user: env.USER_EMAIL,
+                    pass: env.PASS_email
+                },
+                tls: {
+                    rejectUnauthorized: false
                 }
             }));
 
             var mailOptions = {
-                from: 'mercadocreativo@gmail.com',
+                from: `"Soporte ZlipMenu" <${process.env.USER_EMAIL}>`, 
                 to: 'mercadocreativo@gmail.com',
-                subject: 'Nuevo usuario creado en MallConnect',
+                subject: 'Nuevo usuario creado en Zlipmenu App',
                 text: `Nuevo usuario registrado:
-Nombre: ${usuario.first_name} ${usuario.last_name || ''}
-Email: ${usuario.email}
-Teléfono: ${usuario.telefono || 'N/A'}
-Role: ${usuario.role}
-Local: ${usuario.local || 'N/A'}
-ID: ${usuario.id}`
+                Nombre: ${usuario.first_name} ${usuario.last_name || ''}
+                Email: ${usuario.email}
+                Teléfono: ${usuario.telefono || 'N/A'}
+                Role: ${usuario.role}
+                Local: ${usuario.local || 'N/A'}
+                ID: ${usuario.id}`
             };
 
-            transporter.sendMail(mailOptions, function(error, info) {
+            transporter.sendMail(mailOptions, function (error, info) {
                 if (error) {
                     console.log('Error enviando email:', error);
                 } else {
@@ -297,7 +300,7 @@ ID: ${usuario.id}`
 
 
 };
-const crearCliente = async(req, res = response) => {
+const crearCliente = async (req, res = response) => {
 
     const { email, password } = req.body;
 
@@ -353,7 +356,7 @@ const crearCliente = async(req, res = response) => {
 
 };
 
-const actualizarUAdmin = async(req, res = response) => {
+const actualizarUAdmin = async (req, res = response) => {
     //todo: validar token y comprobar si el usuario es correcto
 
     const uid = req.params.id;
@@ -408,7 +411,7 @@ const actualizarUAdmin = async(req, res = response) => {
     }
 };
 
-const actualizarUsuario = async(req, res = response) => {
+const actualizarUsuario = async (req, res = response) => {
     //todo: validar token y comprobar si el usuario es correcto
 
     // modificado por José Prados
@@ -440,7 +443,7 @@ const actualizarUsuario = async(req, res = response) => {
             google: req.body.google
         }
         // si en el req viene una password se agrega al objeto data para realizar el update
-        if(req.body.password){
+        if (req.body.password) {
             data.password = req.body.password;
         }
         // console.log('data: ',data)
@@ -448,7 +451,7 @@ const actualizarUsuario = async(req, res = response) => {
 
         if (usuarioDB.email !== data.email) {
 
-            const existeEmail = await Usuario.findOne( {email: email} );
+            const existeEmail = await Usuario.findOne({ email: email });
             if (existeEmail) {
                 return res.status(400).json({
                     ok: false,
@@ -469,7 +472,7 @@ const actualizarUsuario = async(req, res = response) => {
         }
 
         // verificar si en el req hay una password
-        if(req.body.password){
+        if (req.body.password) {
             //encriptar password
             const salt = bcrypt.genSaltSync();
             data.password = bcrypt.hashSync(data.password, salt);
@@ -491,7 +494,7 @@ const actualizarUsuario = async(req, res = response) => {
     }
 };
 
-const actualizarStatusUsuario = async(req, res = response) => {
+const actualizarStatusUsuario = async (req, res = response) => {
     //todo: validar token y comprobar si el usuario es correcto
 
     const uid = req.params.id;
@@ -511,7 +514,7 @@ const actualizarStatusUsuario = async(req, res = response) => {
         const role = {
             role: req.body.role,
         }
-        
+
         const usuarioActualizado = await Usuario.findByIdAndUpdate(uid, role, { new: true });
 
         res.json({
@@ -528,7 +531,7 @@ const actualizarStatusUsuario = async(req, res = response) => {
     }
 };
 
-const borrarUsuario = async(req, res) => {
+const borrarUsuario = async (req, res) => {
 
     const uid = req.params.id;
 
@@ -595,7 +598,7 @@ const set_token_recovery = (req, res) => {
                     } else {
                         res.status(200).send({ data: user_update });
 
-                        transporter.sendMail(mailOptions, function(error, info) {
+                        transporter.sendMail(mailOptions, function (error, info) {
                             if (error) {
 
                             } else {
@@ -636,7 +639,7 @@ const change_password = (req, res) => {
             if (user == null) {
                 res.status(500).send({ message: "El correo electrónico no se encuentra registrado, intente nuevamente." });
             } else {
-                bcrypt.hash(params.password, null, null, function(err, hash) {
+                bcrypt.hash(params.password, null, null, function (err, hash) {
                     Usuario.findByIdAndUpdate({ _id: user._id }, { password: hash }, (err, user_update) => {
                         res.status(200).send({ data: user_update });
                     });
