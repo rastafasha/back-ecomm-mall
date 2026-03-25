@@ -558,6 +558,7 @@ const actualizarStatusUsuario = async (req, res = response) => {
                     <h2>¡Hola, ${usuarioActualizado.username || 'Usuario'}!</h2>
                     <p>Tu rol ha sido actualizado a <strong>${usuarioActualizado.role}</strong>.</p>
                     <p>Ahora puedes acceder al sistema con tus nuevos permisos.</p>
+                    <p>Puedes acceder a la aplicación por aquí: <a href="https://admin.zlipmenu.com/">https://admin.zlipmenu.com/</a>.</p>
                     <p>Si tienes alguna duda, contacta al administrador.</p>
                     <p>¡Gracias por usar Zlipmenu!</p>
                     <p>No Responda este correo</p>
