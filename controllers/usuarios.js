@@ -228,7 +228,6 @@ const crearUsuarios = async (req, res = response) => {
             last_name: body.last_name,
             telefono: body.telefono,
             local: body.local,
-            // pais: body.pais,
             numdoc: body.numdoc,
             email: body.email,
             role: body.role,
@@ -300,47 +299,58 @@ const crearUsuarios = async (req, res = response) => {
 
 
 };
-const crearCliente = async (req, res = response) => {
 
-    const { email, password } = req.body;
-
-    const body = req.body;
-
+const crearClienteExpress = async (req, res = response) => {
+    const { first_name, telefono, local } = req.body;
     try {
-
-        const existeEmail = await Usuario.findOne({ email });
-
-        if (existeEmail) {
+        // 1. Validar que al menos envíen los datos mínimos del formulario express
+        if (!first_name || !telefono) {
             return res.status(400).json({
                 ok: false,
-                msg: 'El correo ya está registrado'
-            })
+                msg: 'El nombre y el teléfono son campos obligatorios.'
+            });
         }
 
-        const usuario = new Usuario({
-            first_name: body.first_name,
-            last_name: body.last_name,
-            telefono: body.telefono,
-            local: body.local,
-            // pais: body.pais,
-            numdoc: body.numdoc,
-            email: body.email,
-            role: body.role,
-            img: 'default.png',
+        // 2. LA LLAVE ÚNICA AHORA ES EL TELÉFONO: Verificamos si ya existe el cliente
+        let usuario = await Usuario.findOne({ telefono });
+
+        if (usuario) {
+            // Si el cliente ya existe en la BD (ha comprado antes), generamos su token y lo dejamos pasar
+            const token = await generarJWT(usuario.id);
+            return res.json({
+                ok: true,
+                msg: 'Cliente existente identificado correctamente.',
+                usuario,
+                token
+            });
+        }
+
+        // 3. SI ES UN CLIENTE NUEVO: Autogeneramos credenciales seguras en segundo plano
+        // Creamos una contraseña aleatoria secreta para cumplir con el modelo de base de datos
+        const salt = bcrypt.genSaltSync();
+        const passwordTemporal = Math.random().toString(36).slice(-8); // Clave aleatoria de 8 dígitos
+        const passwordEncriptada = bcrypt.hashSync(passwordTemporal, salt);
+
+        // Instanciamos el modelo solo con lo que tenemos del formulario rápido
+        usuario = new Usuario({
+            first_name,
+            telefono,
+            local,
+            password: passwordEncriptada,
+            img: 'default.png'
+            // El email no se envía, por lo tanto Mongoose lo guarda como undefined.
+            // Recuerda tener "sparse: true" en tu esquema de base de datos para el campo email.
         });
 
-        //encriptar password
-        const salt = bcrypt.genSaltSync();
-        usuario.password = bcrypt.hashSync(password, salt);
-
-        //guardar usuario
+        // 4. Guardar en MongoDB
         await usuario.save();
 
-        //generar el token - JWT
+        // 5. Generar su Token JWT para que quede logueado en la sesión de Angular
         const token = await generarJWT(usuario.id);
 
         res.json({
             ok: true,
+            msg: 'Nuevo cliente express creado exitosamente.',
             usuario,
             token
         });
@@ -349,12 +359,11 @@ const crearCliente = async (req, res = response) => {
         console.log(error);
         res.status(500).json({
             ok: false,
-            msg: 'Error inesperado... revisar logs'
+            msg: 'Error inesperado en checkout express... revisar logs'
         });
     }
-
-
 };
+
 
 const actualizarUAdmin = async (req, res = response) => {
     //todo: validar token y comprobar si el usuario es correcto
@@ -726,6 +735,6 @@ module.exports = {
     getTClients,
     actualizarStatusUsuario,
     getUsuariobyCedula,
-    crearCliente,
+    crearClienteExpress,
     getTiendaLocalEmployees
 };

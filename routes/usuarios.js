@@ -23,7 +23,7 @@ const {
     getTClients,
     actualizarStatusUsuario,
     getUsuariobyCedula,
-    crearCliente,
+    crearClienteExpress,
     getTiendaLocalEmployees
     
 } = require('../controllers/usuarios');
@@ -69,11 +69,9 @@ router.post('/registro', [
     validarCampos
 ], crearUsuarios);
 
-router.post('/registrocliente', [
-    check('first_name', 'el nombre es obligatorio').not().isEmpty(),
-    check('email', 'el email es obligatorio').isEmail(),
+router.post('/express', [
     validarCampos
-], crearCliente);
+], crearClienteExpress);
 
 router.put('/:uid', [
     validarJWT,
