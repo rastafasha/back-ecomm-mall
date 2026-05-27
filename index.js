@@ -26,6 +26,7 @@ const server = require('http').Server(app);
 
 // Initialize socket.io with the server
 const allowedOrigins = [
+  "https://localhost:4200",
   "http://localhost:4203",
   "http://localhost:4206",
   "http://localhost:4207",

@@ -302,6 +302,15 @@ const crearUsuarios = async (req, res = response) => {
 
 const crearClienteExpress = async (req, res = response) => {
     const { first_name, telefono, local } = req.body;
+    // Creamos un objeto con los datos recibidos
+        const datosUsuario = {
+            first_name,
+            telefono,
+            local,
+            role: 'USER', // O el rol que manejes
+            // 🟢 Generamos un email único ficticio para engañar al índice de MongoDB
+            email: `express_${telefono}@zlipemu.com` 
+        };
     try {
         // 1. Validar que al menos envíen los datos mínimos del formulario express
         if (!first_name || !telefono) {
@@ -332,15 +341,7 @@ const crearClienteExpress = async (req, res = response) => {
         const passwordEncriptada = bcrypt.hashSync(passwordTemporal, salt);
 
         // Instanciamos el modelo solo con lo que tenemos del formulario rápido
-        usuario = new Usuario({
-            first_name,
-            telefono,
-            local,
-            password: passwordEncriptada,
-            img: 'default.png'
-            // El email no se envía, por lo tanto Mongoose lo guarda como undefined.
-            // Recuerda tener "sparse: true" en tu esquema de base de datos para el campo email.
-        });
+        usuario = new Usuario(datosUsuario);
 
         // 4. Guardar en MongoDB
         await usuario.save();
