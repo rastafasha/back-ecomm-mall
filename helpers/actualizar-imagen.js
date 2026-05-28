@@ -13,6 +13,7 @@ const Curso = require('../models/curso');
 const Categoria = require('../models/categoria');
 const Tienda = require('../models/tienda');
 const Driver = require('../models/driver');
+const Transferencia = require('../models/transferencia');
 
 const borrarImagen = (path) => {
 
@@ -23,7 +24,7 @@ const borrarImagen = (path) => {
 }
 
 
-const actualizarImagen = async(tipo, id, nombreArchivo) => {
+const actualizarImagen = async (tipo, id, nombreArchivo) => {
 
     let pathViejo = '';
 
@@ -61,19 +62,19 @@ const actualizarImagen = async(tipo, id, nombreArchivo) => {
             break;
 
         case 'locaciones':
-                const tienda = await Tienda.findById(id);
-                if (!tienda) {
-                    console.log('No es un tienda por id');
-                    return false;
-                }
-                pathViejo = `./uploads/locaciones/${tienda.img}`;
-    
-                borrarImagen(pathViejo);
-    
-                tienda.img = nombreArchivo;
-                await tienda.save();
-                return true;
-                break;
+            const tienda = await Tienda.findById(id);
+            if (!tienda) {
+                console.log('No es un tienda por id');
+                return false;
+            }
+            pathViejo = `./uploads/locaciones/${tienda.img}`;
+
+            borrarImagen(pathViejo);
+
+            tienda.img = nombreArchivo;
+            await tienda.save();
+            return true;
+            break;
 
         case 'galerias':
             const galeria = await Galeria.findById(id);
@@ -120,7 +121,7 @@ const actualizarImagen = async(tipo, id, nombreArchivo) => {
             return true;
             break;
 
-        
+
         case 'usuarios':
             const usuario = await Usuario.findById(id);
             if (!usuario) {
@@ -229,7 +230,7 @@ const actualizarImagen = async(tipo, id, nombreArchivo) => {
             break;
 
 
-            case 'drivers':
+        case 'drivers':
             const driver = await Driver.findById(id);
             if (!driver) {
                 console.log('No es un driver por id');
@@ -244,7 +245,23 @@ const actualizarImagen = async(tipo, id, nombreArchivo) => {
             await driver.save();
             return true;
             break;
-        
+
+        case 'transferencias':
+            const transferencia = await Transferencia.findById(id);
+            if (!transferencia) {
+                console.log('No es un transferencia por id');
+                return false;
+            }
+            if (transferencia.img) {
+                pathViejo = `./uploads/transferencias/${driver.img}`;
+                borrarImagen(pathViejo);
+            }
+
+            transferencia.img = nombreArchivo;
+            await transferencia.save();
+            return true;
+            break;
+
 
     }
 

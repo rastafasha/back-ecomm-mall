@@ -4,8 +4,6 @@ const Tienda = require('../models/tienda');
 const Usuario = require('../models/usuario');
 const Pedido = require('../models/pedidomenu');
 
-
-
 const crearPedidoMenu = async(req, res) => {
     const { user, pedidoList, tienda } = req.body;
 
@@ -262,6 +260,7 @@ const pedidosbyTiendaId = async(req, res) => {
     }
 
 };
+
 const pedidosbyTiendaIdUser = async (req, res) => {
     const { tiendaid, userid } = req.params;
 

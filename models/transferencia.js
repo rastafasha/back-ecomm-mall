@@ -9,6 +9,7 @@ var TransferenciaSchema = Schema({
     referencia: { type: String, required: true },
     name_person: {type: String, required: true},
     phone: {type: String, required: true},
+    img: {type: String, required: false},
     status: { type: String, required: true, default: 'pending' },
     local: { type: Schema.ObjectId, ref: 'tienda' , default: null},
     paymentday: { type: Date, default: Date.now, required: false },

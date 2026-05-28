@@ -26,32 +26,33 @@ const server = require('http').Server(app);
 
 // Initialize socket.io with the server
 const allowedOrigins = [
-  "https://localhost:4200",
-  "http://localhost:4203",
-  "http://localhost:4206",
-  "http://localhost:4207",
-  "https://adminstorenodejs.malcolmcordova.com",
-  "https://admin.zlipmenu.com",
-  "https://menu-panaderia.vercel.app",
-  "https://slide-dish.vercel.app",
-  "https://menu-pizzeria-mauve.vercel.app",
-  "https://delivery-angular.vercel.app",
-  "https://menu-hamburguesa-tawny.vercel.app",
+    "https://localhost:4200",
+    "http://localhost:4203",
+    "http://localhost:4206",
+    "http://localhost:4207",
+    "http://localhost:3001",
+    "https://adminstorenodejs.malcolmcordova.com",
+    "https://admin.zlipmenu.com",
+    "https://menu-panaderia.vercel.app",
+    "https://slide-dish.vercel.app",
+    "https://menu-pizzeria-mauve.vercel.app",
+    "https://delivery-angular.vercel.app",
+    "https://menu-hamburguesa-tawny.vercel.app",
 ];
 
 // Configuración compartida
 const corsOptions = {
-  origin: (origin, callback) => {
-    // Si el origen está en la lista o es una petición local (sin origen)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Origin no permitido por CORS'));
-    }
-  },
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true,
-  optionsSuccessStatus: 204
+    origin: (origin, callback) => {
+        // Si el origen está en la lista o es una petición local (sin origen)
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Origin no permitido por CORS'));
+        }
+    },
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+    optionsSuccessStatus: 204
 };
 
 // 1. Aplicar a las rutas normales de Express (REST API)
@@ -60,7 +61,7 @@ app.use(cors(corsOptions));
 
 // 2. Aplicar a Socket.io
 const io = socketIO(server, {
-  cors: corsOptions
+    cors: corsOptions
 });
 
 module.exports.io = io;
@@ -86,6 +87,7 @@ const startServer = async () => {
     app.use('/api/sliders', require('./routes/slider'));
 
     //tienda
+    app.use('/api/tiendas', require('./routes/tienda'));
     app.use('/api/marcas', require('./routes/marcas'));
     app.use('/api/categorias', require('./routes/categoria'));
     app.use('/api/cursos', require('./routes/curso'));
@@ -108,19 +110,25 @@ const startServer = async () => {
     app.use('/api/promocions', require('./routes/promocion'));
     app.use('/api/shippings', require('./routes/shipping'));
     app.use('/api/pickups', require('./routes/pickup'));
-    app.use('/api/notifications', require('./routes/notifications'));
     app.use('/api/videocursos', require('./routes/videocurso'));
     app.use('/api/favoritos', require('./routes/favorito'));
-    app.use('/api/tiendas', require('./routes/tienda'));
+
+    //pagos
     app.use('/api/tipopago', require('./routes/tipopago'));
     app.use('/api/transferencias', require('./routes/transferencia'));
     app.use('/api/pagoefectivo', require('./routes/pago.efectivo'));
     app.use('/api/pagocheque', require('./routes/pagocheque'));
-    app.use('/api/paises', require('./routes/pais'));
-    app.use('/api/asignardelivery', require('./routes/asignardelivery'));
-    app.use('/api/driver', require('./routes/driver'));
-    app.use('/api/pedidomenu', require('./routes/pedidomenu'));
     app.use('/api/paypal', require('./routes/paypal'));
+
+    app.use('/api/paises', require('./routes/pais'));
+    //delivery
+    app.use('/api/driver', require('./routes/driver'));
+    app.use('/api/asignardelivery', require('./routes/asignardelivery'));
+    app.use('/api/pedidomenu', require('./routes/pedidomenu'));
+
+    //notificacioens
+    app.use('/api/notifications', require('./routes/notifications'));
+    app.use('/api/notificaciones', require('./routes/notificaciones'));
 
     //notification
     const vapidKeys = {
@@ -138,7 +146,7 @@ const startServer = async () => {
 
     //test
     app.get("/", (req, res) => {
-      res.json({ message: "Welcome to nodejs." });
+        res.json({ message: "Welcome to nodejs." });
     });
 
     //lo ultimo

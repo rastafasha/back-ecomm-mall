@@ -4,11 +4,6 @@ const fs = require('fs');
 const webpush = require('web-push');
 const Subscription = require('../models/subscribers');
 
-
-
-
-
-
 const enviarNotificacion = (req, res) => {
 
     const pushSubscription = {
