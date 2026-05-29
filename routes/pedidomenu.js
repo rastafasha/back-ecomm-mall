@@ -41,8 +41,8 @@
  ], actualizarPedidoMenu);
  
 
- router.get('/activar/:id', validarJWT, activar);
- router.get('/finalizado/:id', validarJWT, finalizado);
+ router.put('/activar/:id', validarJWT, activar);
+ router.put('/finalizado/:id', validarJWT, finalizado);
  
  router.delete('/remove/:id', 
     
