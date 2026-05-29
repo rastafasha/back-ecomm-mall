@@ -33,6 +33,7 @@ const allowedOrigins = [
     "http://localhost:3001",
     "https://adminstorenodejs.malcolmcordova.com",
     "https://admin.zlipmenu.com",
+    "https://admin-zlipmenu.vercel.app",// admin en vercel
     "https://menu-panaderia.vercel.app",
     "https://slide-dish.vercel.app",
     "https://menu-pizzeria-mauve.vercel.app",
