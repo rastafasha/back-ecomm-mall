@@ -2,6 +2,9 @@ const { response } = require('express');
 const Transferencia = require('../models/transferencia');
 const nodemailer = require('nodemailer');
 const Congeneral = require('../models/congeneral');
+const PushSubscription = require('../models/push-subscription');
+const { sendNotification } = require('../helpers/notificaciones');
+
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -9,6 +12,7 @@ const transporter = nodemailer.createTransport({
         pass: process.env.PASSWORD_APP
     }
 });
+
 const getTransferencias = async(req, res) => {
 
     const transferencias = await Transferencia.find()
@@ -168,31 +172,76 @@ const listarPorUsuario = (req, res) => {
     });
 }
 
-
-const updateStatus = async(req, res) =>{
+const updateStatus = async (req, res) => {
     const id = req.params.id;
-    const uid = req.uid;
+    const uid = req.uid; // ID del admin/usuario que opera
+    const { status } = req.body;
 
     try {
-
         const transferencia = await Transferencia.findById(id);
         if (!transferencia) {
-            return res.status(500).json({
+            return res.status(404).json({
                 ok: false,
-                msg: 'transferencia no encontrado por el id'
+                msg: 'Transferencia no encontrada por el id'
             });
         }
 
-        // Update fields
+        const antiguoEstado = transferencia.status;
+
+        // Actualizar campos
         Object.assign(transferencia, req.body);
-        transferencia.usuario = uid;
+        transferencia.usuario = uid; 
         
-        // Update updatedAt if status changed
-        if (req.body.status !== undefined && req.body.status !== transferencia.status) {
+        if (status !== undefined && status !== antiguoEstado) {
             transferencia.updatedAt = new Date();
         }
 
         const transferenciaActualizado = await transferencia.save();
+
+        // 🚀 DISPARO CENTRALIZADO DE NOTIFICACIÓN HYBRIDA
+        if (status !== undefined && status !== antiguoEstado) {
+            
+            let tipoNotificacion = 'NUEVO_PAGO';
+            let titulo = 'Actualización de Pago';
+            let mensaje = `Tu pago de transferencia ha cambiado a estado: ${status}`;
+
+            if (status === 'ok') {
+                tipoNotificacion = 'PAGO_APROBADO';
+                titulo = '¡Pago Aprobado! 🎉';
+                mensaje = 'Tu transferencia ha sido verificada con éxito.';
+            } else if (status === 'no') {
+                tipoNotificacion = 'PAGO_RECHAZADO';
+                titulo = 'Pago Rechazado ❌';
+                mensaje = 'Hubo un problema con tu transferencia. Por favor verifica los datos.';
+            }
+
+            const clienteId = transferencia.usuarioOriginal || transferencia.clienteId || transferencia.usuario;
+            const urlRedireccion = `/mis-pagos/${transferencia._id}`;
+
+            // 1. Buscamos los dispositivos Push del cliente
+            const subs = await PushSubscription.find({ usuario: clienteId });
+
+            if (subs.length > 0) {
+                // Caso A: El usuario tiene dispositivos registrados para Push.
+                // Ejecutamos el helper por cada dispositivo.
+                // Nota: La BD y el Socket se ejecutarán de forma segura en la primera iteración.
+                for (const sub of subs) {
+                    try {
+                        await sendNotification(sub, titulo, mensaje, urlRedireccion, clienteId, tipoNotificacion, transferencia._id);
+                    } catch (pushErr) {
+                        // Si el helper arrojó un error 410/404, limpiamos la suscripción inservible de la BD
+                        if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
+                            await PushSubscription.findByIdAndDelete(sub._id);
+                            console.log(`[Limpieza] Suscripción eliminada de la BD por estar expirada.`);
+                        }
+                    }
+                }
+            } else {
+                // Caso B: El usuario no tiene Web Push activado (Ej: Tu iPhone 6s o navegación incógnito).
+                // Pasamos 'null' en la suscripción, pero el helper igual guardará en BD y enviará por WebSockets.
+                await sendNotification(null, titulo, mensaje, urlRedireccion, clienteId, tipoNotificacion, transferencia._id);
+            }
+        }
 
         res.json({
             ok: true,
@@ -200,6 +249,7 @@ const updateStatus = async(req, res) =>{
         });
 
     } catch (error) {
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'Error hable con el admin'

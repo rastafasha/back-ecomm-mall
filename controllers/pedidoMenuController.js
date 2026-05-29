@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const Tienda = require('../models/tienda');
 const Usuario = require('../models/usuario');
 const Pedido = require('../models/pedidomenu');
+const PushSubscription = require('../models/push-subscription');
+const { sendNotification } = require('../helpers/notificaciones');
 
 const crearPedidoMenu = async(req, res) => {
     const { user, pedidoList, tienda } = req.body;
@@ -230,20 +232,60 @@ const getPedidosByStatus = async(req, res) => {
         });
 };
 
-function activar(req, res) {
-    var id = req.params['id'];
-    // console.log(id);
-    Pedido.findByIdAndUpdate({ _id: id }, { status: 'INPROCESS' }, (err, pedido_data) => {
-        if (err) {
-            res.status(500).send({ message: err });
-        } else {
-            if (pedido_data) {
-                res.status(200).send({ pedido: pedido_data });
-            } else {
-                res.status(403).send({ message: 'No se actualizó el pedido, vuelva a intentar nuevamente.' });
-            }
+async function activar(req, res) {
+    const id = req.params['id'];
+
+    try {
+        // 1. Actualizamos el pedido. { new: true } nos devuelve el pedido YA modificado.
+        const pedido_data = await Pedido.findByIdAndUpdate(
+            { _id: id }, 
+            { status: 'INPROCESS' }, 
+            { new: true }
+        );
+
+        if (!pedido_data) {
+            return res.status(403).send({ message: 'No se actualizó el pedido, vuelva a intentar nuevamente.' });
         }
-    })
+
+        // 🚀 DISPARO CENTRALIZADO DE NOTIFICACIÓN HÍBRIDA
+        // Definimos textos atractivos para el cliente de Zlipmenu
+        const tipoNotificacion = 'PEDIDO_APROBADO'; 
+        const titulo = '¡Tu pedido está en proceso! 🍳';
+        const mensaje = `El comercio ha aceptado tu orden y ya la está preparando.`;
+        
+        // El cliente que realizó la compra
+        const clienteId = pedido_data.usuario || pedido_data.cliente; 
+        const urlRedireccion = `/mis-pedidos/${pedido_data._id}`;
+
+        // Buscamos si el cliente tiene dispositivos con Web Push activos
+        const subs = await PushSubscription.find({ usuario: clienteId });
+
+        if (subs.length > 0) {
+            // Caso A: Dispositivos compatibles registrados
+            for (const sub of subs) {
+                try {
+                    await sendNotification(sub, titulo, mensaje, urlRedireccion, clienteId, tipoNotificacion, pedido_data._id);
+                } catch (pushErr) {
+                    // Limpieza automática si el token del navegador expiró (410/404)
+                    if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
+                        await PushSubscription.findByIdAndDelete(sub._id);
+                        console.log(`[Limpieza] Suscripción de pedido eliminada por expiración.`);
+                    }
+                }
+            }
+        } else {
+            // Caso B: Tu iPhone 6s o navegadores sin soporte Push nativo.
+            // Pasa null en la sub, pero ejecuta el guardado en base de datos y el WebSocket
+            await sendNotification(null, titulo, mensaje, urlRedireccion, clienteId, tipoNotificacion, pedido_data._id);
+        }
+
+        // 2. Respondemos al frontend que ejecutó la acción (ej: el panel de administración)
+        res.status(200).send({ pedido: pedido_data });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ message: err.message || 'Error interno en el servidor' });
+    }
 }
 
 const pedidosbyTiendaId = async(req, res) => {

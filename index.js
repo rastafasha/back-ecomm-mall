@@ -127,8 +127,8 @@ const startServer = async () => {
     app.use('/api/pedidomenu', require('./routes/pedidomenu'));
 
     //notificacioens
-    app.use('/api/notifications', require('./routes/notifications'));
     app.use('/api/notificaciones', require('./routes/notificaciones'));
+    app.use('/api/notipush', require('./routes/notificaciones'));
 
     //notification
     const vapidKeys = {

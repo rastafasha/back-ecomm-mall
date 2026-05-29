@@ -28,7 +28,16 @@ const sendNotification = async (userSubscription, title, message, url = '/notifi
 
   // 1. HISTORIAL: Si nos pasan el usuarioId, guardamos la notificación en Mongo de forma automática
   if (usuarioId) {
-    try {
+  try {
+    // Buscamos si ya se registró esta misma notificación hace menos de 5 segundos
+    const yaExiste = await Notificacion.findOne({
+      usuario: usuarioId,
+      referenciaId,
+      tipo,
+      createdAt: { $gte: new Date(Date.now() - 5000) } 
+    });
+
+    if (!yaExiste) {
       nuevaNotif = new Notificacion({
         usuario: usuarioId,
         titulo: title,
@@ -37,10 +46,13 @@ const sendNotification = async (userSubscription, title, message, url = '/notifi
         referenciaId
       });
       await nuevaNotif.save();
-    } catch (dbErr) {
-      console.error('Error al guardar historial de notificación:', dbErr);
+    } else {
+      nuevaNotif = yaExiste; // Reutilizamos para el payload del socket
     }
+  } catch (dbErr) {
+    console.error('Error al guardar historial de notificación:', dbErr);
   }
+}
 
   // 2. 🟢 TIEMPO REAL (SOCKET.IO): Ideal para tu iPhone 6s
   if (global.io && usuarioId) {

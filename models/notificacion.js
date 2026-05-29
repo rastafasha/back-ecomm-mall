@@ -15,6 +15,7 @@ const notificacionSchema = Schema({
             'NUEVO_PAGO', 
             'PEDIDO_APROBADO', 
             'PEDIDO_RECHAZADO',
+            'AVISO_GENERAL',
         ],
         required: true 
     },
