@@ -302,6 +302,7 @@ const byTienda = async(req, res) => {
         const data_transferencia = await Transferencia.find({ tienda: tiendaid })
             .populate('metodo_pago')
              .populate('local')
+             .populate('pedido')
             .sort({ createdAt: -1 });
 
         res.status(200).send({ transferencias: data_transferencia });

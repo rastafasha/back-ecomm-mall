@@ -21,6 +21,7 @@
  
  router.get('/', getTransferencias);
  router.get('/transferencia/:id', listarPorUsuario);
+  router.get('/tienda/:tiendaid', byTienda);
  router.get('/user/:id', listarPagosPorUsuario);
  
  router.post('/store', crearTransferencia);
@@ -35,7 +36,7 @@
  
  router.delete('/remove/:id', validarJWT, borrarTransferencia);
 
- router.get('/tienda/:tiendaid', byTienda);
+
  
  
  
