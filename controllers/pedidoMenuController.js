@@ -254,11 +254,11 @@ async function activar(req, res) {
         const mensaje = `El comercio ha aceptado tu orden y ya la está preparando.`;
         
         // El cliente que realizó la compra
-        const clienteId = pedido_data.usuario || pedido_data.cliente; 
+        const clienteId = pedido_data.user || pedido_data.cliente; 
         const urlRedireccion = `/mis-pedidos/${pedido_data._id}`;
 
         // Buscamos si el cliente tiene dispositivos con Web Push activos
-        const subs = await PushSubscription.find({ usuario: clienteId });
+        const subs = await PushSubscription.find({ user: clienteId });
 
         if (subs.length > 0) {
             // Caso A: Dispositivos compatibles registrados
@@ -310,11 +310,11 @@ async function finalizado(req, res) {
         const mensaje = `Gracias por Comprar y usar nuestra App, Vuelve Pronto!.`;
         
         // El cliente que realizó la compra
-        const clienteId = pedido_data.usuario || pedido_data.cliente; 
+        const clienteId = pedido_data.user || pedido_data.cliente; 
         const urlRedireccion = `/mis-pedidos/${pedido_data._id}`;
 
         // Buscamos si el cliente tiene dispositivos con Web Push activos
-        const subs = await PushSubscription.find({ usuario: clienteId });
+        const subs = await PushSubscription.find({ user: clienteId });
 
         if (subs.length > 0) {
             // Caso A: Dispositivos compatibles registrados
