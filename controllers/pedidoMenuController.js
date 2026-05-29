@@ -255,7 +255,7 @@ async function activar(req, res) {
         
         // El cliente que realizó la compra
         const clienteId = pedido_data.user || pedido_data.cliente; 
-        const urlRedireccion = `/mis-pedidos/${pedido_data._id}`;
+        const urlRedireccion = `/my-account/pedidos/${pedido_data._id}`;
 
         // Buscamos si el cliente tiene dispositivos con Web Push activos
         const subs = await PushSubscription.find({ user: clienteId });
@@ -292,7 +292,7 @@ async function finalizado(req, res) {
     const id = req.params['id'];
 
     try {
-        // 1. Actualizamos el pedido. { new: true } nos devuelve el pedido YA modificado.
+        // 1. Actualizamos el pedido a FINISHED
         const pedido_data = await Pedido.findByIdAndUpdate(
             { _id: id }, 
             { status: 'FINISHED' }, 
@@ -304,25 +304,24 @@ async function finalizado(req, res) {
         }
 
         // 🚀 DISPARO CENTRALIZADO DE NOTIFICACIÓN HÍBRIDA
-        // Definimos textos atractivos para el cliente de Zlipmenu
+        // Ahora sí usamos el tipo oficial gracias a tu nuevo ENUM
         const tipoNotificacion = 'PEDIDO_FINALIZADO'; 
         const titulo = '¡Tu pedido ha finalizado! 🍳';
-        const mensaje = `Gracias por Comprar y usar nuestra App, Vuelve Pronto!.`;
+        const mensaje = `Gracias por comprar y usar nuestra App. ¡Vuelve pronto!`;
         
-        // El cliente que realizó la compra
-        const clienteId = pedido_data.user || pedido_data.cliente; 
-        const urlRedireccion = `/mis-pedidos/${pedido_data._id}`;
+        // Extracción segura del _id del objeto 'user'
+        const clienteId = pedido_data.user?._id || pedido_data.user || pedido_data.cliente; 
+        const urlRedireccion = `/my-account/pedidos/${pedido_data._id}`;
 
-        // Buscamos si el cliente tiene dispositivos con Web Push activos
-        const subs = await PushSubscription.find({ user: clienteId });
+        // Búsqueda de suscripciones usando el campo correcto 'usuario'
+        const subs = await PushSubscription.find({ usuario: clienteId });
 
-        if (subs.length > 0) {
-            // Caso A: Dispositivos compatibles registrados
+        if (subs && subs.length > 0) {
+            // Caso A: Dispositivos compatibles registrados (Múltiples endpoints)
             for (const sub of subs) {
                 try {
-                    await sendNotification(sub, titulo, mensaje, urlRedireccion, clienteId, tipoNotificacion, pedido_data._id);
+                    await sendNotification(sub.subscription || sub, titulo, mensaje, urlRedireccion, clienteId, tipoNotificacion, pedido_data._id);
                 } catch (pushErr) {
-                    // Limpieza automática si el token del navegador expiró (410/404)
                     if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
                         await PushSubscription.findByIdAndDelete(sub._id);
                         console.log(`[Limpieza] Suscripción de pedido eliminada por expiración.`);
@@ -330,19 +329,21 @@ async function finalizado(req, res) {
                 }
             }
         } else {
-            // Caso B: Tu iPhone 6s o navegadores sin soporte Push nativo.
-            // Pasa null en la sub, pero ejecuta el guardado en base de datos y el WebSocket
+            // Caso B: Tu iPhone 6s u otros entornos sin soporte push nativo activo.
+            // Esto guardará el historial en Mongo con el nuevo ENUM y emitirá por Sockets
             await sendNotification(null, titulo, mensaje, urlRedireccion, clienteId, tipoNotificacion, pedido_data._id);
         }
 
-        // 2. Respondemos al frontend que ejecutó la acción (ej: el panel de administración)
+        // 2. Respondemos al frontend que ejecutó la acción
         res.status(200).send({ pedido: pedido_data });
 
     } catch (err) {
         console.error(err);
         res.status(500).send({ message: err.message || 'Error interno en el servidor' });
     }
-}
+};
+
+
 
 const pedidosbyTiendaId = async(req, res) => {
 
