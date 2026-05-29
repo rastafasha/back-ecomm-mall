@@ -12,7 +12,8 @@
     getTransferencia,
     listarPorUsuario,
     updateStatus,
-    byTienda
+    byTienda,
+    listarPagosPorUsuario
  } = require('../controllers/transferenciaController');
  const { validarJWT } = require('../middlewares/validar-jwt');
  const { check } = require('express-validator');
@@ -20,6 +21,7 @@
  
  router.get('/', getTransferencias);
  router.get('/transferencia/:id', listarPorUsuario);
+ router.get('/user/:id', listarPagosPorUsuario);
  
  router.post('/store', crearTransferencia);
  

@@ -1,5 +1,5 @@
-'use strict'
 const { Schema, model } = require('mongoose');
+'use strict'
 
 const notificacionSchema = Schema({
     usuario: { type: Schema.Types.ObjectId, ref: 'Usuario', required: true },
@@ -8,13 +8,14 @@ const notificacionSchema = Schema({
     tipo: { 
         type: String, 
         enum: [
+            'NUEVO_PAGO', 
             'PAGO_APROBADO', 
             'PAGO_RECHAZADO', 
             'NUEVO_PEDIDO',  
-            'NUEVO_MENSAJE', 
-            'NUEVO_PAGO', 
             'PEDIDO_APROBADO', 
             'PEDIDO_RECHAZADO',
+            'PEDIDO_FINALIZADO',
+            'NUEVO_MENSAJE', 
             'AVISO_GENERAL',
         ],
         required: true 

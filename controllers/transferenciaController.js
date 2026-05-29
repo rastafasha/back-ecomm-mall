@@ -174,10 +174,11 @@ const listarPorUsuario = (req, res) => {
 
 const updateStatus = async (req, res) => {
     const id = req.params.id;
-    const uid = req.uid; // ID del admin/usuario que opera
+    const uid = req.uid; // ID del administrador que cambia el estado
     const { status } = req.body;
 
     try {
+        // 1. Buscamos la transferencia original ANTES de modificarla
         const transferencia = await Transferencia.findById(id);
         if (!transferencia) {
             return res.status(404).json({
@@ -186,11 +187,15 @@ const updateStatus = async (req, res) => {
             });
         }
 
+        // 🚨 CORRECCIÓN 1: Extraer de forma segura el ID del CLIENTE real antes de machacar el campo .usuario
+        // (Ajusta 'cliente' o 'usuario' según como se llame el campo del comprador en tu modelo Transferencia)
+        const clienteId = transferencia.user ;
+        
         const antiguoEstado = transferencia.status;
 
-        // Actualizar campos
+        // Actualizar campos en la BD
         Object.assign(transferencia, req.body);
-        transferencia.usuario = uid; 
+        transferencia.usuario = uid; // Aquí 'usuario' pasa a ser el admin validador
         
         if (status !== undefined && status !== antiguoEstado) {
             transferencia.updatedAt = new Date();
@@ -201,45 +206,50 @@ const updateStatus = async (req, res) => {
         // 🚀 DISPARO CENTRALIZADO DE NOTIFICACIÓN HYBRIDA
         if (status !== undefined && status !== antiguoEstado) {
             
-            let tipoNotificacion = 'NUEVO_PAGO';
-            let titulo = 'Actualización de Pago';
-            let mensaje = `Tu pago de transferencia ha cambiado a estado: ${status}`;
+            // CORRECCIÓN 3: Asegurar la coincidencia del string de estado ('APROBADO' o 'APROVED')
+            const esAprobado = status === 'ok';
+            
+            let tipoNotificacion = esAprobado ? 'PAGO_APROBADO' : 'PAGO_RECHAZADO';
+            let titulo = esAprobado ? '¡Pago Aprobado! 🎉' : 'Pago Rechazado ❌';
+            let mensaje = esAprobado 
+                ? 'Tu transferencia ha sido verificada con éxito.' 
+                : `Hubo un problema con tu transferencia. Motivo: ${req.body.observaciones || 'Datos incorrectos'}`;
 
-            if (status === 'ok') {
-                tipoNotificacion = 'PAGO_APROBADO';
-                titulo = '¡Pago Aprobado! 🎉';
-                mensaje = 'Tu transferencia ha sido verificada con éxito.';
-            } else if (status === 'no') {
-                tipoNotificacion = 'PAGO_RECHAZADO';
-                titulo = 'Pago Rechazado ❌';
-                mensaje = 'Hubo un problema con tu transferencia. Por favor verifica los datos.';
-            }
+            const urlRedireccion = `/mis-pagos`;
 
-            const clienteId = transferencia.usuarioOriginal || transferencia.clienteId || transferencia.usuario;
-            const urlRedireccion = `/mis-pagos/${transferencia._id}`;
-
-            // 1. Buscamos los dispositivos Push del cliente
+            // Buscamos los dispositivos Push usando el clienteId correcto que guardamos arriba
             const subs = await PushSubscription.find({ usuario: clienteId });
 
             if (subs.length > 0) {
                 // Caso A: El usuario tiene dispositivos registrados para Push.
-                // Ejecutamos el helper por cada dispositivo.
-                // Nota: La BD y el Socket se ejecutarán de forma segura en la primera iteración.
-                for (const sub of subs) {
-                    try {
-                        await sendNotification(sub, titulo, mensaje, urlRedireccion, clienteId, tipoNotificacion, transferencia._id);
-                    } catch (pushErr) {
-                        // Si el helper arrojó un error 410/404, limpiamos la suscripción inservible de la BD
-                        if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
-                            await PushSubscription.findByIdAndDelete(sub._id);
-                            console.log(`[Limpieza] Suscripción eliminada de la BD por estar expirada.`);
+                subs.forEach(s => {
+                    sendNotification(
+                        s.subscription, // 🚨 CORRECCIÓN 2: Se envía la propiedad interna 'subscription' como en la flecha
+                        titulo, 
+                        mensaje, 
+                        urlRedireccion, 
+                        clienteId, 
+                        tipoNotificacion, 
+                        transferencia._id
+                    ).catch(err => { 
+                        // Limpieza si expiró la suscripción
+                        if (err.statusCode === 410 || err.statusCode === 404) {
+                            s.deleteOne().catch(e => console.log('Error eliminando sub', e)); 
                         }
-                    }
-                }
+                    });
+                });
             } else {
-                // Caso B: El usuario no tiene Web Push activado (Ej: Tu iPhone 6s o navegación incógnito).
-                // Pasamos 'null' en la suscripción, pero el helper igual guardará en BD y enviará por WebSockets.
-                await sendNotification(null, titulo, mensaje, urlRedireccion, clienteId, tipoNotificacion, transferencia._id);
+                // Caso B: Tu iPhone 6s u otros dispositivos sin Push nativo activo.
+                // Registra en base de datos e intenta emitir por Socket.io a través del helper
+                await sendNotification(
+                    null, 
+                    titulo, 
+                    mensaje, 
+                    urlRedireccion, 
+                    clienteId, 
+                    tipoNotificacion, 
+                    transferencia._id
+                );
             }
         }
 
@@ -302,7 +312,34 @@ const byTienda = async(req, res) => {
 };
 
 
+const listarPagosPorUsuario = (req, res) => {
+    var id = req.params['id'];
+    const page = parseInt(req.query.page) || 1;
+    const limit = 4; // Tu límite actual
+    const skip = (page - 1) * limit; // Cuántos posts saltar
 
+    Transferencia.find({ user: id })
+        .populate('pedido')
+        .populate('metodo_pago', 'tipo bankName' )
+        .sort({ createdAt: -1 })
+        .skip(skip)   // <-- Nos saltamos los ya cargados
+        .limit(limit) // <-- Traemos los siguientes 4
+        .exec((err, data) => {
+            if (err) {
+                return res.status(500).send({ ok: false, message: 'Error en el servidor' });
+            }
+
+            if (data) {
+                // Es buena práctica enviar 'ok: true' para que coincida con tu map del frontend
+                res.status(200).send({
+                    ok: true,
+                    transferencias: data
+                });
+            } else {
+                res.status(404).send({ ok: false, transferencias: [] });
+            }
+        });
+}
 
 module.exports = {
     getTransferencias,
@@ -312,5 +349,6 @@ module.exports = {
     getTransferencia,
     listarPorUsuario,
     updateStatus,
-    byTienda
+    byTienda,
+    listarPagosPorUsuario
 };

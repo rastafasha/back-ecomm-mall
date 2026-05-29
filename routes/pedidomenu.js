@@ -15,6 +15,7 @@
     listarPedidoPorUser,
     getPedidosByStatus,
     activar,
+    finalizado,
     pedidosbyTiendaId,
     pedidosbyTiendaIdUser,
  } = require('../controllers/pedidoMenuController');
@@ -41,6 +42,7 @@
  
 
  router.get('/activar/:id', validarJWT, activar);
+ router.get('/finalizado/:id', validarJWT, finalizado);
  
  router.delete('/remove/:id', 
     
