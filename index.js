@@ -25,7 +25,9 @@ const app = express();
 const server = require('http').Server(app);
 
 // Initialize socket.io with the server
+// Direcciones estáticas permitidas (Locales y Paneles Administrativos fijos)
 const allowedOrigins = [
+    "http://localhost:4200",
     "https://localhost:4200",
     "http://localhost:4203",
     "http://localhost:4206",
@@ -33,21 +35,27 @@ const allowedOrigins = [
     "http://localhost:3001",
     "https://adminstorenodejs.malcolmcordova.com",
     "https://admin.zlipmenu.com",
-    "https://admin-zlipmenu.vercel.app",// admin en vercel
-    "https://menu-panaderia.vercel.app",
-    "https://slide-dish.vercel.app",
-    "https://menu-pizzeria-mauve.vercel.app",
-    "https://delivery-angular.vercel.app",
-    "https://menu-hamburguesa-tawny.vercel.app",
+    "https://admin-zlipmenu.vercel.app", // admin en vercel
+    "https://delivery-angular.vercel.app"
 ];
 
-// Configuración compartida
+// Configuración compartida inteligente para SaaS Multi-Tenant
 const corsOptions = {
     origin: (origin, callback) => {
-        // Si el origen está en la lista o es una petición local (sin origen)
-        if (!origin || allowedOrigins.includes(origin)) {
+        // 1. Permitir peticiones locales o sin origen (como Postman o apps móviles nativas)
+        if (!origin) {
+            return callback(null, true);
+        }
+
+        // 2. MAGIA DINÁMICA: Permitir CUALQUIER subdominio que termine en .zlipmenu.com
+        // Esto valida http://zlipmenu.com, https://pizzeria.zlipmenu.com, etc.
+        const esSubdominioZlipmenu = /\.zlipmenu\.com$/.test(origin) || origin === "https://zlipmenu.com" || origin === "http://zlipmenu.com";
+
+        // 3. Validar si el origen es dinámico o si está en la lista de estáticos anteriores
+        if (esSubdominioZlipmenu || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
+            console.log(`[CORS RECHAZADO]: El origen ${origin} no tiene permisos.`);
             callback(new Error('Origin no permitido por CORS'));
         }
     },
@@ -55,6 +63,7 @@ const corsOptions = {
     credentials: true,
     optionsSuccessStatus: 204
 };
+
 
 // 1. Aplicar a las rutas normales de Express (REST API)
 
