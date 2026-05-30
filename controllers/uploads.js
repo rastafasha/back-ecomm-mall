@@ -74,9 +74,12 @@ const fileUpload = async (req, res = response) => {
 
         const urlImagen = result.secure_url;
 
-        // 7. Actualizar tu Base de Datos
-        // Nota: Asegúrate de que esta función use 'await' si es asíncrona
-        await actualizarImagen(tipo, id, urlImagen);
+        // 🛠️ CAPTURAMOS EL CAMPO DESTINO (Opcional, con fallback al comportamiento normal)
+        // Ejemplo: req.query.campo puede ser 'img' o 'img_hero'
+        const campoDestino = req.query.campo || null;
+
+         // 7. Actualizar tu Base de Datos pasándole el campo específico
+        await actualizarImagen(tipo, id, urlImagen, campoDestino);
 
         res.json({
             ok: true,

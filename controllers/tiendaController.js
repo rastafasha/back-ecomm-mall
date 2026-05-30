@@ -142,6 +142,7 @@ const actualizarTienda = async(req, res) => {
         });
 
     } catch (error) {
+        console.log(error)
         res.status(500).json({
             ok: false,
             msg: 'Error hable con el admin'

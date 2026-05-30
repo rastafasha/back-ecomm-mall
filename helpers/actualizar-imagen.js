@@ -16,15 +16,14 @@ const Driver = require('../models/driver');
 const Transferencia = require('../models/transferencia');
 
 const borrarImagen = (path) => {
-
     if (fs.existsSync(path)) {
-        //borrar la imagen anterior
+        // borrar la imagen anterior si usas almacenamiento local
         fs.unlinkSync(path);
     }
 }
 
-
-const actualizarImagen = async (tipo, id, nombreArchivo) => {
+// 🛠️ SE AGREGA 'campoDestino' como parámetro opcional al final
+const actualizarImagen = async (tipo, id, nombreArchivo, campoDestino = null) => {
 
     let pathViejo = '';
 
@@ -37,14 +36,11 @@ const actualizarImagen = async (tipo, id, nombreArchivo) => {
                 return false;
             }
             pathViejo = `./uploads/congenerals/${congeneral.img}`;
-
             borrarImagen(pathViejo);
-
             congeneral.img = nombreArchivo;
             await congeneral.save();
             return true;
             break;
-
 
         case 'productos':
             const producto = await Producto.findById(id);
@@ -53,25 +49,26 @@ const actualizarImagen = async (tipo, id, nombreArchivo) => {
                 return false;
             }
             pathViejo = `./uploads/productos/${producto.img}`;
-
             borrarImagen(pathViejo);
-
             producto.img = nombreArchivo;
             await producto.save();
             return true;
             break;
 
-        case 'locaciones':
+         case 'locaciones': 
             const tienda = await Tienda.findById(id);
             if (!tienda) {
-                console.log('No es un tienda por id');
+                console.log('No se encontró una tienda por ese id');
                 return false;
             }
-            pathViejo = `./uploads/locaciones/${tienda.img}`;
 
-            borrarImagen(pathViejo);
+            // 🌟 MULTI-TENANT: Sincronizado con las variables correctas del controlador
+            if (campoDestino === 'img_hero') {
+                tienda.img_hero = nombreArchivo; // Inyecta la URL del banner del Hero (Pizzas/Croissants)
+            } else {
+                tienda.img = nombreArchivo;      // Por defecto inyecta la URL en el logo circular
+            }
 
-            tienda.img = nombreArchivo;
             await tienda.save();
             return true;
             break;
@@ -83,9 +80,7 @@ const actualizarImagen = async (tipo, id, nombreArchivo) => {
                 return false;
             }
             pathViejo = `./uploads/galerias/${galeria.img}`;
-
             borrarImagen(pathViejo);
-
             galeria.img = nombreArchivo;
             await galeria.save();
             return true;
@@ -98,9 +93,7 @@ const actualizarImagen = async (tipo, id, nombreArchivo) => {
                 return false;
             }
             pathViejo = `./uploads/cursos/${curso.img}`;
-
             borrarImagen(pathViejo);
-
             curso.img = nombreArchivo;
             await curso.save();
             return true;
@@ -113,14 +106,11 @@ const actualizarImagen = async (tipo, id, nombreArchivo) => {
                 return false;
             }
             pathViejo = `./uploads/marcas/${marca.img}`;
-
             borrarImagen(pathViejo);
-
             marca.img = nombreArchivo;
             await marca.save();
             return true;
             break;
-
 
         case 'usuarios':
             const usuario = await Usuario.findById(id);
@@ -129,15 +119,11 @@ const actualizarImagen = async (tipo, id, nombreArchivo) => {
                 return false;
             }
             pathViejo = `./uploads/usuarios/${usuario.img}`;
-
             borrarImagen(pathViejo);
-
             usuario.img = nombreArchivo;
             await usuario.save();
             return true;
             break;
-
-
 
         case 'ingresos':
             const ingreso = await Ingreso.findById(id);
@@ -146,9 +132,7 @@ const actualizarImagen = async (tipo, id, nombreArchivo) => {
                 return false;
             }
             pathViejo = `./uploads/ingresos/${ingreso.img}`;
-
             borrarImagen(pathViejo);
-
             ingreso.img = nombreArchivo;
             await ingreso.save();
             return true;
@@ -161,9 +145,7 @@ const actualizarImagen = async (tipo, id, nombreArchivo) => {
                 return false;
             }
             pathViejo = `./uploads/blogs/${blog.img}`;
-
             borrarImagen(pathViejo);
-
             blog.img = nombreArchivo;
             await blog.save();
             return true;
@@ -176,9 +158,7 @@ const actualizarImagen = async (tipo, id, nombreArchivo) => {
                 return false;
             }
             pathViejo = `./uploads/pages/${page.img}`;
-
             borrarImagen(pathViejo);
-
             page.img = nombreArchivo;
             await page.save();
             return true;
@@ -191,9 +171,7 @@ const actualizarImagen = async (tipo, id, nombreArchivo) => {
                 return false;
             }
             pathViejo = `./uploads/promocions/${promocion.img}`;
-
             borrarImagen(pathViejo);
-
             promocion.img = nombreArchivo;
             await promocion.save();
             return true;
@@ -206,9 +184,7 @@ const actualizarImagen = async (tipo, id, nombreArchivo) => {
                 return false;
             }
             pathViejo = `./uploads/sliders/${slider.img}`;
-
             borrarImagen(pathViejo);
-
             slider.img = nombreArchivo;
             await slider.save();
             return true;
@@ -221,14 +197,11 @@ const actualizarImagen = async (tipo, id, nombreArchivo) => {
                 return false;
             }
             pathViejo = `./uploads/categorias/${categoria.img}`;
-
             borrarImagen(pathViejo);
-
             categoria.img = nombreArchivo;
             await categoria.save();
             return true;
             break;
-
 
         case 'drivers':
             const driver = await Driver.findById(id);
@@ -240,7 +213,6 @@ const actualizarImagen = async (tipo, id, nombreArchivo) => {
                 pathViejo = `./uploads/drivers/${driver.img}`;
                 borrarImagen(pathViejo);
             }
-
             driver.img = nombreArchivo;
             await driver.save();
             return true;
@@ -253,18 +225,14 @@ const actualizarImagen = async (tipo, id, nombreArchivo) => {
                 return false;
             }
             if (transferencia.img) {
-                pathViejo = `./uploads/transferencias/${driver.img}`;
+                pathViejo = `./uploads/transferencias/${transferencia.img}`; // Corregido typo de variable 'driver'
                 borrarImagen(pathViejo);
             }
-
             transferencia.img = nombreArchivo;
             await transferencia.save();
             return true;
             break;
-
-
     }
-
 };
 
 module.exports = {
