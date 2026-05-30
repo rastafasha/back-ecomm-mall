@@ -73,31 +73,36 @@ const getCategoria = async(req, res) => {
 // }
 
 const crearCategoria = async(req, res) => {
-
     const uid = req.uid;
-     // Convertir el nombre en slug
-        const nombre = req.body.nombre || '';
-        const slug = nombre.toLowerCase()
-            .trim()
-            .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
-            .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
-            .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
-            // reemplaza acentos y caracteres especiales
-                .replace(/á/g, 'a')
-                .replace(/é/g, 'e')
-                .replace(/í/g, 'i')
-                .replace(/ó/g, 'o')
-                .replace(/ú/g, 'u')
-                .replace(/ñ/g, 'n')
-                .replace(/ü/g, 'u');
+    const nombre = req.body.nombre || '';
 
-    const categoria = new Categoria({
-        usuario: uid,
-        ...req.body,
-        slug: slug
-    });
+    // 1. Generación correcta y segura del SLUG
+    const slug = nombre
+        .toLowerCase()
+        .trim()
+        .replace(/ñ/g, 'n') // Reemplaza la eñe primero
+        .normalize('NFD') // Descompone los acentos (ej: "í" se vuelve "i" + símbolo de acento)
+        .replace(/[\u0300-\u036f]/g, '') // Elimina todos los símbolos de acentos sueltos
+        .replace(/[\s]+/g, '-') // Reemplaza espacios por guiones
+        .replace(/[^\w\-]+/g, '') // Elimina cualquier otro carácter especial que quede
+        .replace(/\-\-+/g, '-'); // Reduce guiones múltiples a uno solo
 
     try {
+        // 2. Validación de unicidad: Verificar si el slug ya existe en la base de datos
+        const existeSlug = await Categoria.findOne({ slug });
+        if (existeSlug) {
+            return res.status(400).json({
+                ok: false,
+                msg: `Ya existe una categoría con un nombre similar (Slug duplicado: ${slug})`
+            });
+        }
+
+        // 3. Crear la instancia con el slug limpio
+        const categoria = new Categoria({
+            usuario: uid,
+            ...req.body,
+            slug: slug
+        });
 
         const categoriaDB = await categoria.save();
 
@@ -107,29 +112,26 @@ const crearCategoria = async(req, res) => {
         });
 
     } catch (error) {
-        // console.log(error);
+        console.error(error); // Buenas prácticas para poder debuggear en Render
         res.status(500).json({
             ok: false,
             msg: 'Hable con el admin'
         });
     }
-
-
 };
 
-const actualizarCategoria = async(req, res) => {
 
+const actualizarCategoria = async(req, res) => {
     const id = req.params.id;
     const uid = req.uid;
 
-
     try {
-
+        // 1. Verificar existencia del recurso
         const categoria = await Categoria.findById(id);
         if (!categoria) {
-            return res.status(500).json({
+            return res.status(404).json({ // Cambiado semánticamente a 404
                 ok: false,
-                msg: 'Categoria no encontrado por el id'
+                msg: 'Categoría no encontrada por el id'
             });
         }
 
@@ -138,25 +140,31 @@ const actualizarCategoria = async(req, res) => {
             usuario: uid
         }
 
-        // Si viene el nombre actualizado, actualizar el slug
+        // 2. Si viene el nombre modificado, recalcular el slug de forma segura
         if (req.body.nombre) {
-            const nombre = req.body.nombre;
-            const slug = nombre.toLowerCase()
+            const slug = req.body.nombre
+                .toLowerCase()
                 .trim()
-                .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
-                .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
-                .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
-                // reemplaza acentos y caracteres especiales
-                .replace(/á/g, 'a')
-                .replace(/é/g, 'e')
-                .replace(/í/g, 'i')
-                .replace(/ó/g, 'o')
-                .replace(/ú/g, 'u')
-                .replace(/ñ/g, 'n')
-                .replace(/ü/g, 'u');
+                .replace(/ñ/g, 'n') // Reemplaza la eñe primero
+                .normalize('NFD') // Descompone caracteres con acentos
+                .replace(/[\u0300-\u036f]/g, '') // Remueve los acentos sueltos
+                .replace(/[\s]+/g, '-') // Espacios a guiones
+                .replace(/[^\w\-]+/g, '') // Limpia caracteres especiales restantes
+                .replace(/\-\-+/g, '-'); // Reduce guiones repetidos
+
+            // 3. Validación de duplicados: Asegurar que nadie más use este slug
+            const existeSlug = await Categoria.findOne({ slug, _id: { $ne: id } });
+            if (existeSlug) {
+                return res.status(400).json({
+                    ok: false,
+                    msg: `No se puede actualizar. El nombre genera un slug ya existente: ${slug}`
+                });
+            }
+
             cambiosCategoria.slug = slug;
         }
 
+        // 4. Ejecutar la actualización en MongoDB Atlas
         const categoriaActualizado = await Categoria.findByIdAndUpdate(id, cambiosCategoria, { new: true });
 
         res.json({
@@ -165,14 +173,14 @@ const actualizarCategoria = async(req, res) => {
         });
 
     } catch (error) {
+        console.error(error); // Permite registrar el error real para debugging en Render
         res.status(500).json({
             ok: false,
             msg: 'Error hable con el admin'
         });
     }
-
-
 };
+
 
 const borrarCategoria = async(req, res) => {
 
@@ -238,24 +246,43 @@ function list_one(req, res) {
 
 
 async function find_by_name(req, res) {
-    var nombre = req.params['nombre'];
-     try {
+    const termino = req.params['nombre'].toLowerCase().trim();
+    // Si puedes enviar el ID del local por query string o headers (ej: req.query.localId) lo capturamos.
+    // De lo contrario, hacemos la búsqueda cruzada por categoría:
+    const localId = req.query.localId; 
 
-        // Use case-insensitive regex for the search
-                const categoria = await Categoria.findOne({ 
-                    nombre: { $regex: nombre, $options: 'i' } 
-                });
-                
+    try {
+        // 1. Buscamos la categoría correspondiente
+        const categoria = await Categoria.findOne({
+            $or: [
+                { slug: termino },
+                { nombre: { $regex: termino, $options: 'i' } }
+            ]
+        }); 
+
         if (!categoria) {
-            return res.status(500).json({
+            return res.status(404).json({
                 ok: false,
-                msg: 'categoria no encontrado por el id'
+                msg: `Categoría no encontrada con el término: ${termino}`
             });
         }
 
+        // 2. Construimos el filtro dinámico para MongoDB Atlas
+        const filtro = { categoria: categoria._id };
+        
+        // Si desde el frontend nos envían el ID de la tienda activa, filtramos estrictamente por ese local
+        if (localId) {
+            filtro.local = localId; 
+        }
+
+        // 3. Buscamos los platos en la colección de Productos
+        const productosAsociados = await Producto.find(filtro)
+            .populate('categoria')
+            .populate('local'); // Trae la info del restaurante si la necesitas
 
         res.json({
             ok: true,
+            productos: productosAsociados, // <-- Aquí ya viajarán tus pizzas filtradas por local
             categoria: categoria
         });
 
@@ -267,6 +294,11 @@ async function find_by_name(req, res) {
         });
     }
 }
+
+
+
+
+
 function find_by_subcategory(req, res) {
     const id = req.params.id;
 

@@ -202,32 +202,41 @@ const getProductosTiendaId= async(req, res) => {
 };
 
 const crearProducto = async(req, res) => {
-
     const uid = req.uid;
-    
-    // Convertir el título en slug
-        const titulo = req.body.titulo || '';
-        const slug = titulo.toLowerCase()
-            .trim()
-            .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
-            .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
-            .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
-            // reemplaza acentos y caracteres especiales
-                .replace(/á/g, 'a')
-                .replace(/é/g, 'e')
-                .replace(/í/g, 'i')
-                .replace(/ó/g, 'o')
-                .replace(/ú/g, 'u')
-                .replace(/ñ/g, 'n')
-                .replace(/ü/g, 'u');
-    
+    const titulo = req.body.titulo || '';
+    const idLocal = req.body.local; // ID de la tienda a la que pertenece el producto
+
+    // 1. Generación correcta y segura del SLUG sin pérdida de caracteres
+    const slug = titulo
+        .toLowerCase()
+        .trim()
+        .replace(/ñ/g, 'n') // Reemplaza la eñe primero
+        .normalize('NFD') // Descompone caracteres acentuados
+        .replace(/[\u0300-\u036f]/g, '') // Elimina los símbolos de acentos sueltos
+        .replace(/[\s]+/g, '-') // Espacios a guiones
+        .replace(/[^\w\-]+/g, '') // Limpia caracteres especiales restantes [5]
+        .replace(/\-\-+/g, '-'); // Reduce guiones múltiples a uno solo [5]
+
+    try {
+        // 2. Validación de unicidad inteligente (Multi-Tenant)
+        // Permite que "Tienda A" y "Tienda B" tengan una "margherita", 
+        // pero evita que la misma tienda duplique el mismo plato.
+        if (idLocal) {
+            const existeProductoEnLocal = await Producto.findOne({ slug, local: idLocal });
+            if (existeProductoEnLocal) {
+                return res.status(400).json({
+                    ok: false,
+                    msg: `Este restaurante ya tiene un producto registrado con un nombre similar (Slug duplicado: ${slug})`
+                });
+            }
+        }
+
+        // 3. Crear la instancia con el slug limpio
         const producto = new Producto({
             usuario: uid,
             ...req.body,
-            slug: slug
+            slug: slug // Asegura pisar cualquier slug corrupto enviado en el body
         });
-
-    try {
 
         const productoDB = await producto.save();
 
@@ -237,30 +246,26 @@ const crearProducto = async(req, res) => {
         });
 
     } catch (error) {
-        // console.log(error);
+        console.error('Error al crear producto:', error); // Rastro visible en los logs de Render
         res.status(500).json({
             ok: false,
-            msg: 'Hable con el admin'
+            msg: 'Hable con el admin',
+            error: error.message
         });
     }
-
-
 };
 
 const actualizarProducto = async(req, res) => {
-
     const id = req.params.id;
     const uid = req.uid;
 
-     
-
     try {
-
+        // 1. Verificar si el producto existe
         const producto = await Producto.findById(id);
         if (!producto) {
-            return res.status(500).json({
+            return res.status(404).json({ // Cambiado semánticamente a 404 (Not Found)
                 ok: false,
-                msg: 'producto no encontrado por el id'
+                msg: 'Producto no encontrado por el id'
             });
         }
 
@@ -269,26 +274,41 @@ const actualizarProducto = async(req, res) => {
             usuario: uid
         }
 
-        // Si viene el título actualizado, actualizar el slug
+        // 2. Si viene el título modificado, recalcular el slug de forma segura
         if (req.body.titulo) {
-            const titulo = req.body.titulo;
-            const slug = titulo.toLowerCase()
+            const slug = req.body.titulo
+                .toLowerCase()
                 .trim()
-                .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
-                .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
-                .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
-                // reemplaza acentos y caracteres especiales
-                .replace(/á/g, 'a')
-                .replace(/é/g, 'e')
-                .replace(/í/g, 'i')
-                .replace(/ó/g, 'o')
-                .replace(/ú/g, 'u')
-                .replace(/ñ/g, 'n')
-                .replace(/ü/g, 'u');
+                .replace(/ñ/g, 'n') // Reemplaza la eñe primero
+                .normalize('NFD') // Descompone caracteres con acentos
+                .replace(/[\u0300-\u036f]/g, '') // Remueve acentos sueltos
+                .replace(/[\s]+/g, '-') // Espacios a guiones
+                .replace(/[^\w\-]+/g, '') // Limpia caracteres especiales restantes
+                .replace(/\-\-+/g, '-'); // Reduce guiones repetidos
+
+            // 3. Validación Multi-Tenant: El slug debe ser único dentro del mismo local
+            // Usamos el ID del local que viene en el body, o el que ya tenía el producto guardado
+            const idLocal = req.body.local || producto.local;
+
+            if (idLocal) {
+                const existeProductoEnLocal = await Producto.findOne({ 
+                    slug, 
+                    local: idLocal,
+                    _id: { $ne: id } // Excluye el producto actual para evitar falsos positivos
+                });
+
+                if (existeProductoEnLocal) {
+                    return res.status(400).json({
+                        ok: false,
+                        msg: `No se puede actualizar. Ya existe otro producto en este restaurante con un nombre similar (Slug: ${slug})`
+                    });
+                }
+            }
+
             cambiosProducto.slug = slug;
         }
 
-
+        // 4. Ejecutar la actualización en MongoDB Atlas
         const productoActualizado = await Producto.findByIdAndUpdate(id, cambiosProducto, { new: true });
 
         res.json({
@@ -297,14 +317,15 @@ const actualizarProducto = async(req, res) => {
         });
 
     } catch (error) {
+        console.error('Error al actualizar producto:', error); // Logs listos para producción en Render
         res.status(500).json({
             ok: false,
-            msg: 'Error hable con el admin'
+            msg: 'Error hable con el admin',
+            error: error.message
         });
     }
-
-
 };
+
 
 const borrarProducto = async(req, res) => {
 
@@ -421,6 +442,7 @@ function listar_best_sellers(req, res) {
         }
     });
 }
+
 function listar_best_sellers_local(req, res) {
      const id = req.params.id;
     Producto.find({local:id}).sort({ ventas: -1 }).limit(8).exec((err, data) => {
@@ -437,6 +459,7 @@ function listar_populares(req, res) {
         }
     });
 }
+
 function listar_populares_local(req, res) {
     const id = req.params.id;
     Producto.find({local:id}).sort({ stars: -1 }).limit(4).exec((err, data) => {
@@ -445,8 +468,6 @@ function listar_populares_local(req, res) {
         }
     });
 }
-
-
 
 function listar_papelera(req, res) {
 
@@ -467,6 +488,7 @@ function listar_papelera(req, res) {
     });
 }
 
+//categoria
 const cat_by_name = async(req, res) => {
     try {
         var nombre = req.params['nombre'];
@@ -498,9 +520,6 @@ const cat_by_name = async(req, res) => {
         res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
     }
 }
-
-
-
 
 function listar_cat(req, res) {
     var filtro = req.params['filtro'];
@@ -534,8 +553,48 @@ function listar_cat_papelera(req, res) {
     });
 }
 
+//estes es el que funciona!!
+function listar_productosCateg(req, res) {
 
+    const id = req.params.id;
 
+    Producto.find({ categoria: id, status: ['Activo']  })
+    .populate('categoria')
+    .exec((err, producto_data) => {
+        if (err) {
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+        } else {
+            if (producto_data) {
+                res.status(200).send({ productos: producto_data });
+            } else {
+                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
+            }
+        }
+    });
+
+}
+
+function listar_productosCategNombre(req, res) {
+
+    const nombre = req.params.nombre;
+
+    Producto.find({ categoria: nombre, status: ['Activo']  })
+    .populate('categoria')
+    .exec((err, productos) => {
+        if (err) {
+            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
+        } else {
+            if (productos) {
+                res.status(200).send({ productos: productos });
+            } else {
+                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
+            }
+        }
+    });
+
+}
+
+//categoria
 
 function desactivar(req, res) {
     var id = req.params['id'];
@@ -688,46 +747,6 @@ function listar_general_data(req, res) {
 }
 
 
-//estes es el que funciona!!
-function listar_productosCateg(req, res) {
-
-    const id = req.params.id;
-
-    Producto.find({ categoria: id, status: ['Activo']  })
-    .populate('categoria')
-    .exec((err, producto_data) => {
-        if (err) {
-            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
-        } else {
-            if (producto_data) {
-                res.status(200).send({ productos: producto_data });
-            } else {
-                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
-            }
-        }
-    });
-
-}
-
-function listar_productosCategNombre(req, res) {
-
-    const nombre = req.params.nombre;
-
-    Producto.find({ categoria: nombre, status: ['Activo']  })
-    .populate('categoria')
-    .exec((err, productos) => {
-        if (err) {
-            res.status(500).send({ message: 'Ocurrió un error en el servidor.' });
-        } else {
-            if (productos) {
-                res.status(200).send({ productos: productos });
-            } else {
-                res.status(500).send({ message: 'No se encontró ningun dato en esta sección.' });
-            }
-        }
-    });
-
-}
 
 
 function listar_productosColor(req, res) {
@@ -1409,13 +1428,6 @@ function ecoomerce(req, res) {
 
 
 }
-
-
-
-
-
-
-
 
 
 

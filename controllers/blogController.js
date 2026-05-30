@@ -62,36 +62,41 @@ function find_by_slug(req, res) {
 }
 
 const crearBlog = async(req, res) => {
-
     const uid = req.uid;
-
-    // Convertir el título en slug
     const titulo = req.body.titulo || '';
-    const slug = titulo.toLowerCase()
-        .trim()
-        .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
-        .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
-        .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
-        // reemplaza acentos y caracteres especiales
-                .replace(/á/g, 'a')
-                .replace(/é/g, 'e')
-                .replace(/í/g, 'i')
-                .replace(/ó/g, 'o')
-                .replace(/ú/g, 'u')
-                .replace(/ñ/g, 'n')
-                .replace(/ü/g, 'u');
-    const short_descripcion = req.body.descripcion || '';
-    //extraemos short_descripcion desde description con un liminte de caracteres de 100
-    const short_descripcion_limit = short_descripcion.substring(0, 100);
 
-    const blog = new Blog({
-        usuario: uid,
-        ...req.body,
-        slug: slug,
-        short_descripcion: short_descripcion_limit
-    });
+    // 1. Generación del SLUG perfecta para el SEO de tus artículos
+    const slug = titulo
+        .toLowerCase()
+        .trim()
+        .replace(/ñ/g, 'n') // Reemplaza la eñe primero
+        .normalize('NFD') // Descompone caracteres acentuados
+        .replace(/[\u0300-\u036f]/g, '') // Remueve acentos sueltos
+        .replace(/[\s]+/g, '-') // Espacios a guiones
+        .replace(/[^\w\-]+/g, '') // Limpia caracteres especiales restantes
+        .replace(/\-\-+/g, '-'); // Reduce guiones múltiples a uno solo
+
+    // 2. Extracción segura de los primeros 100 caracteres para el resumen
+    const descripcion = req.body.descripcion || '';
+    const short_descripcion_limit = descripcion.substring(0, 100);
 
     try {
+        // 3. Validación de unicidad: Evita que dos artículos tengan la misma URL
+        const existeSlug = await Blog.findOne({ slug });
+        if (existeSlug) {
+            return res.status(400).json({
+                ok: false,
+                msg: `Ya existe un artículo de blog con un título similar (Slug duplicado: ${slug})`
+            });
+        }
+
+        // 4. Crear la instancia e indexar en la base de datos
+        const blog = new Blog({
+            usuario: uid,
+            ...req.body,
+            slug: slug,
+            short_descripcion: short_descripcion_limit
+        });
 
         const blogDB = await blog.save();
 
@@ -101,28 +106,26 @@ const crearBlog = async(req, res) => {
         });
 
     } catch (error) {
-        // console.log(error);
+        console.error('Error al crear artículo de blog:', error); // Logs listos para Render
         res.status(500).json({
             ok: false,
-            msg: 'Hable con el admin'
+            msg: 'Hable con el admin',
+            error: error.message
         });
     }
-
-
 };
 
 const actualizarBlog = async(req, res) => {
-
     const id = req.params.id;
     const uid = req.uid;
 
     try {
-
+        // 1. Verificar si el artículo de blog existe
         const blog = await Blog.findById(id);
         if (!blog) {
-            return res.status(500).json({
+            return res.status(404).json({ // Cambiado semánticamente a 404 (Not Found)
                 ok: false,
-                msg: 'blog no encontrado por el id'
+                msg: 'Artículo de blog no encontrado por el id'
             });
         }
 
@@ -131,31 +134,38 @@ const actualizarBlog = async(req, res) => {
             usuario: uid
         }
 
-        // Si viene el título actualizado, actualizar el slug
+        // 2. Si viene el título modificado, recalcular el slug de forma segura
         if (req.body.titulo) {
-            const titulo = req.body.titulo;
-            const slug = titulo.toLowerCase()
+            const slug = req.body.titulo
+                .toLowerCase()
                 .trim()
-                .replace(/[\s]+/g, '-') // reemplaza espacios por guiones
-                .replace(/[^\w\-]+/g, '') // elimina caracteres no alfanuméricos excepto guiones
-                .replace(/\-\-+/g, '-') // reemplaza guiones múltiples por uno solo
-                // reemplaza acentos y caracteres especiales
-                .replace(/á/g, 'a')
-                .replace(/é/g, 'e')
-                .replace(/í/g, 'i')
-                .replace(/ó/g, 'o')
-                .replace(/ú/g, 'u')
-                .replace(/ñ/g, 'n')
-                .replace(/ü/g, 'u');
+                .replace(/ñ/g, 'n') // Reemplaza la eñe primero
+                .normalize('NFD') // Descompone caracteres con acentos
+                .replace(/[\u0300-\u036f]/g, '') // Remueve acentos sueltos
+                .replace(/[\s]+/g, '-') // Espacios a guiones
+                .replace(/[^\w\-]+/g, '') // Limpia caracteres especiales restantes
+                .replace(/\-\-+/g, '-'); // Reduce guiones repetidos
+
+            // 3. Validación de duplicados: Evitar colisión de URLs con otros artículos
+            const existeSlug = await Blog.findOne({ slug, _id: { $ne: id } });
+            if (existeSlug) {
+                return res.status(400).json({
+                    ok: false,
+                    msg: `No se puede actualizar. El título genera un slug ya existente: ${slug}`
+                });
+            }
+
             cambiosBlog.slug = slug;
         }
 
-        if(req.body.descripcion){
+        // 4. Si viene la descripción modificada, actualizar el resumen corto de forma segura
+        if (req.body.descripcion) {
             const short_descripcion = req.body.descripcion || '';
             const short_descripcion_limit = short_descripcion.substring(0, 100);
             cambiosBlog.short_descripcion = short_descripcion_limit;
         }
 
+        // 5. Ejecutar la actualización en MongoDB Atlas
         const blogActualizado = await Blog.findByIdAndUpdate(id, cambiosBlog, { new: true });
 
         res.json({
@@ -164,15 +174,15 @@ const actualizarBlog = async(req, res) => {
         });
 
     } catch (error) {
-
+        console.error('Error al actualizar artículo de blog:', error); // Logs listos para Render
         res.status(500).json({
             ok: false,
-            msg: 'Error hable con el admin'
+            msg: 'Error hable con el admin',
+            error: error.message
         });
     }
-
-
 };
+
 
 const borrarBlog = async(req, res) => {
 
@@ -252,6 +262,7 @@ const getPostsActivos = async(req, res) => {
     });
 
 };
+
 const getPostsActivosDestacados = async(req, res) => {
 
     Blog.find({  status: ['Activo'], isFeatured:true }).populate('categoria').exec((err, blogs) => {
