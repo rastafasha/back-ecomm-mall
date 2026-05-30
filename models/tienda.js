@@ -20,6 +20,8 @@ var TiendaSchema = Schema({
     descripcion_hero: { type: String, required: false },
     color_primario: { type: String, required: false, default: '#e74c3c' }, 
     color_fondo: { type: String, required: false },
+    theme: { type: String, default: 'classic' },
+    css_personalizado: { type: String, required: false, },
     //hero section
     status: { type: String, required: false, default: 'Desactivado' },
     subcategoria: { type: String, required: false },
