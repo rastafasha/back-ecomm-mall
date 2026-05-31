@@ -190,7 +190,7 @@ async function find_by_name (req, res) {
         // Use case-insensitive regex for the search
         const tienda = await Tienda.findOne({ 
             nombre: { $regex: nombre, $options: 'i' } 
-        });
+        }).populate('categoria');
         
         if (!tienda) {
             return res.status(404).json({
