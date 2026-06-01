@@ -11,6 +11,7 @@ var TransferenciaSchema = Schema({
     referencia: { type: String, required: true },
     bankName: { type: String, required: true },
     img: {type: String, required: false},
+    observaciones: { type: String, required: false },
     pedido: { type: Schema.Types.ObjectId, ref: 'pedidomenu' },
     status: { type: String, required: true, default: 'pending' },
     local: { type: Schema.ObjectId, ref: 'tienda' , default: null},

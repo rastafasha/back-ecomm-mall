@@ -177,10 +177,10 @@ const listarPorUsuario = (req, res) => {
 const updateStatus = async (req, res) => {
     const id = req.params.id;
     const uid = req.uid; // ID del administrador que cambia el estado
-    const { status } = req.body;
+    const { status, observaciones } = req.body;
 
     try {
-        // 1. Buscamos la transferencia original ANTES de modificarla
+       // 1. Buscamos la transferencia original e incluimos el pedido
         const transferencia = await Transferencia.findById(id).populate('pedido');
         if (!transferencia) {
             return res.status(404).json({
@@ -196,6 +196,9 @@ const updateStatus = async (req, res) => {
         Object.assign(transferencia, req.body);
         transferencia.usuario = uid; // Aquí 'usuario' pasa a ser el admin validador
 
+        // 🟢 Asignamos las observaciones al documento (asume que tu modelo Transferencia tiene este campo)
+        transferencia.observaciones = observaciones || '';
+
         if (status !== undefined && status !== antiguoEstado) {
             transferencia.updatedAt = new Date();
         }
@@ -203,82 +206,82 @@ const updateStatus = async (req, res) => {
         const transferenciaActualizado = await transferencia.save();
 
         // =========================================================================
-// 🚀 NUEVA LÓGICA: GENERAR VENTA AUTOMÁTICA AL APROBAR
-// =========================================================================
-const estadoNormalizado = status ? status.toLowerCase() : '';
-if (estadoNormalizado === 'aprobado' || estadoNormalizado === 'aproved' || status === 'ok') {
-    
-    // 1. Extraemos la lista de forma segura sin importar si 'pedido' viene como Objeto o ID directo
-    const pedidoObjeto = transferencia.pedido;
-    const listaProductos = (pedidoObjeto && pedidoObjeto.pedidoList) ? pedidoObjeto.pedidoList : [];
+        // 🚀 NUEVA LÓGICA: GENERAR VENTA AUTOMÁTICA AL APROBAR
+        // =========================================================================
+        const estadoNormalizado = status ? status.toLowerCase() : '';
+        if (estadoNormalizado === 'aprobado' || estadoNormalizado === 'aproved' || status === 'ok') {
 
-    // 2. Mapeamos las pizzas al formato compatible con tu bucle
-    const detallesVenta = listaProductos.map(item => ({
-        producto: item._id,            
-        cantidad: item.cantidad,       
-        precio: item.precio_ahora,     
-        color: item.color || '#333',
-        selector: item.nombre_selector || 'unico'
-    }));
+            // 1. Extraemos la lista de forma segura sin importar si 'pedido' viene como Objeto o ID directo
+            const pedidoObjeto = transferencia.pedido;
+            const listaProductos = (pedidoObjeto && pedidoObjeto.pedidoList) ? pedidoObjeto.pedidoList : [];
 
-    // 3. Extraemos de forma limpia el ID del método de pago si viene como objeto
-    const idMetodoPago = (transferencia.metodo_pago && transferencia.metodo_pago._id) 
-        ? transferencia.metodo_pago._id 
-        : transferencia.metodo_pago;
+            // 2. Mapeamos las pizzas al formato compatible con tu bucle
+            const detallesVenta = listaProductos.map(item => ({
+                producto: item._id,
+                cantidad: item.cantidad,
+                precio: item.precio_ahora,
+                color: item.color || '#333',
+                selector: item.nombre_selector || 'unico'
+            }));
 
-    const mockReq = {
-        body: {
-            user: clienteId,
-            local: transferencia.local,
-            total_pagado: transferencia.amount, 
-            
-            // 🟢 SOLUCIÓN 1: Enviamos solo la cadena del ID limpio del método de pago
-            metodo_pago: idMetodoPago, 
-            
-            referencia: transferencia.referencia,
-            idtransaccion: transferencia.referencia,
-            
-            // 🟢 SOLUCIÓN 2: Enviamos el arreglo con los productos mapeados
-            detalles: detallesVenta, 
-            
-            precio_envio: pedidoObjeto?.precio_envio || 0,
-            tipo_envio: pedidoObjeto?.tipo_envio || 'Local',
-            direccion: pedidoObjeto?.direccion || 'N/A',
-            destinatario: pedidoObjeto?.destinatario || transferencia.name_person || 'N/A',
-            tiempo_estimado: pedidoObjeto?.tiempo_estimado || 'Inmediato',
-            pais: pedidoObjeto?.pais || 'Venezuela',
-            zip: pedidoObjeto?.zip || '1010',
-            ciudad: pedidoObjeto?.ciudad || 'Caracas'
+            // 3. Extraemos de forma limpia el ID del método de pago si viene como objeto
+            const idMetodoPago = (transferencia.metodo_pago && transferencia.metodo_pago._id)
+                ? transferencia.metodo_pago._id
+                : transferencia.metodo_pago;
+
+            const mockReq = {
+                body: {
+                    user: clienteId,
+                    local: transferencia.local,
+                    total_pagado: transferencia.amount,
+
+                    // 🟢 SOLUCIÓN 1: Enviamos solo la cadena del ID limpio del método de pago
+                    metodo_pago: idMetodoPago,
+
+                    referencia: transferencia.referencia,
+                    idtransaccion: transferencia.referencia,
+
+                    // 🟢 SOLUCIÓN 2: Enviamos el arreglo con los productos mapeados
+                    detalles: detallesVenta,
+
+                    precio_envio: pedidoObjeto?.precio_envio || 0,
+                    tipo_envio: pedidoObjeto?.tipo_envio || 'Local',
+                    direccion: pedidoObjeto?.direccion || 'N/A',
+                    destinatario: pedidoObjeto?.destinatario || transferencia.name_person || 'N/A',
+                    tiempo_estimado: pedidoObjeto?.tiempo_estimado || 'Inmediato',
+                    pais: pedidoObjeto?.pais || 'Venezuela',
+                    zip: pedidoObjeto?.zip || '1010',
+                    ciudad: pedidoObjeto?.ciudad || 'Caracas'
+                }
+            };
+
+            const mockRes = {
+                status: function (statusCode) {
+                    this.statusCode = statusCode;
+                    return this;
+                },
+                send: function (data) {
+                    this.responseData = data;
+                    return this;
+                },
+                json: function (data) {
+                    this.responseData = data;
+                    return this;
+                }
+            };
+
+            try {
+                // Ejecutamos tu controlador pasándole el mock limpio
+                ventaController.registro(mockReq, mockRes);
+
+                setTimeout(() => {
+                    console.log('Resultado real tras limpiar tipos:', mockRes.responseData);
+                }, 600); // Retraso prudencial para asimilar el save de Mongoose
+
+            } catch (errorVenta) {
+                console.error('Error crítico al ejecutar ventaController.registro:', errorVenta);
+            }
         }
-    };
-
-    const mockRes = {
-        status: function(statusCode) {
-            this.statusCode = statusCode;
-            return this;
-        },
-        send: function(data) {
-            this.responseData = data;
-            return this;
-        },
-        json: function(data) {
-            this.responseData = data;
-            return this;
-        }
-    };
-
-    try {
-        // Ejecutamos tu controlador pasándole el mock limpio
-        ventaController.registro(mockReq, mockRes);
-        
-        setTimeout(() => {
-            console.log('Resultado real tras limpiar tipos:', mockRes.responseData);
-        }, 600); // Retraso prudencial para asimilar el save de Mongoose
-
-    } catch (errorVenta) {
-        console.error('Error crítico al ejecutar ventaController.registro:', errorVenta);
-    }
-}
 
         // =========================================================================
 
