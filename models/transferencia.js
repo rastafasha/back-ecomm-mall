@@ -7,6 +7,7 @@ var TransferenciaSchema = Schema({
     name_person: {type: String, required: false},
     phone: {type: String, required: false},
     amount: { type: String, required: true },
+    tasa: { type: String, required: false },
     referencia: { type: String, required: true },
     bankName: { type: String, required: true },
     img: {type: String, required: false},
