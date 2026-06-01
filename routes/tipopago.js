@@ -22,6 +22,8 @@ const { validarCampos } = require('../middlewares/validar-campos');
 router.get('/', getPaymentMethods);
 router.get('/actives', listar_active);
 router.get('/:id', getPaymentMethod);
+router.get('/user/:id', listarPorUsuario);
+ router.get('/tienda/:id', tiposbyTienda);
 router.get('/name/:tipo', getPaymentMethodName);
 
 router.post('/store', [
@@ -36,8 +38,7 @@ router.put('/update/:id', [
 
 router.delete('/remove/:id', borrarPaymentMethod);
 
-router.get('/user/:id', listarPorUsuario);
- router.get('/tienda/:id', tiposbyTienda);
+
 router.put('/statusupdate/:id', updateStatus);
  
 

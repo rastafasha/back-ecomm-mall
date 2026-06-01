@@ -3,7 +3,9 @@ const Transferencia = require('../models/transferencia');
 const nodemailer = require('nodemailer');
 const Congeneral = require('../models/congeneral');
 const PushSubscription = require('../models/push-subscription');
+const ventaController = require('./ventaController');
 const { sendNotification } = require('../helpers/notificaciones');
+
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -13,12 +15,12 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-const getTransferencias = async(req, res) => {
+const getTransferencias = async (req, res) => {
 
     const transferencias = await Transferencia.find()
-    .sort({ createdAt: -1 })
-    .populate('metodo_pago')
-    ;
+        .sort({ createdAt: -1 })
+        .populate('metodo_pago')
+        ;
 
     res.json({
         ok: true,
@@ -26,7 +28,7 @@ const getTransferencias = async(req, res) => {
     });
 };
 
-const getTransferencia = async(req, res) => {
+const getTransferencia = async (req, res) => {
 
     const id = req.params.id;
     const uid = req.uid;
@@ -56,8 +58,8 @@ const getTransferencia = async(req, res) => {
 
 };
 
-const crearTransferencia = async(req, res) => {
-    
+const crearTransferencia = async (req, res) => {
+
     const uid = req.uid;
     const transferencia = new Transferencia({
         user: uid,
@@ -87,7 +89,7 @@ const crearTransferencia = async(req, res) => {
 
 };
 
-const actualizarTransferencia = async(req, res) => {
+const actualizarTransferencia = async (req, res) => {
 
     const id = req.params.id;
     const uid = req.uid;
@@ -105,7 +107,7 @@ const actualizarTransferencia = async(req, res) => {
         // Update fields
         Object.assign(transferencia, req.body);
         transferencia.usuario = uid;
-        
+
         // Update updatedAt if status changed
         if (req.body.status !== undefined && req.body.status !== transferencia.status) {
             transferencia.updatedAt = new Date();
@@ -128,7 +130,7 @@ const actualizarTransferencia = async(req, res) => {
 
 };
 
-const borrarTransferencia = async(req, res) => {
+const borrarTransferencia = async (req, res) => {
 
     const id = req.params.id;
 
@@ -179,7 +181,7 @@ const updateStatus = async (req, res) => {
 
     try {
         // 1. Buscamos la transferencia original ANTES de modificarla
-        const transferencia = await Transferencia.findById(id);
+        const transferencia = await Transferencia.findById(id).populate('pedido');
         if (!transferencia) {
             return res.status(404).json({
                 ok: false,
@@ -187,32 +189,109 @@ const updateStatus = async (req, res) => {
             });
         }
 
-        // 🚨 CORRECCIÓN 1: Extraer de forma segura el ID del CLIENTE real antes de machacar el campo .usuario
-        // (Ajusta 'cliente' o 'usuario' según como se llame el campo del comprador en tu modelo Transferencia)
-        const clienteId = transferencia.user ;
-        
+        const clienteId = transferencia.user;
         const antiguoEstado = transferencia.status;
 
         // Actualizar campos en la BD
         Object.assign(transferencia, req.body);
         transferencia.usuario = uid; // Aquí 'usuario' pasa a ser el admin validador
-        
+
         if (status !== undefined && status !== antiguoEstado) {
             transferencia.updatedAt = new Date();
         }
 
         const transferenciaActualizado = await transferencia.save();
 
+        // =========================================================================
+// 🚀 NUEVA LÓGICA: GENERAR VENTA AUTOMÁTICA AL APROBAR
+// =========================================================================
+const estadoNormalizado = status ? status.toLowerCase() : '';
+if (estadoNormalizado === 'aprobado' || estadoNormalizado === 'aproved' || status === 'ok') {
+    
+    // 1. Extraemos la lista de forma segura sin importar si 'pedido' viene como Objeto o ID directo
+    const pedidoObjeto = transferencia.pedido;
+    const listaProductos = (pedidoObjeto && pedidoObjeto.pedidoList) ? pedidoObjeto.pedidoList : [];
+
+    // 2. Mapeamos las pizzas al formato compatible con tu bucle
+    const detallesVenta = listaProductos.map(item => ({
+        producto: item._id,            
+        cantidad: item.cantidad,       
+        precio: item.precio_ahora,     
+        color: item.color || '#333',
+        selector: item.nombre_selector || 'unico'
+    }));
+
+    // 3. Extraemos de forma limpia el ID del método de pago si viene como objeto
+    const idMetodoPago = (transferencia.metodo_pago && transferencia.metodo_pago._id) 
+        ? transferencia.metodo_pago._id 
+        : transferencia.metodo_pago;
+
+    const mockReq = {
+        body: {
+            user: clienteId,
+            local: transferencia.local,
+            total_pagado: transferencia.amount, 
+            
+            // 🟢 SOLUCIÓN 1: Enviamos solo la cadena del ID limpio del método de pago
+            metodo_pago: idMetodoPago, 
+            
+            referencia: transferencia.referencia,
+            idtransaccion: transferencia.referencia,
+            
+            // 🟢 SOLUCIÓN 2: Enviamos el arreglo con los productos mapeados
+            detalles: detallesVenta, 
+            
+            precio_envio: pedidoObjeto?.precio_envio || 0,
+            tipo_envio: pedidoObjeto?.tipo_envio || 'Local',
+            direccion: pedidoObjeto?.direccion || 'N/A',
+            destinatario: pedidoObjeto?.destinatario || transferencia.name_person || 'N/A',
+            tiempo_estimado: pedidoObjeto?.tiempo_estimado || 'Inmediato',
+            pais: pedidoObjeto?.pais || 'Venezuela',
+            zip: pedidoObjeto?.zip || '1010',
+            ciudad: pedidoObjeto?.ciudad || 'Caracas'
+        }
+    };
+
+    const mockRes = {
+        status: function(statusCode) {
+            this.statusCode = statusCode;
+            return this;
+        },
+        send: function(data) {
+            this.responseData = data;
+            return this;
+        },
+        json: function(data) {
+            this.responseData = data;
+            return this;
+        }
+    };
+
+    try {
+        // Ejecutamos tu controlador pasándole el mock limpio
+        ventaController.registro(mockReq, mockRes);
+        
+        setTimeout(() => {
+            console.log('Resultado real tras limpiar tipos:', mockRes.responseData);
+        }, 600); // Retraso prudencial para asimilar el save de Mongoose
+
+    } catch (errorVenta) {
+        console.error('Error crítico al ejecutar ventaController.registro:', errorVenta);
+    }
+}
+
+        // =========================================================================
+
+
         // 🚀 DISPARO CENTRALIZADO DE NOTIFICACIÓN HYBRIDA
         if (status !== undefined && status !== antiguoEstado) {
-            
-            // CORRECCIÓN 3: Asegurar la coincidencia del string de estado ('APROBADO' o 'APROVED')
-            const esAprobado = status === 'ok';
-            
+
+            const esAprobado = estadoNormalizado === 'aprobado' || estadoNormalizado === 'aproved' || status === 'ok';
+
             let tipoNotificacion = esAprobado ? 'PAGO_APROBADO' : 'PAGO_RECHAZADO';
             let titulo = esAprobado ? '¡Pago Aprobado! 🎉' : 'Pago Rechazado ❌';
-            let mensaje = esAprobado 
-                ? 'Tu transferencia ha sido verificada con éxito.' 
+            let mensaje = esAprobado
+                ? 'Tu transferencia ha sido verificada con éxito.'
                 : `Hubo un problema con tu transferencia. Motivo: ${req.body.observaciones || 'Datos incorrectos'}`;
 
             const urlRedireccion = `/mis-pagos`;
@@ -221,33 +300,29 @@ const updateStatus = async (req, res) => {
             const subs = await PushSubscription.find({ usuario: clienteId });
 
             if (subs.length > 0) {
-                // Caso A: El usuario tiene dispositivos registrados para Push.
                 subs.forEach(s => {
                     sendNotification(
-                        s.subscription, // 🚨 CORRECCIÓN 2: Se envía la propiedad interna 'subscription' como en la flecha
-                        titulo, 
-                        mensaje, 
-                        urlRedireccion, 
-                        clienteId, 
-                        tipoNotificacion, 
+                        s.subscription,
+                        titulo,
+                        mensaje,
+                        urlRedireccion,
+                        clienteId,
+                        tipoNotificacion,
                         transferencia._id
-                    ).catch(err => { 
-                        // Limpieza si expiró la suscripción
+                    ).catch(err => {
                         if (err.statusCode === 410 || err.statusCode === 404) {
-                            s.deleteOne().catch(e => console.log('Error eliminando sub', e)); 
+                            s.deleteOne().catch(e => console.log('Error eliminando sub', e));
                         }
                     });
                 });
             } else {
-                // Caso B: Tu iPhone 6s u otros dispositivos sin Push nativo activo.
-                // Registra en base de datos e intenta emitir por Socket.io a través del helper
                 await sendNotification(
-                    null, 
-                    titulo, 
-                    mensaje, 
-                    urlRedireccion, 
-                    clienteId, 
-                    tipoNotificacion, 
+                    null,
+                    titulo,
+                    mensaje,
+                    urlRedireccion,
+                    clienteId,
+                    tipoNotificacion,
                     transferencia._id
                 );
             }
@@ -267,7 +342,7 @@ const updateStatus = async (req, res) => {
     }
 }
 
-function sendEmailAdmin(user, id){
+function sendEmailAdmin(user, id) {
     const texto = `Hola! El usuario ${user} ha realizado una compra con transferencia bancaria cuyo id es ${id}`;
     // traemos el email de congeneralController para enviar el correo
     //buscamos en el modelo
@@ -277,17 +352,17 @@ function sendEmailAdmin(user, id){
         from: 'tu-email@gmail.com', // Remitente
         to: process.env.EMAIL_DEST,
         subject: 'Nueva Compra con Transferencia Bancaria',
-        text:texto,
+        text: texto,
         html: `
             <p>${texto}</p>
         `
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
-        if(error){
+        if (error) {
             console.log(error);
         }
-        else{
+        else {
             console.log('Correo enviado: ' + info.response);
         }
     })
@@ -295,14 +370,14 @@ function sendEmailAdmin(user, id){
 }
 
 
-const byTienda = async(req, res) => {
+const byTienda = async (req, res) => {
 
     var tiendaid = req.params['tiendaid'];
     try {
         const data_transferencia = await Transferencia.find({ tienda: tiendaid })
             .populate('metodo_pago')
-             .populate('local')
-             .populate('pedido')
+            .populate('local')
+            .populate('pedido')
             .sort({ createdAt: -1 });
 
         res.status(200).send({ transferencias: data_transferencia });
@@ -321,7 +396,7 @@ const listarPagosPorUsuario = (req, res) => {
 
     Transferencia.find({ user: id })
         .populate('pedido')
-        .populate('metodo_pago', 'tipo bankName' )
+        .populate('metodo_pago', 'tipo bankName')
         .sort({ createdAt: -1 })
         .skip(skip)   // <-- Nos saltamos los ya cargados
         .limit(limit) // <-- Traemos los siguientes 4

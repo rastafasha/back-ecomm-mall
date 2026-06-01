@@ -51,6 +51,29 @@ const login = async (req, res) => {
     }
 };
 
+const loginExpress = async (req, res) => {
+    // Con esto extraes el teléfono sin importar si el frontend envía campos extra como first_name o remember
+    const { telefono } = req.body; 
+
+    try {
+        // Ahora Mongoose recibirá un string limpio y no un objeto
+        const usuario = await Usuario.findOne({ telefono });
+        
+        if (!usuario) {
+            return res.status(404).json({ ok: false, msg: 'No registrado' });
+        }
+
+        const token = await generarJWT(usuario.id);
+        return res.json({ ok: true, usuario, token });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ ok: false, msg: 'Error en el servidor' });
+    }
+}
+
+
+
 const googleSignIn = async (req, res = response) => {
 
     const googleToken = req.body.token;
@@ -332,6 +355,7 @@ const changePassword = async (req, res) => {
 
 module.exports = {
     login,
+    loginExpress,
     googleSignIn,
     renewToken,
     forgotPassword,
