@@ -1,6 +1,8 @@
 const { response } = require('express');
 const Categoria = require('../models/categoria');
 const Producto = require('../models/producto');
+const mongoose = require('mongoose');
+
 
 const getCategorias = async(req, res) => {
 
@@ -296,9 +298,6 @@ async function find_by_name(req, res) {
 }
 
 
-
-
-
 function find_by_subcategory(req, res) {
     const id = req.params.id;
 
@@ -393,6 +392,40 @@ function activar(req, res) {
     })
 }
 
+
+
+const getCategoriasByLocal = async (req, res) => {
+    const { localId } = req.params;
+
+    try {
+        
+
+        // 🟢 1. Forzamos la conversión nativa a ObjectId
+        const localObjectId = new mongoose.Types.ObjectId(localId);
+
+        // 🟢 2. Buscamos de forma directa SIN usar .populate() para evitar que se cuelgue Express
+        const categorias = await Categoria.find({ local: localObjectId });
+
+        console.log('-> API: Consulta exitosa. Categorías encontradas:', categorias.length);
+
+        return res.json({
+            ok: true,
+            categorias
+        });
+
+    } catch (error) {
+        console.error('-> API ERROR CRÍTICO:', error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error en el servidor al cargar categorías por local'
+        });
+    }
+};
+
+
+
+
+
 module.exports = {
     getCategorias,
     crearCategoria,
@@ -405,5 +438,6 @@ module.exports = {
     find_by_subcategory,
     getCategoriasActivos,
     desactivar,
-    activar
+    activar,
+    getCategoriasByLocal
 };

@@ -16,7 +16,8 @@ const {
     find_by_subcategory,
     getCategoriasActivos,
     desactivar,
-    activar
+    activar,
+    getCategoriasByLocal
 } = require('../controllers/categoriaController');
 
 const { validarJWT } = require('../middlewares/validar-jwt');
@@ -33,6 +34,9 @@ router.get('/one/:id?', list_one);
 
 router.get('/category_by_nombre/nombre/:nombre', find_by_name);
 router.get('/category_by_subcategoria/:id', find_by_subcategory);
+// El parámetro DEBE llamarse ":localId"
+router.get('/local/:localId', getCategoriasByLocal);
+
 
 router.get('/admin/desactivar/:id', validarJWT, desactivar);
 router.get('/admin/activar/:id', validarJWT, activar);
