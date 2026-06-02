@@ -169,13 +169,47 @@ const getProductoSlug = async(req, res) => {
 
 };
 
-const getProductosTiendaId= async(req, res) => {
+const getProductosTiendaId = async(req, res) => {
 
     const id = req.params.id;
     const uid = req.uid;
 
     Producto.find({ local: id })
         .populate('local')
+        .populate('categoria')
+        .sort({ createdAt: -1 })
+        .exec((err, productos) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar producto',
+                    errors: err
+                });
+            }
+            if (!productos) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El producto con el id ' + id + ' no existe',
+                    errors: { message: 'No existe un producto con ese id' }
+                });
+
+            }
+            res.status(200).json({
+                ok: true,
+                productos: productos
+            });
+        });
+
+};
+
+const getProductosTiendaIdActive = async(req, res) => {
+
+    const id = req.params.id;
+    const uid = req.uid;
+
+    Producto.find({ local: id }, {  status: ['Activo'] })
+        .populate('local')
+        .populate('categoria')
         .sort({ createdAt: -1 })
         .exec((err, productos) => {
             if (err) {
@@ -1466,6 +1500,7 @@ module.exports = {
     listar_productosColor,
     listar_productosCategNombre,
     getProductosTiendaId,
+    getProductosTiendaIdActive,
     reducir_stock_internal,
 
 
