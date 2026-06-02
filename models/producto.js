@@ -17,7 +17,7 @@ var ProductoSchema = Schema({
     color: { type: Schema.ObjectId, ref: 'color', default: '#f2f2f2' },
     marca: { type: Schema.ObjectId, ref: 'marca' },
     categoria: { type: Schema.ObjectId, ref: 'categoria' },
-    selector: { type: Schema.ObjectId, ref: 'selector' },
+    selector: { type: Schema.ObjectId, ref: 'selector', default: 'unico' },
     local: { type: Schema.ObjectId, ref: 'tienda' },
     subcategoria: { type: String, required: false },
     nombre_selector: { type: String, required: false },
