@@ -14,7 +14,7 @@ var ProductoSchema = Schema({
     info_short: { type: String, required: true },
     detalle: { type: String, required: true },
     stock: { type: Number, required: true },
-    color: { type: Schema.ObjectId, ref: 'color'},
+    color: { type: Schema.ObjectId, ref: 'color', default: '#f2f2f2' },
     marca: { type: Schema.ObjectId, ref: 'marca' },
     categoria: { type: Schema.ObjectId, ref: 'categoria' },
     selector: { type: Schema.ObjectId, ref: 'selector' },
